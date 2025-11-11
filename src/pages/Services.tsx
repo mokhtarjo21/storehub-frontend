@@ -25,13 +25,13 @@ const Services: React.FC = () => {
   const { data: services = [], loading: servicesLoading } = useApi('/products/services/');
   const { data: categories = [] } = useApi('/products/categories/');
 
-  const categoryOptions = [
-    { id: 'all', name: 'All Categories' },
-    ...categories.map((cat: any) => ({
-      id: cat.id.toString(),
-      name: language === 'ar' ? cat.name_ar || cat.name : cat.name
-    }))
-  ];
+const categoryOptions = [
+  { id: 'all', name: t('products.category.all') },
+  ...(categories?.map((cat: any) => ({
+    id: cat.id.toString(),
+    name: language === 'ar' ? cat.name_ar || cat.name : cat.name
+  })) || [])
+];
 
   const durationOptions = [
     { id: 'all', name: 'All Durations' },
@@ -46,7 +46,7 @@ const Services: React.FC = () => {
   ];
 
   const filteredServices = useMemo(() => {
-    let filtered = services.filter((service: any) => {
+    let filtered = (services || []).filter((service: any) => {
       const matchesSearch = language === 'ar' 
         ? (service.title_ar || service.title).toLowerCase().includes(searchTerm.toLowerCase())
         : service.title.toLowerCase().includes(searchTerm.toLowerCase());

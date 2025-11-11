@@ -24,24 +24,24 @@ const Products: React.FC = () => {
   const { data: categories = [] } = useApi('/products/categories/');
   const { data: brands = [] } = useApi('/products/brands/');
 
-  const categoryOptions = [
-    { id: 'all', name: t('products.category.all') },
-    ...categories.map((cat: any) => ({
-      id: cat.id.toString(),
-      name: language === 'ar' ? cat.name_ar || cat.name : cat.name
-    }))
-  ];
+const categoryOptions = [
+  { id: 'all', name: t('products.category.all') },
+  ...(categories?.map((cat: any) => ({
+    id: cat.id.toString(),
+    name: language === 'ar' ? cat.name_ar || cat.name : cat.name
+  })) || [])
+];
 
-  const brandOptions = [
-    { id: 'all', name: 'All Brands' },
-    ...brands.map((brand: any) => ({
-      id: brand.id.toString(),
-      name: brand.name
-    }))
-  ];
+ const brandOptions = [
+  { id: 'all', name: 'All Brands' },
+  ...(brands?.map((brand: any) => ({
+    id: brand.id.toString(),
+    name: brand.name
+  })) || [])
+];
 
   const filteredProducts = useMemo(() => {
-    let filtered = products.filter((product: any) => {
+    let filtered = (products || []).filter((product: any) => {
       const matchesSearch = language === 'ar' 
         ? (product.name_ar || product.name).toLowerCase().includes(searchTerm.toLowerCase())
         : product.name.toLowerCase().includes(searchTerm.toLowerCase());
