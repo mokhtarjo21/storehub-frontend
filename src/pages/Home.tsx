@@ -5,9 +5,6 @@ import {
   ServerIcon,
   CpuChipIcon,
   WrenchScrewdriverIcon,
-  ShieldCheckIcon,
-  TruckIcon,
-  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { useLanguage } from '../contexts/LanguageContext';
 

@@ -1,13 +1,13 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 import {
   CheckCircleIcon,
   ClockIcon,
   TruckIcon,
   ShoppingBagIcon,
   HomeIcon,
-} from '@heroicons/react/24/outline';
-import { CheckCircleIcon as CheckCircleSolidIcon } from '@heroicons/react/24/solid';
+} from "@heroicons/react/24/outline";
+import { CheckCircleIcon as CheckCircleSolidIcon } from "@heroicons/react/24/solid";
 
 interface TimelineStep {
   status: string;
@@ -21,42 +21,49 @@ interface OrderStatusTimelineProps {
   currentStatus: string;
 }
 
-const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({ timeline, currentStatus }) => {
-  const getStepIcon = (status: string, completed: boolean, isActive: boolean) => {
+const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
+  timeline,
+  currentStatus,
+}) => {
+  const getStepIcon = (
+    status: string,
+    completed: boolean,
+    isActive: boolean
+  ) => {
     const iconClass = `w-6 h-6 ${
-      completed 
-        ? 'text-green-500' 
-        : isActive 
-        ? 'text-blue-500' 
-        : 'text-gray-400'
+      completed
+        ? "text-green-500"
+        : isActive
+        ? "text-blue-500"
+        : "text-gray-400 dark:text-gray-300"
     }`;
 
     switch (status) {
-      case 'placed':
+      case "placed":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
           <ShoppingBagIcon className={iconClass} />
         );
-      case 'confirmed':
+      case "confirmed":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
           <CheckCircleIcon className={iconClass} />
         );
-      case 'preparing':
+      case "preparing":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
           <ClockIcon className={iconClass} />
         );
-      case 'shipped':
+      case "shipped":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
           <TruckIcon className={iconClass} />
         );
-      case 'delivered':
+      case "delivered":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
@@ -79,8 +86,10 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({ timeline, cur
               <div className="relative pb-8">
                 {!isLast && (
                   <span
-                    className={`absolute top-4 left-4 -ml-px h-full w-0.5 ${
-                      step.completed ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                    className={`absolute top-4 ltr:left-4 rtl:right-4 ltr:-ml-px rtl:-mr-px h-full w-0.5 ${
+                      step.completed
+                        ? "bg-green-500"
+                        : "bg-gray-300 dark:bg-gray-700"
                     }`}
                     aria-hidden="true"
                   />
@@ -93,10 +102,10 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({ timeline, cur
                       transition={{ delay: stepIdx * 0.1 }}
                       className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ${
                         step.completed
-                          ? 'bg-green-500 ring-green-100 dark:ring-green-900'
+                          ? "bg-green-500 ring-green-100 dark:ring-green-900"
                           : isActive
-                          ? 'bg-blue-500 ring-blue-100 dark:ring-blue-900'
-                          : 'bg-gray-300 ring-gray-100 dark:bg-gray-600 dark:ring-gray-800'
+                          ? "bg-blue-500 ring-blue-100 dark:ring-blue-900"
+                          : "bg-gray-300 ring-gray-100 dark:bg-gray-600 dark:ring-gray-800"
                       }`}
                     >
                       {getStepIcon(step.status, step.completed, isActive)}
@@ -104,11 +113,13 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({ timeline, cur
                   </div>
                   <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                     <div>
-                      <p className={`text-sm font-medium ${
-                        step.completed || isActive 
-                          ? 'text-gray-900 dark:text-white' 
-                          : 'text-gray-500 dark:text-gray-400'
-                      }`}>
+                      <p
+                        className={`text-sm font-medium ${
+                          step.completed || isActive
+                            ? "text-gray-900 dark:text-white"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
                         {step.label}
                       </p>
                       {step.timestamp && (

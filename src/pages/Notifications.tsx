@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   BellIcon,
   CheckIcon,
   TrashIcon,
   FunnelIcon,
-} from '@heroicons/react/24/outline';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../contexts/AuthContext';
-import { Notification } from '../types';
-import toast from 'react-hot-toast';
+} from "@heroicons/react/24/outline";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useAuth } from "../contexts/AuthContext";
+import { Notification } from "../types";
+import toast from "react-hot-toast";
 
 const Notifications: React.FC = () => {
   const { language } = useLanguage();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const notificationTypes = [
-    { value: 'all', label: 'All Types' },
-    { value: 'order', label: 'Order' },
-    { value: 'company', label: 'Company' },
-    { value: 'points', label: 'Points' },
-    { value: 'service', label: 'Service' },
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'security', label: 'Security' },
+    { value: "all", label: "All Types" },
+    { value: "order", label: "Order" },
+    { value: "company", label: "Company" },
+    { value: "points", label: "Points" },
+    { value: "service", label: "Service" },
+    { value: "marketing", label: "Marketing" },
+    { value: "security", label: "Security" },
   ];
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      let url = 'http://localhost:8000/api/accounts/notifications/';
+      let url = "http://localhost:8000/api/accounts/notifications/";
       const params = new URLSearchParams();
 
-      if (filter !== 'all') {
-        params.append('is_read', filter === 'read' ? 'true' : 'false');
+      if (filter !== "all") {
+        params.append("is_read", filter === "read" ? "true" : "false");
       }
 
-      if (typeFilter !== 'all') {
-        params.append('type', typeFilter);
+      if (typeFilter !== "all") {
+        params.append("type", typeFilter);
       }
 
       if (params.toString()) {
-        url += '?' + params.toString();
+        url += "?" + params.toString();
       }
 
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
       });
 
@@ -58,7 +58,7 @@ const Notifications: React.FC = () => {
         setNotifications(data.results || data);
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      console.error("Failed to fetch notifications:", error);
     } finally {
       setLoading(false);
     }
@@ -69,19 +69,19 @@ const Notifications: React.FC = () => {
   }, [filter, typeFilter]);
 
   const getNotificationIcon = (type: string) => {
-    const iconClass = 'w-6 h-6';
+    const iconClass = "w-6 h-6";
     switch (type) {
-      case 'order':
+      case "order":
         return <span className="text-2xl">📦</span>;
-      case 'company':
+      case "company":
         return <span className="text-2xl">🏢</span>;
-      case 'points':
+      case "points":
         return <span className="text-2xl">⭐</span>;
-      case 'service':
+      case "service":
         return <span className="text-2xl">🛠️</span>;
-      case 'marketing':
+      case "marketing":
         return <span className="text-2xl">📢</span>;
-      case 'security':
+      case "security":
         return <span className="text-2xl">🔒</span>;
       default:
         return <BellIcon className={iconClass} />;
@@ -90,92 +90,106 @@ const Notifications: React.FC = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/accounts/notifications/${notificationId}/read/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/accounts/notifications/${notificationId}/read/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
-        setNotifications(prev =>
-          prev.map(n => (n.id === notificationId ? { ...n, is_read: true } : n))
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId ? { ...n, is_read: true } : n
+          )
         );
-        toast.success('Marked as read');
+        toast.success("Marked as read");
       }
     } catch (error) {
-      toast.error('Failed to mark as read');
+      toast.error("Failed to mark as read");
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/notifications/mark-all-read/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/notifications/mark-all-read/",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         fetchNotifications();
-        toast.success('All notifications marked as read');
+        toast.success("All notifications marked as read");
       }
     } catch (error) {
-      toast.error('Failed to mark all as read');
+      toast.error("Failed to mark all as read");
     }
   };
 
   const deleteNotification = async (notificationId: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/accounts/notifications/${notificationId}/delete/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/accounts/notifications/${notificationId}/delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
-        setNotifications(prev => prev.filter(n => n.id !== notificationId));
-        toast.success('Notification deleted');
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+        toast.success("Notification deleted");
       }
     } catch (error) {
-      toast.error('Failed to delete notification');
+      toast.error("Failed to delete notification");
     }
   };
 
   const clearAll = async () => {
-    if (!confirm('Are you sure you want to delete all notifications?')) return;
+    if (!confirm("Are you sure you want to delete all notifications?")) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/notifications/delete-all/', {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/notifications/delete-all/",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         setNotifications([]);
-        toast.success('All notifications deleted');
+        toast.success("All notifications deleted");
       }
     } catch (error) {
-      toast.error('Failed to delete all notifications');
+      toast.error("Failed to delete all notifications");
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleString(language === "ar" ? "ar-SA" : "en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -202,9 +216,10 @@ const Notifications: React.FC = () => {
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-300">
                 {unreadCount > 0
-                  ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}`
-                  : 'All caught up!'
-                }
+                  ? `${unreadCount} unread notification${
+                      unreadCount > 1 ? "s" : ""
+                    }`
+                  : "All caught up!"}
               </p>
             </div>
             <div className="flex items-center space-x-4 rtl:space-x-reverse">
@@ -239,18 +254,18 @@ const Notifications: React.FC = () => {
         >
           {/* Read Status Filter */}
           <div className="flex space-x-1 rtl:space-x-reverse bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            {(['all', 'unread', 'read'] as const).map((filterOption) => (
+            {(["all", "unread", "read"] as const).map((filterOption) => (
               <button
                 key={filterOption}
                 onClick={() => setFilter(filterOption)}
                 className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                   filter === filterOption
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 }`}
               >
                 {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
-                {filterOption === 'unread' && unreadCount > 0 && (
+                {filterOption === "unread" && unreadCount > 0 && (
                   <span className="ml-2 rtl:ml-0 rtl:mr-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
                     {unreadCount}
                   </span>
@@ -301,7 +316,9 @@ const Notifications: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 relative ${
-                  !notification.is_read ? 'ring-2 ring-blue-500 ring-opacity-20' : ''
+                  !notification.is_read
+                    ? "ring-2 ring-blue-500 ring-opacity-20"
+                    : ""
                 }`}
               >
                 <div className="flex items-start space-x-4 rtl:space-x-reverse">
@@ -311,16 +328,20 @@ const Notifications: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
+                        <div className="flex items-center space-x-2 rtl:space-x-reverse mb-1">
                           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                            {language === 'ar' ? notification.title_ar : notification.title}
+                            {language === "ar"
+                              ? notification.title_ar
+                              : notification.title}
                           </h3>
                           <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
                             {notification.notification_type_display}
                           </span>
                         </div>
                         <p className="mt-1 text-gray-600 dark:text-gray-300">
-                          {language === 'ar' ? notification.message_ar : notification.message}
+                          {language === "ar"
+                            ? notification.message_ar
+                            : notification.message}
                         </p>
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                           {formatTime(notification.created_at)}

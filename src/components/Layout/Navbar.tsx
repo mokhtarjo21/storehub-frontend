@@ -1,21 +1,20 @@
-import React, { Fragment } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import React, { Fragment } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
   XMarkIcon,
   UserIcon,
   SunIcon,
   MoonIcon,
-  LanguageIcon,
-  BellIcon,
   ShoppingCartIcon,
-} from '@heroicons/react/24/outline';
-import { useAuth } from '../../contexts/AuthContext';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useCart } from '../../contexts/CartContext';
-import NotificationBell from '../NotificationBell';
+  GlobeAltIcon,
+} from "@heroicons/react/24/outline";
+import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { useCart } from "../../contexts/CartContext";
+import NotificationBell from "../NotificationBell";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -26,50 +25,56 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const navigation = [
-    { name: t('nav.home'), href: '/' },
-    { name: t('nav.products'), href: '/products' },
-    { name: t('nav.services'), href: '/services' },
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.products"), href: "/products" },
+    { name: t("nav.services"), href: "/services" },
   ];
 
   if (user) {
-    navigation.push({ name: t('nav.dashboard'), href: '/dashboard' });
-    if (user.role === 'company_admin') {
-      navigation.push({ name: 'Company', href: '/company' });
+    navigation.push({ name: t("nav.dashboard"), href: "/dashboard" });
+    if (user.role === "company_admin") {
+      navigation.push({ name: "Company", href: "/company" });
     }
-    if (user.role === 'affiliate') {
-      navigation.push({ name: 'Affiliate', href: '/affiliate' });
+    if (user.role === "affiliate") {
+      navigation.push({ name: "Affiliate", href: "/affiliate" });
     }
-    if (user.role === 'super_admin') {
-      navigation.push({ name: t('nav.admin'), href: '/admin' });
+    if (user.role === "super_admin") {
+      navigation.push({ name: t("nav.admin"), href: "/admin" });
     }
   }
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <Disclosure as="nav" className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <Disclosure
+      as="nav"
+      className="fixed top-0 left-0 w-full z-50 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex">
                 <div className="flex flex-shrink-0 items-center">
-                  <Link to="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <Link
+                    to="/"
+                    className="text-2xl font-bold text-blue-600 dark:text-blue-400"
+                  >
                     StoreHub
                   </Link>
                 </div>
-                <div className="hidden sm:ml-6 sm:flex sm:space-x-8 rtl:space-x-reverse">
+                <div className="hidden sm:ms-6 sm:flex sm:space-x-8 rtl:space-x-reverse">
                   {navigation.map((item) => (
                     <Link
                       key={item.name}
                       to={item.href}
-                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                      className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
                         location.pathname === item.href
-                          ? 'border-blue-500 text-gray-900 dark:text-white'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:border-gray-300'
+                          ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                          : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:border-gray-300"
                       }`}
                     >
                       {item.name}
@@ -77,14 +82,14 @@ const Navbar: React.FC = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4 rtl:space-x-reverse">
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleTheme}
                   className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  {theme === 'light' ? (
+                  {theme === "light" ? (
                     <MoonIcon className="h-5 w-5" />
                   ) : (
                     <SunIcon className="h-5 w-5" />
@@ -93,10 +98,10 @@ const Navbar: React.FC = () => {
 
                 {/* Language Toggle */}
                 <button
-                  onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                  onClick={() => setLanguage(language === "en" ? "ar" : "en")}
                   className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <LanguageIcon className="h-5 w-5" />
+                  <GlobeAltIcon className="h-5 w-5" />
                 </button>
 
                 {user ? (
@@ -142,10 +147,10 @@ const Navbar: React.FC = () => {
                               <Link
                                 to="/profile"
                                 className={`block px-4 py-2 text-sm ${
-                                  active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
                                 } text-gray-700 dark:text-gray-200`}
                               >
-                                {t('nav.profile')}
+                                {t("nav.profile")}
                               </Link>
                             )}
                           </Menu.Item>
@@ -154,10 +159,10 @@ const Navbar: React.FC = () => {
                               <button
                                 onClick={handleLogout}
                                 className={`block w-full text-left px-4 py-2 text-sm ${
-                                  active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
                                 } text-gray-700 dark:text-gray-200`}
                               >
-                                {t('nav.logout')}
+                                {t("nav.logout")}
                               </button>
                             )}
                           </Menu.Item>
@@ -171,13 +176,13 @@ const Navbar: React.FC = () => {
                       to="/login"
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors"
                     >
-                      {t('nav.login')}
+                      {t("nav.login")}
                     </Link>
                     <Link
                       to="/register"
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                     >
-                      {t('nav.register')}
+                      {t("nav.register")}
                     </Link>
                   </div>
                 )}
@@ -207,8 +212,8 @@ const Navbar: React.FC = () => {
                   to={item.href}
                   className={`block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-colors ${
                     location.pathname === item.href
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+                      ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
                   }`}
                 >
                   {item.name}
