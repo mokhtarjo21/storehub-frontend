@@ -1,12 +1,19 @@
 const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
-export const getAuthHeaders = () => {
+export const getAuthHeaders = (isFormData = false) => {
   const token = localStorage.getItem("access_token");
-  return {
-    "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
+  const headers: Record<string, string> = {};
+
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  return headers;
 };
 
 // Helper function to handle API responses
@@ -45,13 +52,15 @@ export const refreshToken = async () => {
 };
 
 // API wrapper with automatic token refresh
-export const apiRequest = async (url: string, options: RequestInit = {}) => {
+export const apiRequest = async (url: string, options: RequestInit & { isFormData?: boolean } = {}) => {
+  const { isFormData, ...fetchOptions } = options;
+
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
-      ...options,
+      ...fetchOptions,
       headers: {
-        ...getAuthHeaders(),
-        ...options.headers,
+        ...getAuthHeaders(isFormData),
+        ...fetchOptions.headers,
       },
     });
 
@@ -61,10 +70,10 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
         await refreshToken();
         // Retry the original request
         return await fetch(`${API_BASE_URL}${url}`, {
-          ...options,
+          ...fetchOptions,
           headers: {
-            ...getAuthHeaders(),
-            ...options.headers,
+            ...getAuthHeaders(isFormData),
+            ...fetchOptions.headers,
           },
         });
       } catch (refreshError) {

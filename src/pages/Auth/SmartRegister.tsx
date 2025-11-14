@@ -29,6 +29,11 @@ interface FormData {
   company_phone: string;
   company_address: string;
   commercial_registration_number: string;
+  tax_card_image: File | null;
+  commercial_registration_image: File | null;
+  sales_company_name: string;
+  sales_job_title: string;
+  sales_motivation: string;
   sales_reason: string;
   sales_view: string;
 }
@@ -59,6 +64,11 @@ const SmartRegister: React.FC = () => {
     company_phone: '',
     company_address: '',
     commercial_registration_number: '',
+    tax_card_image: null,
+    commercial_registration_image: null,
+    sales_company_name: '',
+    sales_job_title: '',
+    sales_motivation: '',
     sales_reason: '',
     sales_view: '',
   });
@@ -70,6 +80,14 @@ const SmartRegister: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'tax_card_image' | 'commercial_registration_image') => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: file
     }));
   };
 
@@ -136,9 +154,13 @@ const SmartRegister: React.FC = () => {
         toast.error(language === 'ar' ? 'الرجاء ملء جميع بيانات الشركة' : 'Please fill all company fields');
         return false;
       }
+      if (!formData.tax_card_image || !formData.commercial_registration_image) {
+        toast.error(language === 'ar' ? 'الرجاء إرفاق البطاقة الضريبية والسجل التجاري' : 'Please upload tax card and commercial registration');
+        return false;
+      }
     }
     if (formData.registration_type === 'sales_commission') {
-      if (!formData.sales_reason || !formData.sales_view) {
+      if (!formData.sales_company_name || !formData.sales_job_title || !formData.sales_motivation || !formData.sales_reason || !formData.sales_view) {
         toast.error(language === 'ar' ? 'الرجاء ملء جميع حقول التقديم' : 'Please fill all application fields');
         return false;
       }
@@ -151,9 +173,24 @@ const SmartRegister: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      const submitData = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (key === 'tax_card_image' || key === 'commercial_registration_image') {
+            if (value instanceof File) {
+              submitData.append(key, value);
+            }
+          } else {
+            submitData.append(key, String(value));
+          }
+        }
+      });
+
       const response = await apiRequest('/auth/smart-register/', {
         method: 'POST',
-        body: JSON.stringify(formData)
+        body: submitData,
+        isFormData: true
       });
       const data = await handleApiResponse(response);
 
@@ -369,10 +406,45 @@ const SmartRegister: React.FC = () => {
                   {isCompanyChecked && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                       <input type="text" name="company_name" value={formData.company_name} onChange={handleInputChange} placeholder={language === 'ar' ? 'اسم الشركة' : 'Company Name'} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-                      <input type="email" name="company_email" value={formData.company_email} onChange={handleInputChange} placeholder={language === 'ar' ? 'بريد الشركة' : 'Company Email'} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                      <input type="email" name="company_email" value={formData.company_email} onChange={handleInputChange} placeholder={language === 'ar' ? 'البريد الرسمي للشركة' : 'Official Company Email'} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
                       <input type="text" name="company_phone" value={formData.company_phone} onChange={handleInputChange} placeholder={language === 'ar' ? 'هاتف الشركة' : 'Company Phone'} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
                       <textarea name="company_address" value={formData.company_address} onChange={handleInputChange} placeholder={language === 'ar' ? 'عنوان الشركة' : 'Company Address'} rows={3} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
                       <input type="text" name="commercial_registration_number" value={formData.commercial_registration_number} onChange={handleInputChange} placeholder={language === 'ar' ? 'رقم السجل التجاري' : 'Commercial Registration Number'} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {language === 'ar' ? 'صورة البطاقة الضريبية *' : 'Tax Card Image *'}
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => handleFileChange(e, 'tax_card_image')}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        {formData.tax_card_image && (
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            {language === 'ar' ? '✓ تم الرفع' : '✓ Uploaded'}: {formData.tax_card_image.name}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {language === 'ar' ? 'صورة السجل التجاري *' : 'Commercial Registration Image *'}
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*,.pdf"
+                          onChange={(e) => handleFileChange(e, 'commercial_registration_image')}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        {formData.commercial_registration_image && (
+                          <p className="text-sm text-green-600 dark:text-green-400">
+                            {language === 'ar' ? '✓ تم الرفع' : '✓ Uploaded'}: {formData.commercial_registration_image.name}
+                          </p>
+                        )}
+                      </div>
+
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <p className="text-sm text-blue-800 dark:text-blue-200">
                           {language === 'ar' ?
@@ -385,6 +457,30 @@ const SmartRegister: React.FC = () => {
 
                   {isSalesChecked && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                      <input
+                        type="text"
+                        name="sales_company_name"
+                        value={formData.sales_company_name}
+                        onChange={handleInputChange}
+                        placeholder={language === 'ar' ? 'اسم الشركة التي تعمل بها' : 'Company you work for'}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      />
+                      <input
+                        type="text"
+                        name="sales_job_title"
+                        value={formData.sales_job_title}
+                        onChange={handleInputChange}
+                        placeholder={language === 'ar' ? 'المسمى الوظيفي' : 'Job Title'}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      />
+                      <textarea
+                        name="sales_motivation"
+                        value={formData.sales_motivation}
+                        onChange={handleInputChange}
+                        placeholder={language === 'ar' ? 'جملة تحفيزية عنك' : 'A motivational statement about yourself'}
+                        rows={2}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      />
                       <textarea name="sales_reason" value={formData.sales_reason} onChange={handleInputChange} placeholder={language === 'ar' ? 'لماذا تريد الانضمام إلى برنامج العمولة؟' : 'Why do you want to join our commission program?'} rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
                       <textarea name="sales_view" value={formData.sales_view} onChange={handleInputChange} placeholder={language === 'ar' ? 'كيف يمكنك جلب فرص مبيعات؟' : 'How can you bring sales opportunities?'} rows={4} className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
