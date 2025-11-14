@@ -23,14 +23,21 @@ const Services: React.FC = () => {
 
   // Fetch data from API
   const { data: services = [], loading: servicesLoading } = useApi('/products/services/');
-  const { data: categories = [] } = useApi('/products/categories/');
+  // const { data: categories = [] } = useApi('/products/categories/');
+const { data: categoriesData } = useApi('/products/categories/');
+
+const categories = Array.isArray(categoriesData)
+  ? categoriesData
+  : Array.isArray(categoriesData?.results)
+  ? categoriesData.results
+  : [];
 
 const categoryOptions = [
   { id: 'all', name: t('products.category.all') },
-  ...(categories?.map((cat: any) => ({
-    id: cat.id.toString(),
+  ...categories.map((cat: any) => ({
+    id: cat.id?.toString?.() || String(cat.id),
     name: language === 'ar' ? cat.name_ar || cat.name : cat.name
-  })) || [])
+  })),
 ];
 
   const durationOptions = [

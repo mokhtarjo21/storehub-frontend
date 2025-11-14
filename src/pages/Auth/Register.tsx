@@ -4,11 +4,9 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import toast from 'react-hot-toast';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { User } from '../../types';
 
 const schema = yup.object({
   name: yup.string().required('Name is required'),
@@ -128,8 +126,7 @@ const Register: React.FC = () => {
               >
                 <option value="">{t('auth.role')}</option>
                 <option value="individual">{t('auth.role.individual')}</option>
-                <option value="company_admin">{t('auth.role.company_admin')}</option>
-                <option value="company_staff">{t('auth.role.company_staff')}</option>
+                <option value="company">{t('auth.role.company_admin')}</option>
                 <option value="affiliate">{t('auth.role.affiliate')}</option>
               </select>
               {errors.role && (

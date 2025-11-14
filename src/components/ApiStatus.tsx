@@ -18,7 +18,7 @@ const ApiStatus: React.FC = () => {
 
   const checkApiConnection = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/me/', {
+      const response = await fetch('http://198.168.1.7:8000/api/auth/me/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const ApiStatus: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
@@ -99,7 +99,7 @@ const ApiStatus: React.FC = () => {
             ×
           </button>
         </div>
-      </motion.div>
+      </motion.div> */}
     </AnimatePresence>
   );
 };

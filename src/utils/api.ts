@@ -1,11 +1,11 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   };
 };
 
@@ -13,32 +13,34 @@ export const getAuthHeaders = () => {
 export const handleApiResponse = async (response: Response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || errorData.detail || 'API request failed');
+    throw new Error(
+      errorData.error || errorData.detail || "API request failed"
+    );
   }
   return response.json();
 };
 
 // Token refresh function
 export const refreshToken = async () => {
-  const refresh = localStorage.getItem('refresh_token');
+  const refresh = localStorage.getItem("refresh_token");
   if (!refresh) {
-    throw new Error('No refresh token available');
+    throw new Error("No refresh token available");
   }
 
   const response = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ refresh }),
   });
 
   if (!response.ok) {
-    throw new Error('Token refresh failed');
+    throw new Error("Token refresh failed");
   }
 
   const data = await response.json();
-  localStorage.setItem('access_token', data.access);
+  localStorage.setItem("access_token", data.access);
   return data.access;
 };
 
@@ -67,11 +69,11 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
         });
       } catch (refreshError) {
         // Refresh failed, redirect to login
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-        throw new Error('Session expired');
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+        throw new Error("Session expired");
       }
     }
 
@@ -84,9 +86,9 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
 // OTP verification functions
 export const verifyOTP = async (email: string, otpCode: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/verify-otp/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       email,
@@ -99,9 +101,9 @@ export const verifyOTP = async (email: string, otpCode: string) => {
 
 export const resendOTP = async (email: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/resend-otp/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ email }),
   });
@@ -111,29 +113,29 @@ export const resendOTP = async (email: string) => {
 
 // User profile functions
 export const getCurrentUser = async () => {
-  const response = await apiRequest('/auth/me/');
+  const response = await apiRequest("/auth/me/");
   return handleApiResponse(response);
 };
 
 export const updateUserProfile = async (profileData: any) => {
-  const response = await apiRequest('/auth/profile/', {
-    method: 'PATCH',
+  const response = await apiRequest("/auth/profile/", {
+    method: "PATCH",
     body: JSON.stringify(profileData),
   });
   return handleApiResponse(response);
 };
 
 export const updateUserInfo = async (userData: any) => {
-  const response = await apiRequest('/auth/update/', {
-    method: 'PATCH',
+  const response = await apiRequest("/auth/update/", {
+    method: "PATCH",
     body: JSON.stringify(userData),
   });
   return handleApiResponse(response);
 };
 
 export const changePassword = async (passwordData: any) => {
-  const response = await apiRequest('/auth/change-password/', {
-    method: 'POST',
+  const response = await apiRequest("/auth/change-password/", {
+    method: "POST",
     body: JSON.stringify(passwordData),
   });
   return handleApiResponse(response);

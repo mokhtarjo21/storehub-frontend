@@ -16,7 +16,9 @@ import { Notification } from '../../types';
 
 const MyNotifications: React.FC = () => {
   const { language } = useLanguage();
-  const { data: notifications, loading, error, refetch } = useApi('/auth/notifications/');
+  // const { data: notifications, loading, error, refetch } = useApi('/auth/notifications/');
+  const { data: apiData, loading, error, refetch  } = useApi('/auth/notifications/');
+const notifications = apiData?.notifications || [];
 
   const getNotificationIcon = (type: string) => {
     switch (type) {

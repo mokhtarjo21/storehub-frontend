@@ -7,7 +7,9 @@ import { Order } from '../../types';
 
 const MyOrders: React.FC = () => {
   const { language } = useLanguage();
-  const { data: orders, loading, error } = useApi('/orders/');
+  // const { data: orders, loading, error } = useApi('/orders/');
+const { data, loading, error } = useApi('/orders/');
+const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
 
   if (loading) {
     return (

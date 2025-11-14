@@ -20,25 +20,38 @@ const Products: React.FC = () => {
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'category'>('name');
 
   // Fetch data from API
-  const { data: products = [], loading: productsLoading } = useApi('/products/');
-  const { data: categories = [] } = useApi('/products/categories/');
-  const { data: brands = [] } = useApi('/products/brands/');
+  // const { data: products = [], loading: productsLoading } = useApi('/products/');
+  // const { data: categories = [] } = useApi('/products/categories/');
+  // const { data: brands = [] } = useApi('/products/brands/');
+const { data: categoriesData } = useApi('/products/categories/');
+const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
 const categoryOptions = [
   { id: 'all', name: t('products.category.all') },
-  ...(categories?.map((cat: any) => ({
-    id: cat.id.toString(),
-    name: language === 'ar' ? cat.name_ar || cat.name : cat.name
-  })) || [])
+  ...categories.map((cat: any) => ({
+    id: cat.id?.toString?.() || String(cat.id),
+    name: language === 'ar' ? cat.name_ar || cat.name : cat.name,
+  })),
 ];
+const { data: brandsData } = useApi('/products/brands/');
+const brands = Array.isArray(brandsData) ? brandsData : [];
 
- const brandOptions = [
+const brandOptions = [
   { id: 'all', name: 'All Brands' },
-  ...(brands?.map((brand: any) => ({
-    id: brand.id.toString(),
-    name: brand.name
-  })) || [])
+  ...brands.map((brand: any) => ({
+    id: brand.id?.toString?.() || String(brand.id),
+    name: brand.name,
+  })),
 ];
+const { data: productsData, loading: productsLoading } = useApi('/products/');
+const products = Array.isArray(productsData)
+  ? productsData
+  : Array.isArray(productsData?.results)
+  ? productsData.results
+  : Array.isArray(productsData?.products)
+  ? productsData.products
+  : [];
+
 
   const filteredProducts = useMemo(() => {
     let filtered = (products || []).filter((product: any) => {

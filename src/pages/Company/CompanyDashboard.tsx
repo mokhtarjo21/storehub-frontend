@@ -98,17 +98,19 @@ const CompanyDashboard: React.FC = () => {
     }
   };
 
-  const fetchEmployees = async () => {
-    try {
-      const response = await apiRequest('/auth/employees/');
-      const data = await handleApiResponse(response);
-      setEmployees(data);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchEmployees = async () => {
+  try {
+    const response = await apiRequest('/auth/employees/');
+    const data = await handleApiResponse(response);
+    // Ensure we always have an array
+    setEmployees(Array.isArray(data) ? data : []);
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();

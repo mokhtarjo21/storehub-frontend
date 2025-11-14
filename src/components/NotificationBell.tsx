@@ -14,7 +14,7 @@ const NotificationBell: React.FC = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/notifications/?limit=5', {
+      const response = await fetch('http://192.168.1.7:8000/api/accounts/notifications/?limit=5', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         },

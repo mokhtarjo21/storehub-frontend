@@ -22,7 +22,20 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   
   // Fetch user orders
-  const { data: orders = [], loading: ordersLoading } = useApi('/orders/');
+//   const { data: ordersData, loading: ordersLoading } = useApi('/orders/');
+// const orders = ordersData || [];
+// Fetch user orders
+const { data: ordersData, loading: ordersLoading } = useApi('/orders/');
+
+// التأكد أن orders مصفوفة دائمًا
+const orders = Array.isArray(ordersData)
+  ? ordersData
+  : Array.isArray(ordersData?.results)
+  ? ordersData.results
+  : [];
+
+
+  // const { data: orders = [], loading: ordersLoading } = useApi('/orders/');
   const { data: orderStats } = useApi('/orders/statistics/');
   
   // Mock data for charts
