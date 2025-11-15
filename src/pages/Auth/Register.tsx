@@ -15,18 +15,20 @@ const schema = yup.object({
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+
   role: yup
     .string()
     .oneOf(["individual", "company_admin", "affiliate"])
     .required("Role is required"),
 
+  // COMPANY ADMIN
   companyName: yup.string().when("role", {
-    is: "company",
+    is: "company_admin",
     then: (schema) => schema.required("Company name is required"),
   }),
 
   companyEmail: yup.string().when("role", {
-    is: "company",
+    is: "company_admin",
     then: (schema) =>
       schema
         .email("Invalid company email")
@@ -34,14 +36,39 @@ const schema = yup.object({
   }),
 
   commercialRegister: yup.mixed().when("role", {
-    is: "company",
+    is: "company_admin",
     then: (schema) =>
-      schema.required("Commercial registration image is required"),
+      schema.test(
+        "required",
+        "Commercial registration image is required",
+        (value) => value && value.length > 0
+      ),
   }),
 
   taxCard: yup.mixed().when("role", {
-    is: "company",
-    then: (schema) => schema.required("Tax card image is required"),
+    is: "company_admin",
+    then: (schema) =>
+      schema.test(
+        "required",
+        "Tax card image is required",
+        (value) => value && value.length > 0
+      ),
+  }),
+
+  // AFFILIATE FIELDS
+  affiliateCompany: yup.string().when("role", {
+    is: "affiliate",
+    then: (schema) => schema.required("Company name is required"),
+  }),
+
+  affiliateJobTitle: yup.string().when("role", {
+    is: "affiliate",
+    then: (schema) => schema.required("Job title is required"),
+  }),
+
+  affiliateReason: yup.string().when("role", {
+    is: "affiliate",
+    then: (schema) => schema.required("Please provide a reason"),
   }),
 });
 
@@ -66,19 +93,23 @@ const Register: React.FC = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await registerUser(
-        {
-          name: data.name,
-          email: data.email,
-          role: data.role,
-          companyName: data.companyName,
-        },
-        data.password
-      );
+      const payload: any = {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        companyName: data.companyName,
+      };
+
+      if (data.role === "affiliate") {
+        payload.affiliateCompany = data.affiliateCompany;
+        payload.affiliateJobTitle = data.affiliateJobTitle;
+        payload.affiliateReason = data.affiliateReason;
+      }
+
+      await registerUser(payload, data.password);
 
       navigate(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
-      // Error is already handled in the context
       console.error("Registration error:", error);
     }
   };
@@ -199,6 +230,57 @@ const Register: React.FC = () => {
                 {errors.taxCard && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                     {errors.taxCard.message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+            {selectedRole === "affiliate" && (
+              <motion.div className="space-y-2">
+                {/* Affiliate Company */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Company Name
+                </label>
+                <input
+                  {...register("affiliateCompany")}
+                  type="text"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  placeholder="Enter your company name"
+                />
+                {errors.affiliateCompany && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.affiliateCompany.message}
+                  </p>
+                )}
+
+                {/* Job Title */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Job Title
+                </label>
+                <input
+                  {...register("affiliateJobTitle")}
+                  type="text"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  placeholder="Enter your job title"
+                />
+                {errors.affiliateJobTitle && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.affiliateJobTitle.message}
+                  </p>
+                )}
+
+                {/* Reason */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Why do you want to work with us?
+                </label>
+                <textarea
+                  {...register("affiliateReason")}
+                  rows={3}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  placeholder="Write your reason..."
+                ></textarea>
+                {errors.affiliateReason && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.affiliateReason.message}
                   </p>
                 )}
               </motion.div>
