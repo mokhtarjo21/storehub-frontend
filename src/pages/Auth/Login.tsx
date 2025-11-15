@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import toast from 'react-hot-toast';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -33,7 +32,7 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       if (errorMessage.includes('verify your email')) {

@@ -63,13 +63,13 @@ const orders = Array.isArray(ordersData)
       color: 'blue',
       change: '+12%',
     },
-    {
-      name: t('dashboard.stats.points'),
-      value: user?.points?.toString() || '0',
-      icon: GiftIcon,
-      color: 'green',
-      change: '+8%',
-    },
+    // {
+    //   name: t('dashboard.stats.points'),
+    //   value: user?.points?.toString() || '0',
+    //   icon: GiftIcon,
+    //   color: 'green',
+    //   change: '+8%',
+    // },
     {
       name: t('dashboard.stats.spent'),
       value: `$${orderStats?.total_revenue?.toFixed(2) || '0.00'}`,
@@ -172,7 +172,7 @@ const orders = Array.isArray(ordersData)
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
             >
               {stats.map((stat, index) => (
                 <motion.div

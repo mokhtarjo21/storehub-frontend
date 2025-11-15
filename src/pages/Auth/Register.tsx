@@ -1,22 +1,47 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../contexts/LanguageContext';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const schema = yup.object({
-  name: yup.string().required('Name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  role: yup.string().oneOf(['individual', 'company', 'affiliate']).required('Role is required'),
-  companyName: yup.string().when('role', {
-    is: 'company',
-    then: (schema) => schema.required('Company name is required'),
-    otherwise: (schema) => schema.notRequired(),
+  name: yup.string().required("Name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  role: yup
+    .string()
+    .oneOf(["individual", "company_admin", "affiliate"])
+    .required("Role is required"),
+
+  companyName: yup.string().when("role", {
+    is: "company",
+    then: (schema) => schema.required("Company name is required"),
+  }),
+
+  companyEmail: yup.string().when("role", {
+    is: "company",
+    then: (schema) =>
+      schema
+        .email("Invalid company email")
+        .required("Company email is required"),
+  }),
+
+  commercialRegister: yup.mixed().when("role", {
+    is: "company",
+    then: (schema) =>
+      schema.required("Commercial registration image is required"),
+  }),
+
+  taxCard: yup.mixed().when("role", {
+    is: "company",
+    then: (schema) => schema.required("Tax card image is required"),
   }),
 });
 
@@ -37,27 +62,30 @@ const Register: React.FC = () => {
     resolver: yupResolver(schema),
   });
 
-  const selectedRole = watch('role');
+  const selectedRole = watch("role");
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      await registerUser({
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        companyName: data.companyName,
-      }, data.password);
-      
+      await registerUser(
+        {
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          companyName: data.companyName,
+        },
+        data.password
+      );
+
       navigate(`/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
       // Error is already handled in the context
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full space-y-8"
@@ -69,100 +97,166 @@ const Register: React.FC = () => {
             </span>
           </Link>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
-            {t('auth.register.title')}
+            {t("auth.register.title")}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            {t('auth.register.subtitle')}
+            {t("auth.register.subtitle")}
           </p>
         </div>
 
-        <motion.form 
+        <motion.form
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-8 space-y-6" 
+          className="mt-8 space-y-6"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.name')}
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t("auth.role")}
+              </label>
+              <select
+                {...register("role")}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">{t("auth.role")}</option>
+                <option value="individual">{t("auth.role.individual")}</option>
+                <option value="company_admin">
+                  {t("auth.role.company_admin")}
+                </option>
+                <option value="affiliate">{t("auth.role.affiliate")}</option>
+              </select>
+              {errors.role && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.role.message}
+                </p>
+              )}
+            </div>
+            {selectedRole === "company_admin" && (
+              <motion.div className="space-y-2">
+                {/* Company Name */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Company Name
+                </label>
+                <input
+                  {...register("companyName")}
+                  type="text"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter company name"
+                />
+                {errors.companyName && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.companyName.message}
+                  </p>
+                )}
+
+                {/* Company Email */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Company Email
+                </label>
+                <input
+                  {...register("companyEmail")}
+                  type="email"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter company email"
+                />
+                {errors.companyEmail && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.companyEmail.message}
+                  </p>
+                )}
+
+                {/* Commercial Registration Image */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Commercial Registration Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("commercialRegister")}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.commercialRegister && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.commercialRegister.message}
+                  </p>
+                )}
+
+                {/* Tax Card Image */}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Tax Card Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...register("taxCard")}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.taxCard && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors.taxCard.message}
+                  </p>
+                )}
+              </motion.div>
+            )}
+
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t("auth.name")}
               </label>
               <input
-                {...register('name')}
+                {...register("name")}
                 type="text"
                 autoComplete="name"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your full name"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.email')}
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                {t("auth.email")}
               </label>
               <input
-                {...register('email')}
+                {...register("email")}
                 type="email"
                 autoComplete="email"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Enter your email"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.role')}
-              </label>
-              <select
-                {...register('role')}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                <option value="">{t('auth.role')}</option>
-                <option value="individual">{t('auth.role.individual')}</option>
-                <option value="company">{t('auth.role.company_admin')}</option>
-                <option value="affiliate">{t('auth.role.affiliate')}</option>
-              </select>
-              {errors.role && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.role.message}</p>
-              )}
-            </div>
-
-            {selectedRole === 'company' && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('auth.companyName')}
-                </label>
-                <input
-                  {...register('companyName')}
-                  type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your company name"
-                />
-                {errors.companyName && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.companyName.message}</p>
-                )}
-              </motion.div>
-            )}
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.password')}
+                {t("auth.password")}
               </label>
               <div className="mt-1 relative">
                 <input
-                  {...register('password')}
-                  type={showPassword ? 'text' : 'password'}
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   className="block w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Create a password"
@@ -180,7 +274,9 @@ const Register: React.FC = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {errors.password.message}
+                </p>
               )}
             </div>
           </div>
@@ -191,15 +287,18 @@ const Register: React.FC = () => {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? t('common.loading') : t('auth.register.title')}
+              {isLoading ? t("common.loading") : t("auth.register.title")}
             </button>
           </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
-                {t('nav.login')}
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+              >
+                {t("nav.login")}
               </Link>
             </p>
           </div>

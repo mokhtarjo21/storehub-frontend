@@ -10,15 +10,16 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(
+    () =>
+      (localStorage.getItem("storehub_theme") as "light" | "dark") || "light"
+  );
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("storehub_theme") as
       | "light"
       | "dark";
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    if (savedTheme) setTheme(savedTheme);
   }, []);
 
   useEffect(() => {
@@ -28,9 +29,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("storehub_theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = () =>
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
@@ -41,8 +41,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
   return context;
 };

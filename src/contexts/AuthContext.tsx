@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
-import toast from 'react-hot-toast';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { User } from "../types";
+import toast from "react-hot-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -8,38 +8,56 @@ interface AuthContextType {
   logout: () => void;
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
+  isInitializing: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = 'http://192.168.1.7:8000/api';
+const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   };
 };
 
 // Helper function to handle API responses
 const handleApiResponse = async (response: Response) => {
+  const errorData = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || errorData.detail || 'API request failed');
+    let message =
+      errorData.error ||
+      errorData.detail ||
+      errorData.message ||
+      errorData.non_field_errors?.[0];
+    if (!message && typeof errorData === "object") {
+      const firstKey = Object.keys(errorData)[0];
+      if (Array.isArray(errorData[firstKey])) {
+        message = errorData[firstKey][0];
+      }
+    }
+
+    throw new Error(message || "API request failed");
   }
-  return response.json();
+
+  return errorData;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    const savedUser = localStorage.getItem('user');
-    
+    const token = localStorage.getItem("access_token");
+    const savedUser = localStorage.getItem("user");
+
     if (token && savedUser) {
       try {
         const userData = JSON.parse(savedUser);
@@ -53,34 +71,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           affiliateCode: userData.affiliate_code,
           createdAt: userData.date_joined,
         });
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('user');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+      } catch {
+        localStorage.removeItem("user");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
       }
     }
+
+    setIsInitializing(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await handleApiResponse(response);
-      
+
       // Store tokens
-      localStorage.setItem('access_token', data.tokens.access);
-      localStorage.setItem('refresh_token', data.tokens.refresh);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
+      localStorage.setItem("access_token", data.tokens.access);
+      localStorage.setItem("refresh_token", data.tokens.refresh);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       // Set user state
       const userData = data.user;
       setUser({
@@ -93,10 +112,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         affiliateCode: userData.affiliate_code,
         createdAt: userData.date_joined,
       });
-      
-      toast.success('Login successful!');
+
+      toast.success("Login successful!");
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Login failed";
       toast.error(errorMessage);
       throw error;
     } finally {
@@ -106,48 +126,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
+      const refreshToken = localStorage.getItem("refresh_token");
       if (refreshToken) {
         await fetch(`${API_BASE_URL}/auth/logout/`, {
-          method: 'POST',
+          method: "POST",
           headers: getAuthHeaders(),
           body: JSON.stringify({ refresh_token: refreshToken }),
         });
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setUser(null);
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
-      toast.success('Logged out successfully');
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      toast.success("Logged out successfully");
     }
   };
 
-  const register = async (userData: Partial<User>, password: string): Promise<void> => {
+  const register = async (
+    userData: Partial<User>,
+    password: string
+  ): Promise<void> => {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: userData.email,
           full_name: userData.name,
           role: userData.role,
-          company_name: userData.companyName || '',
+          company_name: userData.companyName || "",
           password: password,
           password_confirm: password,
         }),
       });
 
       await handleApiResponse(response);
-      toast.success('Registration successful! Please check your email for verification code.');
+      toast.success(
+        "Registration successful! Please check your email for verification code."
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      const errorMessage =
+        error instanceof Error ? error.message : "Registration failed";
       toast.error(errorMessage);
       throw error;
     } finally {
@@ -156,7 +182,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, register, isLoading, isInitializing }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -165,7 +193,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
