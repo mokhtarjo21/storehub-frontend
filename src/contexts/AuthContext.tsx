@@ -146,25 +146,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const register = async (
-    userData: Partial<User>,
+    userData: Partial<User> & {
+      affiliateCompany?: string;
+      affiliateJobTitle?: string;
+      affiliateReason?: string;
+    },
     password: string
   ): Promise<void> => {
     setIsLoading(true);
 
     try {
+      const payload: any = {
+        email: userData.email,
+        full_name: userData.name,
+        role: userData.role,
+        company_name: userData.companyName || "",
+        password: password,
+        password_confirm: password,
+      };
+
+      if (userData.role === "affiliate") {
+        payload.affiliate_company = userData.affiliateCompany || "";
+        payload.affiliate_job_title = userData.affiliateJobTitle || "";
+        payload.affiliate_reason = userData.affiliateReason || "";
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: userData.email,
-          full_name: userData.name,
-          role: userData.role,
-          company_name: userData.companyName || "",
-          password: password,
-          password_confirm: password,
-        }),
+        body: JSON.stringify(payload),
       });
 
       await handleApiResponse(response);
