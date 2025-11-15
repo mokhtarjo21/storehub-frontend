@@ -139,13 +139,13 @@ const AffiliateDashboard: React.FC = () => {
       color: 'green',
       change: '+12%',
     },
-    {
-      name: 'Total Referrals',
-      value: stats.total_referrals.toString(),
-      icon: UsersIcon,
-      color: 'blue',
-      change: '+8%',
-    },
+    // {
+    //   name: 'Total Referrals',
+    //   value: stats.total_referrals.toString(),
+    //   icon: UsersIcon,
+    //   color: 'blue',
+    //   change: '+8%',
+    // },
     {
       name: 'Total Sales',
       value: `$${stats.total_sales.toFixed(2)}`,
@@ -208,7 +208,7 @@ const AffiliateDashboard: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
         >
           {statsCards.map((stat, index) => (
             <motion.div
