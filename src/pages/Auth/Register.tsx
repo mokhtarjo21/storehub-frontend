@@ -97,8 +97,14 @@ const Register: React.FC = () => {
         name: data.name,
         email: data.email,
         role: data.role,
-        companyName: data.companyName,
       };
+
+      if (data.role === "company_admin") {
+        payload.companyName = data.companyName;
+        payload.companyEmail = data.companyEmail;
+        payload.commercialRegister = data.commercialRegister;
+        payload.taxCard = data.taxCard;
+      }
 
       if (data.role === "affiliate") {
         payload.affiliateCompany = data.affiliateCompany;
@@ -115,24 +121,24 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-300 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8"
+        className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg transition-colors duration-300"
       >
         <div>
           <Link to="/" className="flex justify-center">
-            <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-3xl font-bold bg-gradient-to-r from-[#155F82] via-[#44B3E1] to-[#155F82] bg-clip-text text-transparent">
               StoreHub
             </span>
           </Link>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             {t("auth.register.title")}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          {/* <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
             {t("auth.register.subtitle")}
-          </p>
+          </p> */}
         </div>
 
         <motion.form
@@ -159,10 +165,10 @@ const Register: React.FC = () => {
                 <option value="company_admin">
                   {t("auth.role.company_admin")}
                 </option>
-                <option value="affiliate">{t("auth.role.affiliate")}</option>
+                <option value="affiliate">Sales by Commission</option>
               </select>
               {errors.role && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                   {errors.role.message}
                 </p>
               )}
@@ -176,11 +182,11 @@ const Register: React.FC = () => {
                 <input
                   {...register("companyName")}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Enter company name"
                 />
                 {errors.companyName && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.companyName.message}
                   </p>
                 )}
@@ -192,11 +198,11 @@ const Register: React.FC = () => {
                 <input
                   {...register("companyEmail")}
                   type="email"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Enter company email"
                 />
                 {errors.companyEmail && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.companyEmail.message}
                   </p>
                 )}
@@ -209,10 +215,10 @@ const Register: React.FC = () => {
                   type="file"
                   accept="image/*"
                   {...register("commercialRegister")}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 />
                 {errors.commercialRegister && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.commercialRegister.message}
                   </p>
                 )}
@@ -225,10 +231,10 @@ const Register: React.FC = () => {
                   type="file"
                   accept="image/*"
                   {...register("taxCard")}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 />
                 {errors.taxCard && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.taxCard.message}
                   </p>
                 )}
@@ -243,11 +249,11 @@ const Register: React.FC = () => {
                 <input
                   {...register("affiliateCompany")}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Enter your company name"
                 />
                 {errors.affiliateCompany && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.affiliateCompany.message}
                   </p>
                 )}
@@ -259,11 +265,11 @@ const Register: React.FC = () => {
                 <input
                   {...register("affiliateJobTitle")}
                   type="text"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Enter your job title"
                 />
                 {errors.affiliateJobTitle && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.affiliateJobTitle.message}
                   </p>
                 )}
@@ -275,11 +281,11 @@ const Register: React.FC = () => {
                 <textarea
                   {...register("affiliateReason")}
                   rows={3}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Write your reason..."
                 ></textarea>
                 {errors.affiliateReason && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.affiliateReason.message}
                   </p>
                 )}
@@ -297,12 +303,12 @@ const Register: React.FC = () => {
                 {...register("name")}
                 type="text"
                 autoComplete="name"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 placeholder="Enter your full name"
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                  {errors.name.message}
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
+                  {errors.name?.message}
                 </p>
               )}
             </div>
@@ -318,11 +324,11 @@ const Register: React.FC = () => {
                 {...register("email")}
                 type="email"
                 autoComplete="email"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 placeholder="Enter your email"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                   {errors.email.message}
                 </p>
               )}
@@ -340,7 +346,7 @@ const Register: React.FC = () => {
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  className="block w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                   placeholder="Create a password"
                 />
                 <button
@@ -356,7 +362,7 @@ const Register: React.FC = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                   {errors.password.message}
                 </p>
               )}
@@ -367,7 +373,7 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? t("common.loading") : t("auth.register.title")}
             </button>

@@ -1,203 +1,183 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 import {
   ServerIcon,
   CpuChipIcon,
   WrenchScrewdriverIcon,
-} from '@heroicons/react/24/outline';
-import { useLanguage } from '../contexts/LanguageContext';
+} from "@heroicons/react/24/outline";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const features = [
     {
       icon: ServerIcon,
-      title: t('home.features.devices'),
-      description: t('home.features.devices.desc'),
+      title: t("home.features.devices"),
+      description: t("home.features.devices.desc"),
     },
     {
       icon: CpuChipIcon,
-      title: t('home.features.licenses'),
-      description: t('home.features.licenses.desc'),
+      title: t("home.features.licenses"),
+      description: t("home.features.licenses.desc"),
     },
     {
       icon: WrenchScrewdriverIcon,
-      title: t('home.features.installation'),
-      description: t('home.features.installation.desc'),
+      title: t("home.features.installation"),
+      description: t("home.features.installation.desc"),
     },
   ];
 
   const stats = [
-    { label: 'Happy Customers', value: '10,000+' },
-    { label: 'Products Available', value: '500+' },
-    { label: 'Countries Served', value: '25+' },
-    { label: 'Years Experience', value: '15+' },
+    { label: "Happy Customers", value: "10,000+" },
+    { label: "Products Available", value: "500+" },
+    { label: "Countries Served", value: "25+" },
+    { label: "Years Experience", value: "15+" },
   ];
 
   return (
-    <div className="overflow-hidden">
-      {/* Hero Section */}
-      <motion.section 
+    <div className="min-h-screen dark:bg-gray-900 dark:text-gray-100">
+      {/* HERO SECTION */}
+      <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 dark:from-blue-800 dark:via-blue-900 dark:to-indigo-900"
+        className="
+          relative 
+          bg-gradient-to-br 
+          from-[#155F82] to-[#44B3E1]
+          dark:from-[#155F82] dark:to-[#44B3E1]
+        "
       >
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-          <div className="text-center">
-            <motion.h1 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
-            >
-              {t('home.hero.title')}
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-blue-100 sm:text-xl"
-            >
-              {t('home.hero.subtitle')}
-            </motion.p>
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-10 flex items-center justify-center gap-x-6"
-            >
-              <Link
-                to="/products"
-                className="rounded-md bg-white px-6 py-3 text-lg font-semibold text-blue-600 shadow-sm hover:bg-blue-50 transition-all duration-200 transform hover:scale-105"
-              >
-                {t('home.hero.cta')}
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent"></div>
-      </motion.section>
-
-      {/* Stats Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-16 bg-white dark:bg-gray-900"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {stats.map((stat, index) => (
-              <motion.div 
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="text-3xl sm:text-4xl font-bold text-blue-600 dark:text-blue-400">
-                  {stat.value}
-                </div>
-                <div className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Features Section */}
-      <motion.section 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-24 bg-gray-50 dark:bg-gray-800"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div 
+        <div className="mx-auto max-w-7xl px-6 py-28 text-center">
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white drop-shadow-lg"
           >
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-              {t('home.features.title')}
-            </h2>
-            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
-              We provide comprehensive solutions for all your networking needs
-            </p>
-          </motion.div>
+            {t("home.hero.title")}
+          </motion.h1>
 
-          <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 mx-auto max-w-2xl text-lg sm:text-xl text-blue-50"
+          >
+            {t("home.hero.subtitle")}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-10 flex justify-center"
+          >
+            <button
+              onClick={() => navigate("/products")}
+              className="px-8 py-3 rounded-xl font-semibold text-lg bg-white text-[#155F82] shadow-lg hover:bg-gray-50 hover:scale-105 transition-all duration-300"
+            >
+              {t("home.hero.cta")}
+            </button>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* STATS */}
+      <section className="py-20 bg-white dark:bg-gray-900">
+        <div className="mx-auto max-w-6xl grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-4xl font-bold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent">
+                {stat.value}
+              </h3>
+              <p className="mt-1 text-gray-600 dark:text-gray-300">
+                {stat.label}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
+            {t("home.features.title")}
+          </h2>
+
+          <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
+            Premium networking solutions designed for stability & performance
+          </p>
+
+          <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {features.map((f, i) => (
               <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 50 }}
+                key={i}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                transition={{ delay: i * 0.2 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-                className="relative p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700"
+                className="
+                  bg-white dark:bg-gray-900 rounded-2xl p-8
+                  border border-gray-200 dark:border-gray-700
+                  hover:shadow-xl transition-all duration-300
+                "
               >
-                <div className="absolute top-6 left-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-white">
-                    <feature.icon className="h-6 w-6" aria-hidden="true" />
-                  </div>
+                <div className="bg-gradient-to-br from-[#155F82] to-[#44B3E1] w-12 h-12 rounded-xl flex items-center justify-center text-white">
+                  <f.icon className="h-6 w-6" />
                 </div>
-                <div className="pt-16">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-4 text-gray-600 dark:text-gray-300">
-                    {feature.description}
-                  </p>
-                </div>
+
+                <h3 className="mt-6 text-xl font-semibold text-gray-900 dark:text-white">
+                  {f.title}
+                </h3>
+
+                <p className="mt-3 text-gray-600 dark:text-gray-300">
+                  {f.description}
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* CTA Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-24 bg-blue-600 dark:bg-blue-800"
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready to transform your network infrastructure?
+      {/* CTA */}
+      <section className="py-24 bg-gradient-to-r from-[#155F82] to-[#44B3E1] text-white">
+        <div className="max-w-5xl mx-auto text-center px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold">
+            Ready to transform your infrastructure?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
-            Join thousands of satisfied customers who trust StoreHub for their networking needs.
+          <p className="mt-4 text-blue-100 max-w-xl mx-auto">
+            Join thousands of professionals using StoreHub to power their
+            networks.
           </p>
-          <div className="mt-8 flex items-center justify-center gap-x-6">
-            <Link
-              to="/products"
-              className="rounded-md bg-white px-6 py-3 text-lg font-semibold text-blue-600 shadow-sm hover:bg-blue-50 transition-all duration-200 transform hover:scale-105"
+
+          <div className="mt-10 flex justify-center gap-6">
+            <button
+              onClick={() => navigate("/products")}
+              className="px-8 py-3 rounded-lg font-semibold bg-white text-[#155F82] shadow-lg hover:bg-gray-50 hover:scale-105 transition"
             >
               Browse Products
-            </Link>
-            <Link
-              to="/register"
-              className="text-lg font-semibold leading-6 text-white hover:text-blue-100 transition-colors"
+            </button>
+
+            <button
+              onClick={() => navigate("/register")}
+              className="px-8 py-3 rounded-lg font-semibold border border-white/60 hover:bg-white/10 transition"
             >
-              Create Account <span aria-hidden="true">→</span>
-            </Link>
+              Create Account
+            </button>
           </div>
         </div>
-      </motion.section>
+      </section>
     </div>
   );
 };

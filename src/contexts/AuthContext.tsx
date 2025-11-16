@@ -145,48 +145,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const register = async (
-    userData: Partial<User> & {
-      affiliateCompany?: string;
-      affiliateJobTitle?: string;
-      affiliateReason?: string;
-    },
-    password: string
-  ): Promise<void> => {
+  const register = async (userData: any, password: string): Promise<void> => {
     setIsLoading(true);
 
     try {
-      const payload: any = {
-        email: userData.email,
-        full_name: userData.name,
-        role: userData.role,
-        company_name: userData.companyName || "",
-        password: password,
-        password_confirm: password,
-      };
+      const formData = new FormData();
 
-      if (userData.role === "affiliate") {
-        payload.affiliate_company = userData.affiliateCompany || "";
-        payload.affiliate_job_title = userData.affiliateJobTitle || "";
-        payload.affiliate_reason = userData.affiliateReason || "";
+      formData.append("email", userData.email);
+      formData.append("full_name", userData.name);
+      formData.append("role", userData.role);
+      formData.append("password", password);
+
+      if (userData.role === "company_admin") {
+        formData.append("company_name", userData.companyName);
+        formData.append("company_email", userData.companyEmail);
+
+        if (!userData.commercialRegister?.length) {
+          throw new Error("Commercial register file is required");
+        }
+
+        if (!userData.taxCard?.length) {
+          throw new Error("Tax card file is required");
+        }
+
+        formData.append("commercial_register", userData.commercialRegister[0]);
+        formData.append("tax_card", userData.taxCard[0]);
       }
 
+      if (userData.role === "affiliate") {
+        formData.append("affiliate_company", userData.affiliateCompany);
+        formData.append("affiliate_job_title", userData.affiliateJobTitle);
+        formData.append("affiliate_reason", userData.affiliateReason);
+      }
+      console.log(formData);
+      
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       await handleApiResponse(response);
-      toast.success(
-        "Registration successful! Please check your email for verification code."
-      );
+
+      toast.success("Registration successful! Check your email.");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Registration failed";
-      toast.error(errorMessage);
+      toast.error(
+        error instanceof Error ? error.message : "Registration failed"
+      );
       throw error;
     } finally {
       setIsLoading(false);
