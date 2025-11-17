@@ -20,7 +20,7 @@ import SmartRegister from "./pages/Auth/SmartRegister";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import EmailVerification from "./pages/Auth/EmailVerification";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
+import Adminpanel from "./pages/Admin/AdminPanel";
 import AffiliateDashboard from "./pages/Affiliate/AffiliateDashboard";
 import ProductDetail from "./pages/ProductDetail";
 import OrderDetail from "./pages/OrderDetail";
@@ -44,7 +44,7 @@ function App() {
                     element={<AccountUnderReview />}
                   />
                   <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} />
+                    <Route index element={<Adminpanel />} />
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
                     <Route path="services" element={<Services />} />
@@ -113,7 +113,7 @@ function App() {
                       path="admin"
                       element={
                         <ProtectedRoute requiredRole="super_admin">
-                          <AdminDashboard />
+                          <Adminpanel />
                         </ProtectedRoute>
                       }
                     />
