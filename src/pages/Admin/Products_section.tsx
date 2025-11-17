@@ -57,9 +57,6 @@ export default function AdminProductsSection() {
   const [brands, setBrands] = useState<Brand[] | null>(null)
    const { fetchProducts,fetchbrands,
     fetchcategories,
-    fetchProduct,
-    createProduct,
-    updateProduct,
     deleteProduct,} = useAuth();
    
 
@@ -324,7 +321,7 @@ function ProductForm({
   const [isActive, setIsActive] = useState<boolean>((initial?.is_active as boolean) ?? true)
   const [isFeatured, setIsFeatured] = useState<boolean>((initial?.is_featured as boolean) ?? false)
   const [imageFile, setImageFile] = useState<File | null>(null)
-
+  const { fetchProduct,createProduct,updateProduct } =useAuth()
   useEffect(() => {
     // if editing, try to pre-fill categoryId/brandId by fetching detail
     if (initial && initial.id) {
@@ -332,7 +329,7 @@ function ProductForm({
       // We'll try GET /api/admin/products/<id>/ (some backends expose id-based detail); fallback to nothing
       (async () => {
         try {
-          const res = await axios.get(`/api/admin/products/${initial.id}/`)
+          const res = await fetchProduct(initial.id)
           const data = res.data
           setName(data.name ?? '')
           setNameAr(data.name_ar ?? '')
@@ -381,13 +378,9 @@ function ProductForm({
 
       let res
       if (initial && initial.id) {
-        res = await axios.put(`/api/admin/products/${initial.id}/update/`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
+        res = await updateProduct(initial.id,fd)
       } else {
-        res = await axios.post(CREATE_ENDPOINT, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
+        res = await createProduct(fd)
       }
 
       const saved = res.data
