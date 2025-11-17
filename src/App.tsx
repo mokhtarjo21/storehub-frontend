@@ -44,7 +44,7 @@ function App() {
                     element={<AccountUnderReview />}
                   />
                   <Route path="/" element={<Layout />}>
-                    <Route index element={<Adminpanel />} />
+                    <Route index element={<Home />} />
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
                     <Route path="services" element={<Services />} />
