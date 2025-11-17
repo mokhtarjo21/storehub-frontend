@@ -310,7 +310,7 @@ const deleteProduct = async (id: string | number): Promise<void> => {
 const fetchcategories = async (): Promise<any[]> => {
   setIsLoading(true);
   try {
-    const response = await fetch(`${API_BASE_URL}/products/`, {
+    const response = await fetch(`${API_BASE_URL}/products/categories/`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
@@ -326,7 +326,7 @@ const fetchcategories = async (): Promise<any[]> => {
 const fetchbrands = async (): Promise<any[]> => {
   setIsLoading(true);
   try {
-    const response = await fetch(`${API_BASE_URL}/brands/`, {
+    const response = await fetch(`${API_BASE_URL}/products/brands/`, {
       method: "GET",
       headers: getAuthHeaders(),
     });
