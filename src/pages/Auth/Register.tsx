@@ -8,77 +8,110 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 
-const schema = yup.object({
-  name: yup.string().required("Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+export const useRegisterSchema = () => {
+  const { language } = useLanguage();
 
-  role: yup
-    .string()
-    .oneOf(["individual", "company_admin", "affiliate"])
-    .required("Role is required"),
+  const messages = {
+    en: {
+      nameRequired: "Name is required",
+      emailRequired: "Email is required",
+      emailInvalid: "Invalid email",
+      passwordRequired: "Password is required",
+      passwordMin: "Password must be at least 6 characters",
+      roleRequired: "Role is required",
+      companyNameRequired: "Company name is required",
+      // companyEmailRequired: "Company email is required",
+      // companyEmailInvalid: "Invalid company email",
+      commercialRegisterRequired: "Commercial registration image is required",
+      taxCardRequired: "Tax card image is required",
+      affiliateCompanyRequired: "Company name is required",
+      affiliateJobTitleRequired: "Job title is required",
+      affiliateReasonRequired: "Please provide a reason",
+      phoneRequired: "Phone number is required",
+      phoneInvalid: "Invalid  phone number",
+    },
+    ar: {
+      nameRequired: "الاسم مطلوب",
+      emailRequired: "البريد الإلكتروني مطلوب",
+      emailInvalid: "البريد الإلكتروني غير صالح",
+      passwordRequired: "كلمة المرور مطلوبة",
+      passwordMin: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+      roleRequired: "اختر نوع الحساب",
+      companyNameRequired: "اسم الشركة مطلوب",
+      // companyEmailRequired: "البريد الإلكتروني للشركة مطلوب",
+      // companyEmailInvalid: "البريد الإلكتروني للشركة غير صالح",
+      commercialRegisterRequired: "صورة السجل التجاري مطلوبة",
+      taxCardRequired: "صورة البطاقة الضريبية مطلوبة",
+      affiliateCompanyRequired: "اسم الشركة مطلوب",
+      affiliateJobTitleRequired: "المسمى الوظيفي مطلوب",
+      affiliateReasonRequired: "الرجاء تقديم السبب",
+      phoneRequired: "رقم الهاتف مطلوب",
+      phoneInvalid: "رقم الهاتف غير صالح",
+    },
+  };
 
-  // COMPANY ADMIN
-  companyName: yup.string().when("role", {
-    is: "company_admin",
-    then: (schema) => schema.required("Company name is required"),
-  }),
-
-  companyEmail: yup.string().when("role", {
-    is: "company_admin",
-    then: (schema) =>
-      schema
-        .email("Invalid company email")
-        .required("Company email is required"),
-  }),
-
-  commercialRegister: yup.mixed().when("role", {
-    is: "company_admin",
-    then: (schema) =>
-      schema.test(
-        "required",
-        "Commercial registration image is required",
-        (value) => value && value.length > 0
-      ),
-  }),
-
-  taxCard: yup.mixed().when("role", {
-    is: "company_admin",
-    then: (schema) =>
-      schema.test(
-        "required",
-        "Tax card image is required",
-        (value) => value && value.length > 0
-      ),
-  }),
-
-  // AFFILIATE FIELDS
-  affiliateCompany: yup.string().when("role", {
-    is: "affiliate",
-    then: (schema) => schema.required("Company name is required"),
-  }),
-
-  affiliateJobTitle: yup.string().when("role", {
-    is: "affiliate",
-    then: (schema) => schema.required("Job title is required"),
-  }),
-
-  affiliateReason: yup.string().when("role", {
-    is: "affiliate",
-    then: (schema) => schema.required("Please provide a reason"),
-  }),
-});
-
-type RegisterFormData = yup.InferType<typeof schema>;
+  return yup.object({
+    name: yup.string().required(messages[language].nameRequired),
+    email: yup
+      .string()
+      .email(messages[language].emailInvalid)
+      .required(messages[language].emailRequired),
+    phone: yup
+      .string()
+      .required(messages[language].phoneRequired)
+      .matches(/^01[0-9]{9}$/, messages[language].phoneInvalid),
+    password: yup
+      .string()
+      .min(6, messages[language].passwordMin)
+      .required(messages[language].passwordRequired),
+    role: yup.string().required(messages[language].roleRequired),
+    companyName: yup.string().when("role", {
+      is: "company_admin",
+      then: (schema) => schema.required(messages[language].companyNameRequired),
+    }),
+    commercialRegister: yup.mixed().when("role", {
+      is: "company_admin",
+      then: (schema) =>
+        schema.test(
+          "required",
+          messages[language].commercialRegisterRequired,
+          (value) => value && value.length > 0
+        ),
+    }),
+    taxCard: yup.mixed().when("role", {
+      is: "company_admin",
+      then: (schema) =>
+        schema.test(
+          "required",
+          messages[language].taxCardRequired,
+          (value) => value && value.length > 0
+        ),
+    }),
+    affiliateCompany: yup.string().when("role", {
+      is: "affiliate",
+      then: (schema) =>
+        schema.required(messages[language].affiliateCompanyRequired),
+    }),
+    affiliateJobTitle: yup.string().when("role", {
+      is: "affiliate",
+      then: (schema) =>
+        schema.required(messages[language].affiliateJobTitleRequired),
+    }),
+    affiliateReason: yup.string().when("role", {
+      is: "affiliate",
+      then: (schema) =>
+        schema.required(messages[language].affiliateReasonRequired),
+    }),
+  });
+};
 
 const Register: React.FC = () => {
   const { register: registerUser, isLoading } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  const schema = useRegisterSchema();
 
   const {
     register,
@@ -96,12 +129,13 @@ const Register: React.FC = () => {
       const payload: any = {
         name: data.name,
         email: data.email,
+        phone: data.phone,
         role: data.role,
       };
 
       if (data.role === "company_admin") {
         payload.companyName = data.companyName;
-        payload.companyEmail = data.companyEmail;
+        // payload.companyEmail = data.companyEmail;
         payload.commercialRegister = data.commercialRegister;
         payload.taxCard = data.taxCard;
       }
@@ -160,16 +194,18 @@ const Register: React.FC = () => {
                 {...register("role")}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">{t("auth.role")}</option>
+                <option value="" disabled>
+                  {t("auth.role")}
+                </option>
                 <option value="individual">{t("auth.role.individual")}</option>
                 <option value="company_admin">
                   {t("auth.role.company_admin")}
                 </option>
-                <option value="affiliate">Sales by Commission</option>
+                <option value="affiliate">{t("auth.role.affiliate")}</option>
               </select>
               {errors.role && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
-                  {errors.role.message}
+                  {t(errors.role.message || "")}
                 </p>
               )}
             </div>
@@ -177,39 +213,23 @@ const Register: React.FC = () => {
               <motion.div className="space-y-2">
                 {/* Company Name */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Company Name
+                  {t("auth.companyName")}
                 </label>
                 <input
                   {...register("companyName")}
                   type="text"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Enter company name"
+                  placeholder={t("auth.register.companyName.placeholder")}
                 />
                 {errors.companyName && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
-                    {errors.companyName.message}
-                  </p>
-                )}
-
-                {/* Company Email */}
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Company Email
-                </label>
-                <input
-                  {...register("companyEmail")}
-                  type="email"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Enter company email"
-                />
-                {errors.companyEmail && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
-                    {errors.companyEmail.message}
+                    {t(errors.companyName.message || "")}
                   </p>
                 )}
 
                 {/* Commercial Registration Image */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Commercial Registration Image
+                  {t("auth.register.commercialRegister")}
                 </label>
                 <input
                   type="file"
@@ -225,7 +245,7 @@ const Register: React.FC = () => {
 
                 {/* Tax Card Image */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Tax Card Image
+                  {t("auth.register.taxCard")}
                 </label>
                 <input
                   type="file"
@@ -244,13 +264,13 @@ const Register: React.FC = () => {
               <motion.div className="space-y-2">
                 {/* Affiliate Company */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Company Name
+                  {t("auth.register.affiliateCompany")}
                 </label>
                 <input
                   {...register("affiliateCompany")}
                   type="text"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Enter your company name"
+                  placeholder={t("auth.register.affiliateCompany.placeholder")}
                 />
                 {errors.affiliateCompany && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
@@ -260,13 +280,13 @@ const Register: React.FC = () => {
 
                 {/* Job Title */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Job Title
+                  {t("auth.register.affiliateJobTitle")}
                 </label>
                 <input
                   {...register("affiliateJobTitle")}
                   type="text"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Enter your job title"
+                  placeholder={t("auth.register.affiliateJobTitle.placeholder")}
                 />
                 {errors.affiliateJobTitle && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
@@ -276,13 +296,13 @@ const Register: React.FC = () => {
 
                 {/* Reason */}
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Why do you want to work with us?
+                  {t("auth.register.affiliateReason")}
                 </label>
                 <textarea
                   {...register("affiliateReason")}
                   rows={3}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Write your reason..."
+                  placeholder={t("auth.register.affiliateReason.placeholder")}
                 ></textarea>
                 {errors.affiliateReason && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
@@ -304,7 +324,7 @@ const Register: React.FC = () => {
                 type="text"
                 autoComplete="name"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                placeholder="Enter your full name"
+                placeholder={t("auth.register.name.placeholder")}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
@@ -325,11 +345,17 @@ const Register: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                placeholder="Enter your email"
+                placeholder={t("auth.register.email.placeholder")}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                   {errors.email.message}
+                </p>
+              )}
+              {/* Company Email Hint */}
+              {selectedRole === "company_admin" && (
+                <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                  {t("auth.register.companyEmail.hint")}
                 </p>
               )}
             </div>
@@ -347,7 +373,7 @@ const Register: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-                  placeholder="Create a password"
+                  placeholder={t("auth.register.password.placeholder")}
                 />
                 <button
                   type="button"
@@ -367,13 +393,30 @@ const Register: React.FC = () => {
                 </p>
               )}
             </div>
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t("auth.phone")}
+              </label>
+              <input
+                {...register("phone")}
+                type="text"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
+                placeholder={t("auth.register.phone.placeholder")}
+              />
+              {errors.phone && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
+                  {errors.phone.message}
+                </p>
+              )}
+            </div>
           </div>
 
           <div>
             <button
               type="submit"
               disabled={isLoading}
-            className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? t("common.loading") : t("auth.register.title")}
             </button>
@@ -381,7 +424,7 @@ const Register: React.FC = () => {
 
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{" "}
+              {t("auth.register.haveAccount")}{" "}
               <Link
                 to="/login"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"

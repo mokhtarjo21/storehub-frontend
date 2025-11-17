@@ -155,10 +155,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       formData.append("full_name", userData.name);
       formData.append("role", userData.role);
       formData.append("password", password);
+      formData.append("phone", userData.phone);
 
       if (userData.role === "company_admin") {
         formData.append("company_name", userData.companyName);
-        formData.append("company_email", userData.companyEmail);
+        // formData.append("company_email", userData.companyEmail);
 
         if (!userData.commercialRegister?.length) {
           throw new Error("Commercial register file is required");
@@ -178,7 +179,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         formData.append("affiliate_reason", userData.affiliateReason);
       }
       console.log(formData);
-      
+
+      for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: "POST",
         body: formData,

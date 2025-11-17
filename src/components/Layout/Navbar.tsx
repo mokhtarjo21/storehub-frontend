@@ -12,13 +12,13 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useLanguage } from "../../contexts/LanguageContext";
-// import { useCart } from "../../contexts/CartContext";
+import { useCart } from "../../contexts/CartContext";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  // const { itemCount } = useCart();
+  const { itemCount } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -133,14 +133,14 @@ const Navbar: React.FC = () => {
                   <div className="flex items-center space-x-4 rtl:space-x-reverse">
                     <button
                       onClick={() => navigate("/login")}
-                      className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors"
+                      className="px-5 py-2 bg-[#DF1783] text-white rounded-full hover:bg-pink-500 transition-all"
                     >
                       {t("nav.login")}
                     </button>
 
                     <button
                       onClick={() => navigate("/register")}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                      className="px-5 py-2 bg-[#DF1783] text-white rounded-full hover:bg-pink-500 transition-all"
                     >
                       {t("nav.register")}
                     </button>

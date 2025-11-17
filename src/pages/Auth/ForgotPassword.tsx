@@ -7,22 +7,43 @@ import * as yup from "yup";
 import toast from "react-hot-toast";
 import {
   EnvelopeIcon,
-  ArrowLeftIcon,
   PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
-// import { useLanguage } from "../../contexts/LanguageContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 
-const schema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-});
+export const useForgotPasswordSchema = () => {
+  const { language } = useLanguage();
 
-type ForgotPasswordFormData = yup.InferType<typeof schema>;
+  const messages = {
+    en: {
+      emailRequired: "Email is required",
+      emailInvalid: "Invalid email",
+    },
+    ar: {
+      emailRequired: "البريد الإلكتروني مطلوب",
+      emailInvalid: "البريد الإلكتروني غير صالح",
+    },
+  };
+
+  return yup.object({
+    email: yup
+      .string()
+      .email(messages[language].emailInvalid)
+      .required(messages[language].emailRequired),
+  });
+};
+
+type ForgotPasswordFormData = yup.InferType<
+  ReturnType<typeof useForgotPasswordSchema>
+>;
 
 const ForgotPassword: React.FC = () => {
-  // const { t } = useLanguage();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
+
+  const schema = useForgotPasswordSchema();
 
   const {
     register,
@@ -34,15 +55,12 @@ const ForgotPassword: React.FC = () => {
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true);
-
     try {
       const response = await fetch(
         "http://192.168.1.7:8000/api/auth/request-password-reset/",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: data.email }),
         }
       );
@@ -56,16 +74,17 @@ const ForgotPassword: React.FC = () => {
           responseData.detail ||
           responseData.email?.[0] ||
           responseData.non_field_errors?.[0] ||
-          "Failed to send reset code";
-
+          t("auth.forgotPassword.error");
         throw new Error(message);
       }
 
       setSentEmail(data.email);
       setEmailSent(true);
-      toast.success("Password reset code sent to your email!");
+      toast.success(t("auth.forgotPassword.codeSent"));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unknown error");
+      toast.error(
+        error instanceof Error ? error.message : t("common.unknownError")
+      );
     } finally {
       setIsLoading(false);
     }
@@ -89,27 +108,15 @@ const ForgotPassword: React.FC = () => {
               <PaperAirplaneIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
             </motion.div>
 
-            <h2
-              className="
-              mt-6 text-3xl font-bold 
-              bg-gradient-to-r from-[#155F82] to-[#44B3E1]
-              bg-clip-text text-transparent
-            "
-            >
-              Check Your Email
+            <h2 className="mt-6 text-3xl font-bold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent p-4">
+              {t("auth.forgotPassword.checkEmail")}
             </h2>
 
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              We've sent a password reset code to
+              {t("auth.forgotPassword.sentTo")}
             </p>
 
-            <p
-              className="
-              mt-1 text-sm font-semibold
-              bg-gradient-to-r from-[#155F82] to-[#44B3E1]
-              bg-clip-text text-transparent
-            "
-            >
+            <p className="mt-1 text-sm font-semibold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent p-2">
               {sentEmail}
             </p>
           </div>
@@ -117,37 +124,17 @@ const ForgotPassword: React.FC = () => {
           <div className="space-y-4">
             <Link
               to={`/reset-password?email=${encodeURIComponent(sentEmail)}`}
-              className="
-                w-full flex justify-center py-3 px-4 rounded-md text-white 
-                bg-gradient-to-r from-[#155F82] to-[#44B3E1]
-                hover:opacity-90 transition-all font-medium
-              "
+              className="w-full flex justify-center py-3 px-4 rounded-md text-white bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition-all font-medium"
             >
-              Enter Reset Code
+              {t("auth.forgotPassword.enterCode")}
             </Link>
 
             <Link
               to="/login"
-              className="
-                w-full flex justify-center py-2 px-4 text-sm font-medium
-                text-[#155F82] dark:text-[#44B3E1]
-                hover:text-[#44B3E1] dark:hover:text-[#155F82]
-                transition
-              "
+              className="w-full flex justify-center py-2 px-4 text-sm font-medium text-[#155F82] dark:text-[#44B3E1] hover:text-[#44B3E1] dark:hover:text-[#155F82] transition"
             >
-              <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Back to Login
+              {t("auth.forgotPassword.login")}
             </Link>
-          </div>
-
-          <div className="mt-6 p-4 bg-gradient-to-r from-[#155F82]/10 to-[#44B3E1]/10 dark:from-[#155F82]/20 dark:to-[#44B3E1]/20 rounded-lg">
-            <div className="flex items-start space-x-3">
-              <EnvelopeIcon className="h-5 w-5 text-[#155F82] dark:text-[#44B3E1]" />
-              <div className="text-sm text-[#155F82] dark:text-[#44B3E1]">
-                <p className="font-medium mb-1">Didn't receive the email?</p>
-                <p>Check your spam folder or request a new code.</p>
-              </div>
-            </div>
           </div>
         </motion.div>
       </div>
@@ -163,27 +150,17 @@ const ForgotPassword: React.FC = () => {
       >
         <div className="text-center">
           <Link to="/" className="flex justify-center">
-            <span
-              className="
-              text-3xl font-bold 
-              bg-gradient-to-r from-[#155F82] to-[#44B3E1]
-              bg-clip-text text-transparent
-            "
-            >
+            <span className="text-3xl font-bold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent">
               StoreHub
             </span>
           </Link>
 
-          <h2
-            className="
-            mt-6 text-2xl font-bold text-gray-900 dark:text-white
-          "
-          >
-            Forgot Password
+          <h2 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">
+            {t("auth.forgotPassword.title")}
           </h2>
 
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Enter your email and we'll send you a reset code
+            {t("auth.forgotPassword.subtitle")}
           </p>
         </div>
 
@@ -199,7 +176,7 @@ const ForgotPassword: React.FC = () => {
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Email Address
+              {t("auth.email")}
             </label>
 
             <div className="mt-1 relative">
@@ -207,14 +184,8 @@ const ForgotPassword: React.FC = () => {
               <input
                 {...register("email")}
                 type="email"
-                className="
-                  block w-full pl-10 pr-3 py-2 rounded-md
-                  border border-gray-300 dark:border-gray-600
-                  bg-white dark:bg-gray-800
-                  text-gray-900 dark:text-white
-                  focus:ring-2 focus:ring-[#44B3E1]
-                "
-                placeholder="Enter your email"
+                className="block w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#44B3E1]"
+                placeholder={t("auth.forgotPassword.emailPlaceholder")}
               />
             </div>
 
@@ -228,26 +199,18 @@ const ForgotPassword: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="
-              w-full py-3 px-4 rounded-md text-white font-medium
-              bg-gradient-to-r from-[#155F82] to-[#44B3E1]
-              hover:opacity-90 transition disabled:opacity-50
-            "
+            className="w-full py-3 px-4 rounded-md text-white font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50"
           >
-            {isLoading ? "Sending..." : "Send Reset Code"}
+            {isLoading
+              ? t("common.sending")
+              : t("auth.forgotPassword.sendCode")}
           </button>
 
           <Link
             to="/login"
-            className="
-              flex items-center justify-center text-sm
-              text-[#155F82] dark:text-[#44B3E1]
-              hover:text-[#44B3E1] dark:hover:text-[#155F82]
-              transition
-            "
+            className="flex items-center justify-center text-sm text-[#155F82] dark:text-[#44B3E1] hover:text-[#44B3E1] dark:hover:text-[#155F82] transition"
           >
-            <ArrowLeftIcon className="w-4 h-4 mr-2" />
-            Back to Login
+            {t("auth.forgotPassword.login")}
           </Link>
         </motion.form>
       </motion.div>

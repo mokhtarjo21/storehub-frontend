@@ -8,21 +8,45 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 
-const schema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
+export const useLoginSchema = () => {
+  const { language } = useLanguage();
 
-type LoginFormData = yup.InferType<typeof schema>;
+  const messages = {
+    en: {
+      emailRequired: "Email is required",
+      emailInvalid: "Invalid email",
+      passwordRequired: "Password is required",
+      passwordMin: "Password must be at least 6 characters",
+    },
+    ar: {
+      emailRequired: "البريد الإلكتروني مطلوب",
+      emailInvalid: "البريد الإلكتروني غير صالح",
+      passwordRequired: "كلمة المرور مطلوبة",
+      passwordMin: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    },
+  };
+
+  return yup.object({
+    email: yup
+      .string()
+      .email(messages[language].emailInvalid)
+      .required(messages[language].emailRequired),
+    password: yup
+      .string()
+      .min(6, messages[language].passwordMin)
+      .required(messages[language].passwordRequired),
+  });
+};
 
 const Login: React.FC = () => {
   const { login, isLoading } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  const schema = useLoginSchema();
+
+  type LoginFormData = yup.InferType<typeof schema>;
 
   const {
     register,
@@ -85,11 +109,11 @@ const Login: React.FC = () => {
                 {...register("email")}
                 type="email"
                 className="mt-1 block w-full text-xs px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#44B3E1]"
-                placeholder="Enter your email"
+                placeholder={t("auth.login.emailPlaceholder")}
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.email.message}
+                  {t(errors.email.message || "")}
                 </p>
               )}
             </div>
@@ -99,13 +123,12 @@ const Login: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("auth.password")}
               </label>
-
               <div className="mt-1 relative">
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   className="block w-full text-xs px-3 py-2 pr-10 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#44B3E1]"
-                  placeholder="Enter your password"
+                  placeholder={t("auth.login.passwordPlaceholder")}
                 />
                 <button
                   type="button"
@@ -119,42 +142,41 @@ const Login: React.FC = () => {
                   )}
                 </button>
               </div>
-
               {errors.password && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.password.message}
+                  {t(errors.password.message || "")}
                 </p>
               )}
             </div>
-          </div>
 
-          {/* SUBMIT BUTTON */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? t("common.loading") : t("auth.login.title")}
-          </button>
-
-          {/* LINKS */}
-          <div className="text-center mt-6 space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                className="font-semibold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent hover:opacity-80 transition"
-              >
-                {t("nav.register")}
-              </Link>
-            </p>
-
-            <Link
-              to="/forgot-password"
-              className="inline-block text-xs font-medium text-[#155F82] hover:text-[#44B3E1] dark:text-[#44B3E1] dark:hover:text-[#155F82] transition"
+            {/* SUBMIT BUTTON */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Forgot your password?
-            </Link>
+              {isLoading ? t("common.loading") : t("auth.login.title")}
+            </button>
+
+            {/* LINKS */}
+            <div className="text-center mt-6 space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {t("auth.login.noAccount")}{" "}
+                <Link
+                  to="/register"
+                  className="font-semibold bg-gradient-to-r from-[#155F82] to-[#44B3E1] bg-clip-text text-transparent hover:opacity-80 transition"
+                >
+                  {t("nav.register")}
+                </Link>
+              </p>
+
+              <Link
+                to="/forgot-password"
+                className="inline-block text-xs font-medium text-[#155F82] hover:text-[#44B3E1] dark:text-[#44B3E1] dark:hover:text-[#155F82] transition"
+              >
+                {t("auth.login.forgotPassword")}
+              </Link>
+            </div>
           </div>
         </motion.form>
       </motion.div>

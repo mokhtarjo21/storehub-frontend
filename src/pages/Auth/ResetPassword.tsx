@@ -11,9 +11,8 @@ import {
   EyeSlashIcon,
   CheckCircleIcon,
   ArrowPathIcon,
-  ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
-// import { useLanguage } from "../../contexts/LanguageContext";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const schema = yup.object({
   otp_code: yup
@@ -34,7 +33,7 @@ const schema = yup.object({
 type ResetPasswordFormData = yup.InferType<typeof schema>;
 
 const ResetPassword: React.FC = () => {
-  // const { t } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
@@ -146,15 +145,15 @@ const ResetPassword: React.FC = () => {
           </motion.div>
 
           <h2
-            className="mt-6 text-3xl font-bold 
+            className="mt-6 text-3xl font-bold pb-2
   bg-gradient-to-r from-[#155F82] via-[#44B3E1] to-[#155F82] 
   bg-clip-text text-transparent"
           >
-            Reset Password
+            {t("auth.resetPassword.title")}
           </h2>
 
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Enter the reset code sent to
+            {t("auth.resetPassword.subtitle")}
           </p>
 
           <p
@@ -181,7 +180,7 @@ const ResetPassword: React.FC = () => {
               htmlFor="otp_code"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
-              Reset Code
+              {t("auth.resetPassword.title")}
             </label>
 
             <input
@@ -205,7 +204,7 @@ const ResetPassword: React.FC = () => {
               htmlFor="new_password"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              New Password
+              {t("auth.resetPassword.subtitle")}
             </label>
             <div className="mt-1 relative">
               <input
@@ -213,7 +212,7 @@ const ResetPassword: React.FC = () => {
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 className="block w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter new password"
+                placeholder={t("auth.resetPassword.newPasswordPlaceholder")}
               />
               <button
                 type="button"
@@ -239,7 +238,7 @@ const ResetPassword: React.FC = () => {
               htmlFor="confirm_password"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Confirm New Password
+              {t("auth.resetPassword.confirmPassword")}
             </label>
             <div className="mt-1 relative">
               <input
@@ -247,7 +246,7 @@ const ResetPassword: React.FC = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 autoComplete="new-password"
                 className="block w-full px-3 py-2 pr-10 rtl:pr-3 rtl:pl-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Confirm new password"
+                placeholder={t("auth.resetPassword.confirmPasswordPlaceholder")}
               />
               <button
                 type="button"
@@ -277,12 +276,12 @@ const ResetPassword: React.FC = () => {
             {isLoading ? (
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 <ArrowPathIcon className="h-4 w-4 animate-spin" />
-                <span>Resetting Password...</span>
+                <span>{t("auth.resetPassword.resetting")}</span>
               </div>
             ) : (
               <div className="flex items-center space-x-2 rtl:space-x-reverse">
                 <CheckCircleIcon className="h-4 w-4" />
-                <span>Reset Password</span>
+                <span>{t("auth.resetPassword.resetButton")}</span>
               </div>
             )}
           </button>
@@ -290,7 +289,7 @@ const ResetPassword: React.FC = () => {
           {/* Resend Code */}
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Didn't receive the code?{" "}
+              {t("auth.resetPassword.didntReceive")}&nbsp;
               <button
                 type="button"
                 onClick={handleResendCode}
@@ -302,7 +301,7 @@ const ResetPassword: React.FC = () => {
     transition-all
   "
               >
-                Resend Code
+                {t("auth.resetPassword.resendCode")}
               </button>
             </p>
           </div>
@@ -317,8 +316,7 @@ const ResetPassword: React.FC = () => {
     transition-colors
   "
             >
-              <ArrowLeftIcon className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" />
-              Back to Login
+              {t("auth.resetPassword.backToLogin")}
             </Link>
           </div>
         </motion.form>
