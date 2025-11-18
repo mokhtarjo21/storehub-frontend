@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-
 import { motion } from 'framer-motion'
 import { PlusCircleIcon, PencilSquareIcon, TrashIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
@@ -58,7 +57,8 @@ export default function AdminProductsSection() {
    const { fetchProducts,fetchbrands,
     fetchcategories,
     deleteProduct,} = useAuth();
-   
+   const API_BASE_URL = "http://192.168.1.7:8000";
+
 
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<ProductListItem | null>(null)
@@ -73,9 +73,9 @@ export default function AdminProductsSection() {
       if (brandFilter) params.brand = brandFilter
 
       const res = await fetchProducts()
-
+      console.log('Fetched products:', res);
       // backend might return {results: [...]} or plain array
-      const data = res.data?.results ?? res.data
+      const data = res.results ?? res
       setProducts(Array.isArray(data) ? data : [])
     } catch (err: any) {
       console.error('fetchProducts error', err)
@@ -92,13 +92,15 @@ export default function AdminProductsSection() {
       fetchcategories(),
       fetchbrands()
       ])
+      console.log(cRes,bRes);
+      
 
       if (cRes.status === 'fulfilled') {
-        const cdata = (cRes.value.data?.results ?? cRes.value.data) as Category[]
+        const cdata = (cRes.value.results ?? cRes.value.data) as Category[]
         if (Array.isArray(cdata)) setCategories(cdata)
       }
       if (bRes.status === 'fulfilled') {
-        const bdata = (bRes.value.data?.results ?? bRes.value.data) as Brand[]
+        const bdata = (bRes.value.results ?? bRes.value.data) as Brand[]
         if (Array.isArray(bdata)) setBrands(bdata)
       }
     } catch (e) {
@@ -120,9 +122,10 @@ export default function AdminProductsSection() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, categoryFilter, brandFilter])
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number|string) => {
     if (!confirm(language === 'ar' ? 'هل تريد حذف هذا المنتج؟' : 'Delete this product?')) return
     try {
+      console.log('Deleting product with id:', id);
       await deleteProduct(id)
       toast.success(language === 'ar' ? 'تم الحذف' : 'Deleted')
       setProducts((prev) => prev.filter((p) => p.id !== id))
@@ -234,7 +237,7 @@ export default function AdminProductsSection() {
                     {p.primary_image ? (
                       // full URL expected from serializer
                       // keep image responsive and small
-                      <img src={p.primary_image} alt={p.name} className="w-16 h-16 object-cover rounded" />
+                      <img src={API_BASE_URL + p.primary_image} alt={p.name} className="w-16 h-16 object-cover rounded" />
                     ) : (
                       <PhotoIcon className="w-10 h-10 text-gray-400" />
                     )}
@@ -383,7 +386,7 @@ function ProductForm({
         res = await createProduct(fd)
       }
 
-      const saved = res.data
+      const saved = res
       // Normalize saved product for the list shape
       const normalized: ProductListItem = {
         id: saved.id,
@@ -447,7 +450,7 @@ function ProductForm({
             <input
               required
               type="number"
-              step="0.01"
+              step="0.1"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
               placeholder={language === 'ar' ? 'السعر' : 'Price'}

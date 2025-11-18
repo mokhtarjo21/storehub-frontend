@@ -10,26 +10,16 @@ import {
 } from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useAuth } from "../contexts/AuthContext";
-import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
-
+import { useCart } from "../contexts/CartContext";
 const Cart: React.FC = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [usePoints, setUsePoints] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "split">("cod");
-
-  // Fetch cart data from API
-  const {
-    data: cartData,
-    loading,
-    execute: refetchCart,
-  } = useApi("/products/cart/");
-  console.log(cartData);
-
-  const items = cartData?.items || [];
-  const total = cartData?.total_price || 0;
+  const { updateQuantity, removeItem, clearCart, items, total, fetchCart } =
+    useCart();
 
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
@@ -39,72 +29,37 @@ const Cart: React.FC = () => {
     : 0;
   const finalTotal = total - pointsDiscount;
 
-  const updateQuantity = async (itemId: string, quantity: number) => {
+  const handelUpdate = async (
+    itemId: string,
+    newQuantity: number,
+    maxStock: number
+  ) => {
+    const quantityToSet = Math.max(1, Math.min(newQuantity, maxStock)); // لا يقل عن 1 ولا يزيد عن stock
+
     try {
-      const response = await fetch(
-        `http://198.168.1.7:8000/api/products/cart/update/${itemId}/`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-          body: JSON.stringify({ quantity }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update cart item");
-      }
-
-      refetchCart();
+      await updateQuantity(itemId, quantityToSet);
+      fetchCart();
       toast.success("Cart updated successfully");
     } catch (error) {
       toast.error("Failed to update cart");
     }
   };
 
-  const removeItem = async (itemId: string) => {
+  const itemRemove = async (itemId: string) => {
     try {
-      const response = await fetch(
-        `http://198.168.1.7:8000/api/products/cart/remove/${itemId}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      );
+      await removeItem(itemId);
+      fetchCart();
 
-      if (!response.ok) {
-        throw new Error("Failed to remove item from cart");
-      }
-
-      refetchCart();
       toast.success("Item removed from cart");
     } catch (error) {
       toast.error("Failed to remove item");
     }
   };
 
-  const clearCart = async () => {
+  const cartClear = async () => {
     try {
-      const response = await fetch(
-        "http://198.168.1.7:8000/api/products/cart/clear/",
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to clear cart");
-      }
-
-      refetchCart();
-      toast.success("Cart cleared successfully");
+      clearCart();
+      fetchCart();
     } catch (error) {
       toast.error("Failed to clear cart");
     }
@@ -114,20 +69,12 @@ const Cart: React.FC = () => {
     console.log("Processing checkout with payment method:", paymentMethod);
     console.log("Has services:", hasServices);
     console.log("Has products:", hasProducts);
-    toast.info(
+    toast(
       `Checkout with ${
         paymentMethod === "split" ? "Split Payment" : "Cash on Delivery"
       }`
     );
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (
@@ -194,7 +141,7 @@ const Cart: React.FC = () => {
                   >
                     <img
                       src={
-                        item.item_image ||
+                        item.product.image ||
                         "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                       }
                       alt={item.item_name}
@@ -208,32 +155,43 @@ const Cart: React.FC = () => {
                         {item.item_type === "product" ? "Product" : "Service"}
                       </p>
                       <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-2">
-                        ${parseFloat(item.item_price).toLocaleString()}
+                        ${parseFloat(item.product.price).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
+                          handelUpdate(
+                            item.id,
+                            item.quantity - 1,
+                            item.product.stock
+                          )
                         }
                         className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                       >
                         <MinusIcon className="w-5 h-5" />
                       </button>
+
                       <span className="w-12 text-center font-medium text-gray-900 dark:text-white">
                         {item.quantity}
                       </span>
+
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
+                          handelUpdate(
+                            item.id,
+                            item.quantity + 1,
+                            item.product.stock
+                          )
                         }
+                        disabled={item.quantity >= item.product.stock}
                         className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                       >
                         <PlusIcon className="w-5 h-5" />
                       </button>
                     </div>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => itemRemove(item.id)}
                       className="p-2 text-red-400 hover:text-red-600 transition-colors"
                     >
                       <TrashIcon className="w-5 h-5" />
@@ -400,7 +358,7 @@ const Cart: React.FC = () => {
               </button>
 
               <button
-                onClick={clearCart}
+                onClick={cartClear}
                 className="w-full mt-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-lg transition-colors"
               >
                 {t("cart.clear")}

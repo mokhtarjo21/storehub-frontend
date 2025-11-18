@@ -23,7 +23,7 @@ interface ActivityData {
   metadata?: Record<string, any>;
 }
 
-const API_BASE_URL = 'http://192.168.1.7:8000/api/accounts';
+const API_BASE_URL = 'http://192.168.1.7:8000/api/auth';
 
 let sessionId: string | null = null;
 

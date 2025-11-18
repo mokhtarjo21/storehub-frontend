@@ -11,12 +11,13 @@ const NotificationBell: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const token = localStorage.getItem("access_token");
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('http://192.168.1.7:8000/api/accounts/notifications/?limit=5', {
+      const response = await fetch('http://192.168.1.7:8000/api/auth/notifications/?limit=5', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+         'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -31,9 +32,9 @@ const NotificationBell: React.FC = () => {
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/accounts/notifications/unread-count/', {
+      const response = await fetch('http://192.168.1.7:8000/api/auth/notifications/unread-count/', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -60,10 +61,10 @@ const NotificationBell: React.FC = () => {
   const markAsRead = async (notificationId: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/accounts/notifications/${notificationId}/read/`, {
+      const response = await fetch(`http://192.168.1.7:8000/api/auth/notifications/${notificationId}/read/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -87,10 +88,10 @@ const NotificationBell: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/accounts/notifications/${notificationId}/delete/`, {
+      const response = await fetch(`http://192.168.1.7:8000/api/auth/notifications/${notificationId}/delete/`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+         'Authorization': `Bearer ${token}`,
         },
       });
 

@@ -122,7 +122,10 @@ export const resendOTP = async (email: string) => {
 
 // User profile functions
 export const getCurrentUser = async () => {
-  const response = await apiRequest("/auth/me/");
+  const response = await fetch(`${API_BASE_URL}/auth/me/`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
   return handleApiResponse(response);
 };
 

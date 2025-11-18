@@ -9,10 +9,10 @@ interface AuthContextType {
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
-    // Add product endpoints
+  // Add product endpoints
   fetchProducts: () => Promise<any[]>;
-  fetchcategories: ()=>Promise<any[]>;
-  fetchbrands : () => Promise<any[]>;
+  fetchcategories: () => Promise<any[]>;
+  fetchbrands: () => Promise<any[]>;
   fetchProduct: (id: string | number) => Promise<any>;
   createProduct: (productData: any) => Promise<any>;
   updateProduct: (id: string | number, productData: any) => Promise<any>;
@@ -125,6 +125,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
+         setUser(null);
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      toast.success("Logged out successfully");
       toast.error(errorMessage);
       throw error;
     } finally {
@@ -167,7 +172,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (userData.role === "company_admin") {
         formData.append("company_name", userData.companyName);
-        // formData.append("company_email", userData.companyEmail);
 
         if (!userData.commercialRegister?.length) {
           throw new Error("Commercial register file is required");
@@ -211,150 +215,182 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // داخل AuthProvider
-// ==================
+  // ==================
 
-// 1. جلب جميع المنتجات
-const fetchProducts = async (): Promise<any[]> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-    const data = await handleApiResponse(response);
-    return data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to fetch products");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+  // 1. جلب جميع المنتجات
+  const fetchProducts = async (): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const data = await handleApiResponse(response);
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch products"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  // 2. جلب منتج واحد
+  const fetchProduct = async (id: string | number): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${id}/`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleApiResponse(response);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-// 2. جلب منتج واحد
-const fetchProduct = async (id: string | number): Promise<any> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}/`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-    return await handleApiResponse(response);
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to fetch product");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+  // 3. إنشاء منتج جديد
+  const createProduct = async (formData: FormData): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
 
-// 3. إنشاء منتج جديد
-const createProduct = async (productData: any): Promise<any> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(productData),
-    });
-    const data = await handleApiResponse(response);
-    toast.success("Product created successfully!");
-    return data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to create product");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const response = await fetch(`${API_BASE_URL}/products/`, {
+        method: "POST",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
 
-// 4. تحديث منتج
-const updateProduct = async (id: string | number, productData: any): Promise<any> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}/`, {
-      method: "PUT", // أو "PATCH" حسب الحاجة
-      headers: getAuthHeaders(),
-      body: JSON.stringify(productData),
-    });
-    const data = await handleApiResponse(response);
-    toast.success("Product updated successfully!");
-    return data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to update product");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const data = await handleApiResponse(response);
+      toast.success("Product created successfully!");
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-// 5. حذف منتج
-const deleteProduct = async (id: string | number): Promise<void> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}/`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-    await handleApiResponse(response);
-    toast.success("Product deleted successfully!");
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to delete product");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+  // 4. تحديث منتج
+  const updateProduct = async (
+    id: string | number,
+    formData: FormData
+  ): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
 
-const fetchcategories = async (): Promise<any[]> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/categories/`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-    const data = await handleApiResponse(response);
-    return data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to fetch products");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
-const fetchbrands = async (): Promise<any[]> => {
-  setIsLoading(true);
-  try {
-    const response = await fetch(`${API_BASE_URL}/products/brands/`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
-    const data = await handleApiResponse(response);
-    return data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : "Failed to fetch products");
-    throw error;
-  } finally {
-    setIsLoading(false);
-  }
-};
+      const response = await fetch(`${API_BASE_URL}/products/${id}/update/`, {
+        method: "PUT",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const data = await handleApiResponse(response);
+      toast.success("Product updated successfully!");
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 5. حذف منتج
+  const deleteProduct = async (id: string | number): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${id}/delete/`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      await handleApiResponse(response);
+      toast.success("Product deleted successfully!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchcategories = async (): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/categories/`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const data = await handleApiResponse(response);
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch products"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const fetchbrands = async (): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/brands/`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const data = await handleApiResponse(response);
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch products"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, register, isLoading, isInitializing,
-    fetchProducts,
-    fetchbrands,
-    fetchcategories,
-    fetchProduct,
-    createProduct,
-    updateProduct,
-    deleteProduct,}}
+      value={{
+        user,
+        login,
+        logout,
+        register,
+        isLoading,
+        isInitializing,
+        fetchProducts,
+        fetchbrands,
+        fetchcategories,
+        fetchProduct,
+        createProduct,
+        updateProduct,
+        deleteProduct,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

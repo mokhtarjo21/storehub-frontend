@@ -11,7 +11,7 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import { apiRequest, handleApiResponse } from '../../utils/api';
 import toast from 'react-hot-toast';
-
+import { useAuth } from '../../contexts/AuthContext';
 type RegistrationType = 'individual' | 'company' | 'sales_commission';
 type Step = 1 | 2 | 3;
 

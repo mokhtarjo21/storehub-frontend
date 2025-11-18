@@ -5,12 +5,8 @@ import {
   ArrowLeftIcon,
   TruckIcon,
   MapPinIcon,
-  CreditCardIcon,
   PhoneIcon,
   EnvelopeIcon,
-  CalendarDaysIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useApi } from '../hooks/useApi';
