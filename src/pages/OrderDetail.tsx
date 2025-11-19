@@ -22,7 +22,7 @@ const OrderDetail: React.FC = () => {
   const { data: order, loading, error, execute: refetchOrder } = useApi(`/orders/${orderNumber}/`);
 
   const handleCancelOrder = async () => {
-    if (!order || !confirm('Are you sure you want to cancel this order?')) return;
+    if (!order || !confirm(t('orders.cancelConfirm'))) return;
 
     setCancelling(true);
     try {
@@ -38,10 +38,10 @@ const OrderDetail: React.FC = () => {
         throw new Error('Failed to cancel order');
       }
 
-      toast.success('Order cancelled successfully');
+      toast.success(t('orders.cancelled'));
       refetchOrder();
     } catch (error) {
-      toast.error('Failed to cancel order');
+      toast.error(t('orders.cancelFailed'));
     } finally {
       setCancelling(false);
     }
@@ -60,13 +60,13 @@ const OrderDetail: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Order not found
+            {t("orders.notFound")}
           </h2>
           <Link
             to="/dashboard"
             className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            ← Back to Dashboard
+            {t("orders.backToDashboard")}
           </Link>
         </div>
       </div>

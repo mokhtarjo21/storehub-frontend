@@ -38,7 +38,7 @@ const Products: React.FC = () => {
   const brands = Array.isArray(brandsData) ? brandsData : [];
 
   const brandOptions = [
-    { id: "all", name: "All Brands" },
+    { id: "all", name: t("products.allBrands") },
     ...brands.map((brand: any) => ({
       id: brand.id?.toString?.() || String(brand.id),
       name: brand.name,
@@ -53,6 +53,7 @@ const Products: React.FC = () => {
     : Array.isArray(productsData?.products)
     ? productsData.products
     : [];
+  console.log(products);
 
   const filteredProducts = useMemo(() => {
     let filtered = (products || []).filter((product: any) => {
@@ -65,9 +66,11 @@ const Products: React.FC = () => {
 
       const matchesCategory =
         selectedCategory === "all" ||
-        product.category?.toString() === selectedCategory;
+        product.category_name?.toLowerCase() === selectedCategory.toLowerCase();
+
       const matchesBrand =
-        selectedBrand === "all" || product.brand?.toString() === selectedBrand;
+        selectedBrand === "all" ||
+        product.brand_name?.toLowerCase() === selectedBrand.toLowerCase();
 
       const matchesPrice =
         (!priceRange.min || product.price >= parseFloat(priceRange.min)) &&
@@ -105,12 +108,14 @@ const Products: React.FC = () => {
     const [quantity, setQuantity] = useState(1);
 
     const existingItem = items.find(
-      (i: any) => i.product.id.toString() === product.id.toString()
+      (i: any) =>
+        i?.product && i.product.id?.toString?.() === product.id.toString()
     );
+
     const maxQuantity = product.stock - (existingItem?.quantity || 0);
 
     const handleAddToCart = () => {
-      if (!user){
+      if (!user) {
         toast.error(
           language === "ar"
             ? "يرجى تسجيل الدخول لإضافة منتجات إلى السلة"
@@ -118,7 +123,7 @@ const Products: React.FC = () => {
         );
         return;
       }
-      
+
       if (maxQuantity <= 0) {
         toast.error(
           language === "ar"
@@ -149,8 +154,6 @@ const Products: React.FC = () => {
       addItem(cartProduct, quantityToAdd);
       trackAddToCart(product.id.toString(), product.name, product.product_type);
 
-     
-
       setQuantity(1);
     };
 
@@ -179,9 +182,10 @@ const Products: React.FC = () => {
     };
 
     return (
-      <motion.div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <motion.div className="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg overflow-hidden border border-gray-300 dark:border-gray-700 transition-all duration-300">
         <Link to={`/products/${product.slug}`}>
-          <div className="aspect-w-16 aspect-h-9">
+          <div className="relative bg-gray-100 dark:bg-gray-700 h-52 flex items-center justify-center overflow-hidden">
+            {/* Image */}
             <img
               src={
                 API_BASE_URL + product.primary_image ||
@@ -192,71 +196,114 @@ const Products: React.FC = () => {
                   ? product.name_ar || product.name
                   : product.name
               }
-              className="w-full h-full object-fill"
+              className="h-full w-full object-fill"
             />
           </div>
         </Link>
 
-        <div className="p-6">
+        {/* Content */}
+        <div className="p-4">
+          {/* Title */}
           <Link to={`/products/${product.slug}`}>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
               {language === "ar"
                 ? product.name_ar || product.name
                 : product.name}
             </h3>
           </Link>
 
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+          {/* Prices */}
+          <div className="mt-2">
+            <div className="flex items-center gap-2 rtl:space-x-reverse">
+              {/* Main Price */}
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                {language === "ar" ? "جنية" : "EGP"}{" "}
+                {parseFloat(product.price).toLocaleString()}
+              </span>
+
+              {/* Compare Price */}
+              {product.compare_price &&
+                parseFloat(product.compare_price) >
+                  parseFloat(product.price) && (
+                  <span className="text-xl text-gray-500 dark:text-gray-400 line-through">
+                    {parseFloat(product.compare_price).toLocaleString()}
+                  </span>
+                )}
+
+              {product.discount_percentage > 0 && (
+                <span className="text-xl font-semibold pl-6 text-[#44B3E1] dark:text-[#44B3E1]">
+                  {product.discount_percentage}%{" "}
+                  {language === "ar" ? "خصم" : "Off"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Short Description */}
+          <p className="text-gray-600 dark:text-gray-300 text-xs mt-2 line-clamp-2">
             {language === "ar"
               ? product.description_ar || product.description
               : product.description}
           </p>
 
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              ${parseFloat(product.price).toLocaleString()}
-            </span>
-
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+          {/* Add to Cart Section */}
+          <div className="flex items-center justify-between mt-4">
+            {/* Quantity Controls */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleDecrease}
-                className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded"
+                className="px-2 py-1 bg-gray-200 dark:bg-gray-300 rounded"
               >
                 -
               </button>
-              <span className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm">
+              <span className="px-3 py-1 border dark:bg-gray-100 border-gray-300 rounded text-sm">
                 {quantity}
               </span>
               <button
                 onClick={handleIncrease}
-                className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded"
+                className="px-2 py-1 bg-gray-200 dark:bg-gray-300 rounded"
               >
                 +
               </button>
-              <button
-                onClick={handleAddToCart}
-                disabled={maxQuantity <= 0}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  maxQuantity <= 0
-                    ? "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
-              >
-                <ShoppingCartIcon className="w-5 h-5" />
-                <span>
-                  {product.stock > 0
-                    ? t("products.addToCart")
-                    : t("products.outOfStock")}
-                </span>
-              </button>
             </div>
+
+            {/* Add to Cart Noon Yellow Button */}
+            <button
+              onClick={handleAddToCart}
+              disabled={maxQuantity <= 0}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                maxQuantity <= 0
+                  ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+                  : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white"
+              }`}
+            >
+              <ShoppingCartIcon className="w-5 h-5" />
+              {product.stock > 0
+                ? t("products.addToCart")
+                : t("products.outOfStock")}
+            </button>
           </div>
 
-          {product.stock > 0 && product.stock <= 10 && (
-            <span className="text-orange-600 dark:text-orange-400">
-              Only {product.stock} left
-            </span>
-          )}
+          {/* Stock */}
+          <div className="flex items-center pt-4 space-x-2 rtl:space-x-reverse">
+            {product.stock > 0 ? (
+              <>
+                <div className="w-3 h-3 bg-[#E97132] dark:bg-[#E97132] rounded-full"></div>
+                <span className="text-[#E97132] dark:text-[#E97132] font-medium">
+                  {language === "ar" ? "الكمية المتوفرة" : " In Stock"}{" "}
+                  {product.stock}
+                </span>
+              </>
+            ) : (
+              <>
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-red-600 dark:text-red-400 font-medium">
+                  {language === "ar" ? "غير متوفر في المخزون" : "Out of Stock"}{" "}
+                  {product.outofstock}
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </motion.div>
     );
@@ -271,7 +318,7 @@ const Products: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -281,10 +328,6 @@ const Products: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             {t("products.title")}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Discover our comprehensive range of network devices, software
-            licenses, and professional services.
-          </p>
         </motion.div>
 
         {/* Filters */}
@@ -362,7 +405,11 @@ const Products: React.FC = () => {
           >
             <p className="text-lg text-gray-500 dark:text-gray-400">
               {productsLoading
-                ? "Loading products..."
+                ? language === "ar"
+                  ? "جاري تحميل المنتجات..."
+                  : "Loading products..."
+                : language === "ar"
+                ? "لم يتم العثور على منتجات تطابق معايير البحث."
                 : "No products found matching your criteria."}
             </p>
           </motion.div>

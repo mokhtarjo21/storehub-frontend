@@ -27,7 +27,8 @@ import OrderDetail from "./pages/OrderDetail";
 import AccountSuspended from "./pages/AccountSuspended";
 import AccountUnderReview from "./pages/AccountUnderReview";
 import ScrollToTop from "./components/ScrollToTop";
-
+import Checkout from "./pages/checkout";
+import ServiceDetails from "./pages/ServiceDetails";
 function App() {
   return (
     <LanguageProvider>
@@ -48,6 +49,10 @@ function App() {
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
                     <Route path="services" element={<Services />} />
+                    <Route
+                      path="/services/:slug"
+                      element={<ServiceDetails />}
+                    />
                     <Route path="cart" element={<Cart />} />
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
@@ -94,10 +99,18 @@ function App() {
                       }
                     />
                     <Route
-                      path="company"
+                      path="orders/:orderNumber"
                       element={
-                        <ProtectedRoute requiredRole="company_admin">
-                          <CompanyDashboard />
+                        <ProtectedRoute>
+                          <OrderDetail />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="checkout"
+                      element={
+                        <ProtectedRoute>
+                          <Checkout />
                         </ProtectedRoute>
                       }
                     />

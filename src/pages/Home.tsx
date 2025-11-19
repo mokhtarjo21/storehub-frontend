@@ -31,10 +31,10 @@ const Home: React.FC = () => {
   ];
 
   const stats = [
-    { label: "Happy Customers", value: "10,000+" },
-    { label: "Products Available", value: "500+" },
-    { label: "Countries Served", value: "25+" },
-    { label: "Years Experience", value: "15+" },
+    { label: t("home.stats.customers"), value: "10,000+" },
+    { label: t("home.stats.products"), value: "500+" },
+    { label: t("home.stats.countries"), value: "25+" },
+    { label: t("home.stats.experience"), value: "15+" },
   ];
 
   return (
@@ -116,7 +116,7 @@ const Home: React.FC = () => {
           </h2>
 
           <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
-            Premium networking solutions designed for stability & performance
+            {t("home.features.subtitle")}
           </p>
 
           <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -154,11 +154,10 @@ const Home: React.FC = () => {
       <section className="py-24 bg-gradient-to-r from-[#155F82] to-[#44B3E1] text-white">
         <div className="max-w-5xl mx-auto text-center px-4">
           <h2 className="text-3xl sm:text-4xl font-bold">
-            Ready to transform your infrastructure?
+            {t("home.cta.title")}
           </h2>
           <p className="mt-4 text-blue-100 max-w-xl mx-auto">
-            Join thousands of professionals using StoreHub to power their
-            networks.
+            {t("home.cta.subtitle")}
           </p>
 
           <div className="mt-10 flex justify-center gap-6">
@@ -166,14 +165,14 @@ const Home: React.FC = () => {
               onClick={() => navigate("/products")}
               className="px-8 py-3 rounded-lg font-semibold bg-white text-[#155F82] shadow-lg hover:bg-gray-50 hover:scale-105 transition"
             >
-              Browse Products
+              {t("home.cta.browse")}
             </button>
 
             <button
               onClick={() => navigate("/register")}
               className="px-8 py-3 rounded-lg font-semibold border border-white/60 hover:bg-white/10 transition"
             >
-              Create Account
+              {t("home.cta.createAccount")}
             </button>
           </div>
         </div>

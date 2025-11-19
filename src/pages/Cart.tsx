@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   TrashIcon,
   PlusIcon,
@@ -12,6 +12,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import { useCart } from "../contexts/CartContext";
+
 const Cart: React.FC = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -20,9 +21,10 @@ const Cart: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "split">("cod");
   const { updateQuantity, removeItem, clearCart, items, total, fetchCart } =
     useCart();
-
+  const navigate = useNavigate();
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
+  console.log(items);
 
   const pointsDiscount = usePoints
     ? Math.min(user?.points || 0, total * 0.1)
@@ -66,14 +68,10 @@ const Cart: React.FC = () => {
   };
 
   const handleCheckout = () => {
+    navigate("/checkout");
     console.log("Processing checkout with payment method:", paymentMethod);
     console.log("Has services:", hasServices);
     console.log("Has products:", hasProducts);
-    toast(
-      `Checkout with ${
-        paymentMethod === "split" ? "Split Payment" : "Cash on Delivery"
-      }`
-    );
   };
 
   if (items.length === 0) {
@@ -141,7 +139,7 @@ const Cart: React.FC = () => {
                   >
                     <img
                       src={
-                        item.product.image ||
+                        item.product?.image ||
                         "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                       }
                       alt={item.item_name}
@@ -152,10 +150,12 @@ const Cart: React.FC = () => {
                         {item.item_name}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {item.item_type === "product" ? "Product" : "Service"}
+                        {item.item_type === "product"
+                          ? t("orders.product")
+                          : t("orders.service")}
                       </p>
                       <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-2">
-                        ${parseFloat(item.product.price).toLocaleString()}
+                        ${parseFloat(item.product?.price || 0).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -184,7 +184,7 @@ const Cart: React.FC = () => {
                             item.product.stock
                           )
                         }
-                        disabled={item.quantity >= item.product.stock}
+                        disabled={item.quantity >= item.product?.stock || false}
                         className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                       >
                         <PlusIcon className="w-5 h-5" />
@@ -217,7 +217,7 @@ const Cart: React.FC = () => {
               {hasServices && (
                 <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                   <label className="block text-sm font-medium text-gray-900 dark:text-white mb-3">
-                    Payment Method
+                    {t("checkout.payment")}
                   </label>
 
                   <div className="space-y-3">
@@ -234,10 +234,10 @@ const Cart: React.FC = () => {
                       />
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          Cash on Delivery (Full Payment)
+                          {t("checkout.cod")}
                         </span>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Pay the full amount when order is delivered
+                          {t("checkout.codDesc")}
                         </p>
                       </div>
                     </label>
@@ -255,11 +255,10 @@ const Cart: React.FC = () => {
                       />
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
-                          Split Payment (Deposit + Final)
+                          {t("checkout.split")}
                         </span>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Pay deposit now, remaining amount upon service
-                          completion
+                          {t("checkout.splitDesc")}
                         </p>
                       </div>
                     </label>
@@ -315,7 +314,7 @@ const Cart: React.FC = () => {
                     {t("cart.subtotal")}
                   </span>
                   <span className="text-gray-900 dark:text-white">
-                    ${parseFloat(total).toFixed(2)}
+                    ${Number(total).toFixed(2)}
                   </span>
                 </div>
                 {pointsDiscount > 0 && (

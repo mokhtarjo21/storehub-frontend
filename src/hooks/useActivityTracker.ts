@@ -1,21 +1,21 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useRef, useCallback } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 type ActivityAction =
-  | 'page_view'
-  | 'search'
-  | 'product_click'
-  | 'product_view'
-  | 'service_view'
-  | 'add_to_cart'
-  | 'remove_from_cart'
-  | 'checkout'
-  | 'order_placed'
-  | 'login'
-  | 'logout'
-  | 'register'
-  | 'filter_applied'
-  | 'other';
+  | "page_view"
+  | "search"
+  | "product_click"
+  | "product_view"
+  | "service_view"
+  | "add_to_cart"
+  | "remove_from_cart"
+  | "checkout"
+  | "order_placed"
+  | "login"
+  | "logout"
+  | "register"
+  | "filter_applied"
+  | "other";
 
 interface ActivityData {
   action: ActivityAction;
@@ -23,34 +23,36 @@ interface ActivityData {
   metadata?: Record<string, any>;
 }
 
-const API_BASE_URL = 'http://192.168.1.7:8000/api/auth';
+const API_BASE_URL = "http://192.168.1.7:8000/api/auth";
 
 let sessionId: string | null = null;
 
 const getSessionId = (): string => {
   if (sessionId) return sessionId;
 
-  sessionId = localStorage.getItem('session_id');
+  sessionId = localStorage.getItem("session_id");
   if (!sessionId) {
-    sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    localStorage.setItem('session_id', sessionId);
+    sessionId = `session_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(7)}`;
+    localStorage.setItem("session_id", sessionId);
   }
   return sessionId;
 };
 
 const logActivity = async (data: ActivityData) => {
   try {
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = localStorage.getItem("access_token");
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
 
     if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
+      headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
     await fetch(`${API_BASE_URL}/activity/log/`, {
-      method: 'POST',
+      method: "POST",
       headers,
       body: JSON.stringify({
         ...data,
@@ -58,7 +60,7 @@ const logActivity = async (data: ActivityData) => {
       }),
     });
   } catch (error) {
-    console.error('Failed to log activity:', error);
+    console.error("Failed to log activity:", error);
   }
 };
 
@@ -73,7 +75,7 @@ export const useActivityTracker = () => {
   const trackPageView = useCallback(
     async (pagePath: string) => {
       await trackActivity({
-        action: 'page_view',
+        action: "page_view",
         target: pagePath,
         metadata: {
           user_id: user?.id,
@@ -87,7 +89,7 @@ export const useActivityTracker = () => {
   const trackSearch = useCallback(
     async (searchQuery: string, resultsCount?: number) => {
       await trackActivity({
-        action: 'search',
+        action: "search",
         target: searchQuery,
         metadata: {
           query: searchQuery,
@@ -102,7 +104,7 @@ export const useActivityTracker = () => {
   const trackProductClick = useCallback(
     async (productId: string, productName: string) => {
       await trackActivity({
-        action: 'product_click',
+        action: "product_click",
         target: `/products/${productId}`,
         metadata: {
           product_id: productId,
@@ -117,7 +119,7 @@ export const useActivityTracker = () => {
   const trackProductView = useCallback(
     async (productId: string, productName: string) => {
       await trackActivity({
-        action: 'product_view',
+        action: "product_view",
         target: `/products/${productId}`,
         metadata: {
           product_id: productId,
@@ -132,7 +134,7 @@ export const useActivityTracker = () => {
   const trackServiceView = useCallback(
     async (serviceId: string, serviceName: string) => {
       await trackActivity({
-        action: 'service_view',
+        action: "service_view",
         target: `/services/${serviceId}`,
         metadata: {
           service_id: serviceId,
@@ -145,9 +147,13 @@ export const useActivityTracker = () => {
   );
 
   const trackAddToCart = useCallback(
-    async (itemId: string, itemName: string, itemType: 'product' | 'service') => {
+    async (
+      itemId: string,
+      itemName: string,
+      itemType: "product" | "service"
+    ) => {
       await trackActivity({
-        action: 'add_to_cart',
+        action: "add_to_cart",
         target: `${itemType}/${itemId}`,
         metadata: {
           item_id: itemId,
@@ -161,9 +167,13 @@ export const useActivityTracker = () => {
   );
 
   const trackRemoveFromCart = useCallback(
-    async (itemId: string, itemName: string, itemType: 'product' | 'service') => {
+    async (
+      itemId: string,
+      itemName: string,
+      itemType: "product" | "service"
+    ) => {
       await trackActivity({
-        action: 'remove_from_cart',
+        action: "remove_from_cart",
         target: `${itemType}/${itemId}`,
         metadata: {
           item_id: itemId,
@@ -179,8 +189,8 @@ export const useActivityTracker = () => {
   const trackCheckout = useCallback(
     async (cartValue: number, itemCount: number) => {
       await trackActivity({
-        action: 'checkout',
-        target: '/checkout',
+        action: "checkout",
+        target: "/checkout",
         metadata: {
           cart_value: cartValue,
           item_count: itemCount,
@@ -194,7 +204,7 @@ export const useActivityTracker = () => {
   const trackOrderPlaced = useCallback(
     async (orderId: string, orderValue: number) => {
       await trackActivity({
-        action: 'order_placed',
+        action: "order_placed",
         target: `/orders/${orderId}`,
         metadata: {
           order_id: orderId,
@@ -209,7 +219,7 @@ export const useActivityTracker = () => {
   const trackFilterApplied = useCallback(
     async (filters: Record<string, any>) => {
       await trackActivity({
-        action: 'filter_applied',
+        action: "filter_applied",
         target: window.location.pathname,
         metadata: {
           filters,

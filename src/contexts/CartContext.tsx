@@ -13,6 +13,7 @@ interface CartContextType {
   loading: boolean;
   items: CartItem[];
   addItem: (product: Product, quantity?: number) => Promise<void>;
+  addService: (service: any, customerInfo: any) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -43,6 +44,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       const data = await res.json();
       setItems(data.items || []);
+     
+      
     } finally {
       setLoading(false);
     }
@@ -62,7 +65,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           item_type: "product",
         }),
       });
-     
+
       if (!res.ok) {
         const errData = await res.json();
         console.log("API Error:", errData, res.reson);
@@ -70,8 +73,38 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       await fetchCart();
+      toast.success("Product added to cart");
     } catch (err) {
       toast.error("Failed to add product to cart");
+    }
+  };
+
+  const addService = async (service: any, customerInfo: any) => {
+    try {
+      const res = await fetch(`${API_BASE}/add/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          item_id: service.id,
+          quantity: 1,
+          item_type: "service",
+          customer_info: customerInfo,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        console.log("API Error:", errData);
+        throw new Error("Failed to add service");
+      }
+
+      await fetchCart();
+    } catch (err) {
+      toast.error("Failed to add service to cart");
+      throw err;
     }
   };
 
@@ -130,16 +163,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       if (!res.ok) throw new Error("Failed to clear cart");
       await fetchCart();
-      toast.success("Cart cleared");
     } catch (err) {
       toast.error("Failed to clear cart");
     }
   };
 
-  const total = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const total = items.reduce((sum, item) => {
+    const rawPrice =
+      item.product?.price ?? item.service?.price ?? item.price ?? 0;
+    const price = Number(rawPrice) || 0;
+    const qty = Number(item.quantity) || 1;
+
+    return sum + price * qty;
+  }, 0);
+
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -148,6 +185,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         items,
         setItems,
         addItem,
+        addService,
         removeItem,
         updateQuantity,
         clearCart,

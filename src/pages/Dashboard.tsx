@@ -78,7 +78,7 @@ const orders = Array.isArray(ordersData)
       change: '+15%',
     },
     {
-      name: 'Processing Orders',
+      name: t('dashboard.processingOrders'),
       value: orderStats?.processing_orders?.toString() || '0',
       icon: TruckIcon,
       color: 'orange',
@@ -277,7 +277,7 @@ const orders = Array.isArray(ordersData)
           >
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                My Orders
+                {t("dashboard.myOrders")}
               </h3>
             </div>
 
@@ -289,10 +289,10 @@ const orders = Array.isArray(ordersData)
               <div className="text-center py-12">
                 <ShoppingBagIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" />
                 <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                  No orders yet
+                  {t("dashboard.noOrders")}
                 </h3>
                 <p className="mt-2 text-gray-500 dark:text-gray-400">
-                  Start shopping to see your orders here.
+                  {t("dashboard.startShopping")}
                 </p>
               </div>
             ) : (
@@ -304,10 +304,10 @@ const orders = Array.isArray(ordersData)
                         {getStatusIcon(order.order_status)}
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white">
-                            Order {order.order_number}
+                            {t("dashboard.order")} {order.order_number}
                           </p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {new Date(order.created_at).toLocaleDateString()} • {order.items_count} items
+                            {new Date(order.created_at).toLocaleDateString()} • {order.items_count} {t("dashboard.items")}
                           </p>
                         </div>
                       </div>
@@ -324,19 +324,19 @@ const orders = Array.isArray(ordersData)
                     {/* Order Status Timeline */}
                     <div className="ml-8 pl-4 border-l-2 border-gray-200 dark:border-gray-700">
                       <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                        <span>Status:</span>
+                        <span>{t("dashboard.status")}:</span>
                         <span className="font-medium">{order.status_display}</span>
                         {order.payment_status === 'pending' && (
                           <>
                             <span>•</span>
-                            <span className="text-yellow-600 dark:text-yellow-400">Payment Pending</span>
+                            <span className="text-yellow-600 dark:text-yellow-400">{t("dashboard.paymentPending")}</span>
                           </>
                         )}
                       </div>
                       {order.estimated_delivery && (
                         <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
                           <CalendarDaysIcon className="w-4 h-4" />
-                          <span>Estimated delivery: {new Date(order.estimated_delivery).toLocaleDateString()}</span>
+                          <span>{t("dashboard.estimatedDelivery")}: {new Date(order.estimated_delivery).toLocaleDateString()}</span>
                         </div>
                       )}
                     </div>

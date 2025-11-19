@@ -69,11 +69,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (token && savedUser) {
       try {
         const userData = JSON.parse(savedUser);
+
         setUser({
           id: userData.id.toString(),
           name: userData.full_name,
           email: userData.email,
           role: userData.role,
+          address: userData.address,
+          phone: userData.phone,
           points: userData.points || 0,
           companyName: userData.company_name,
           affiliateCode: userData.affiliate_code,
@@ -102,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const data = await handleApiResponse(response);
-
+      console.log("Login response data:", data.user);
       // Store tokens
       localStorage.setItem("access_token", data.tokens.access);
       localStorage.setItem("refresh_token", data.tokens.refresh);
@@ -114,6 +117,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         id: userData.id.toString(),
         name: userData.full_name,
         email: userData.email,
+        phone: userData.phone,
+        address: userData.address,
         role: userData.role,
         points: userData.points || 0,
         companyName: userData.company_name,
@@ -125,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
-         setUser(null);
+      setUser(null);
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
@@ -292,7 +297,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${API_BASE_URL}/products/${id}/update/`, {
+      const response = await fetch(`${API_BASE_URL}/products/admin/products/${id}/update/`, {
         method: "PUT",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -317,7 +322,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteProduct = async (id: string | number): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${id}/delete/`, {
+      const response = await fetch(`${API_BASE_URL}/products/a${id}/delete/`, {
         method: "DELETE",
         headers: getAuthHeaders(),
       });
