@@ -61,36 +61,33 @@ const Services: React.FC = () => {
   ];
 
   const filteredServices = useMemo(() => {
-    let filtered = (services?.results || []).filter((service: any) => {
-      const matchesSearch =
-        language === "ar"
-          ? (service.title_ar || service.title)
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-          : service.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const term = searchTerm.toLowerCase().trim();
 
-      const matchesCategory =
-        selectedCategory === "all" ||
-        service.category?.toString() === selectedCategory;
-      const matchesDuration =
-        selectedDuration === "all" || service.duration === selectedDuration;
+    return (services?.results || [])
+      .filter((service: any) => {
+        // البحث على الإنجليزي + العربي
+        const titleMatch =
+          service.title?.toLowerCase().includes(term) ||
+          service.title_ar?.toLowerCase().includes(term);
 
-      return matchesSearch && matchesCategory && matchesDuration;
-    });
+        // فلاتر أخرى
+        const categoryMatch =
+          selectedCategory === "all" ||
+          service.category?.toString() === selectedCategory;
 
-    // Sort services
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "price":
+        const durationMatch =
+          selectedDuration === "all" || service.duration === selectedDuration;
+
+        return titleMatch && categoryMatch && durationMatch;
+      })
+      .sort((a, b) => {
+        if (sortBy === "price")
           return parseFloat(a.price) - parseFloat(b.price);
-        default:
-          return language === "ar"
-            ? (a.title_ar || a.title).localeCompare(b.title_ar || b.title)
-            : a.title.localeCompare(b.title);
-      }
-    });
-
-    return filtered;
+        // sort by title with fallback to Arabic
+        const titleA = language === "ar" ? a.title_ar || a.title : a.title;
+        const titleB = language === "ar" ? b.title_ar || b.title : b.title;
+        return titleA.localeCompare(titleB);
+      });
   }, [
     services,
     searchTerm,
@@ -183,16 +180,15 @@ const Services: React.FC = () => {
             </span>
             <div className="ml-auto">
               {service.is_active === true ? (
-              <span className="text-[#E97132] dark:text-[#E97132] text-sm font-medium">
-                {language === "ar" ? "متوفر" : "Available"} {service.stock}
-              </span>
-            ) : (
-              <span className="text-red-600 dark:text-red-400 text-sm font-medium">
-                {language === "ar" ? "غير متوفر" : "Not Available"}
-              </span>
-            )}
+                <span className="text-[#E97132] dark:text-[#E97132] text-sm font-medium">
+                  {language === "ar" ? "متوفر" : "Available"} {service.stock}
+                </span>
+              ) : (
+                <span className="text-red-600 dark:text-red-400 text-sm font-medium">
+                  {language === "ar" ? "غير متوفر" : "Not Available"}
+                </span>
+              )}
             </div>
-            
           </div>
         </div>
 

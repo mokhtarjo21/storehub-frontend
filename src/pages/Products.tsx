@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
+type Category = { id: number; name: string };
+type Brand = { id: number; name: string };
+
 import { Link } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useCart } from "../contexts/CartContext";
@@ -12,97 +15,78 @@ import { useApi } from "../hooks/useApi";
 import { useActivityTracker } from "../hooks/useActivityTracker";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
+import { set } from "react-hook-form";
 const Products: React.FC = () => {
   const { t, language } = useLanguage();
   const { addItem, items } = useCart();
   const { trackAddToCart } = useActivityTracker();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedBrand, setSelectedBrand] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [sortBy, setSortBy] = useState<"name" | "price" | "category">("name");
+  const [selectedCategory, setSelectedCategory] = useState<string | number>("");
+  const [selectedBrand, setSelectedBrand] = useState<string | number>("");
   const API_BASE_URL = "http://192.168.1.7:8000";
-  const { user } = useAuth();
-  const { data: categoriesData } = useApi("/products/categories/");
-  const categories = Array.isArray(categoriesData) ? categoriesData : [];
+  const [loading, setLoading] = useState(false);
+  const { user, fetchProducts, fetchcategories, fetchbrands } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
 
-  const categoryOptions = [
-    { id: "all", name: t("products.category.all") },
-    ...categories.map((cat: any) => ({
-      id: cat.id?.toString?.() || String(cat.id),
-      name: language === "ar" ? cat.name_ar || cat.name : cat.name,
-    })),
-  ];
+  // const { data: productsData, loading: productsLoading } = useApi("/products/")
+  let productsData: any = null;
+  const [products, setProducts] = useState<any[]>([]);
+  const getProducts = async () => {
+    setLoading(true);
+    try {
+      const params: any = {};
+      if (searchTerm) params.search = searchTerm;
+      if (selectedCategory) params.category = selectedCategory;
+      if (selectedBrand) params.brand = selectedBrand;
 
-  const { data: brandsData } = useApi("/products/brands/");
-  const brands = Array.isArray(brandsData) ? brandsData : [];
+      productsData = await fetchProducts(params);
+      console.log("Fetched products:", productsData);
+      // backend might return {results: [...]} or plain array
+      setProducts(productsData.results ?? productsData);
+    } catch (err: any) {
+      console.error("fetchProducts error", err);
+      toast.error(
+        language === "ar" ? "فشل في جلب المنتجات" : "Failed to load products"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchCategoriesAndBrands();
+    getProducts();
+  }, []);
 
-  const brandOptions = [
-    { id: "all", name: t("products.allBrands") },
-    ...brands.map((brand: any) => ({
-      id: brand.id?.toString?.() || String(brand.id),
-      name: brand.name,
-    })),
-  ];
+  useEffect(() => {
+    const t = setTimeout(() => {
+      getProducts();
+    }, 400);
 
-  const { data: productsData, loading: productsLoading } = useApi("/products/");
-  const products = Array.isArray(productsData)
-    ? productsData
-    : Array.isArray(productsData?.results)
-    ? productsData.results
-    : Array.isArray(productsData?.products)
-    ? productsData.products
-    : [];
-  console.log(products);
+    return () => clearTimeout(t);
+  }, [searchTerm, selectedCategory, selectedBrand]);
 
-  const filteredProducts = useMemo(() => {
-    let filtered = (products || []).filter((product: any) => {
-      const matchesSearch =
-        language === "ar"
-          ? (product.name_ar || product.name)
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-          : product.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const fetchCategoriesAndBrands = async () => {
+    try {
+      const [cRes, bRes] = await Promise.allSettled([
+        fetchcategories(),
+        fetchbrands(),
+      ]);
+      console.log(cRes, bRes);
 
-      const matchesCategory =
-        selectedCategory === "all" ||
-        product.category_name?.toLowerCase() === selectedCategory.toLowerCase();
-
-      const matchesBrand =
-        selectedBrand === "all" ||
-        product.brand_name?.toLowerCase() === selectedBrand.toLowerCase();
-
-      const matchesPrice =
-        (!priceRange.min || product.price >= parseFloat(priceRange.min)) &&
-        (!priceRange.max || product.price <= parseFloat(priceRange.max));
-
-      return matchesSearch && matchesCategory && matchesBrand && matchesPrice;
-    });
-
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "price":
-          return a.price - b.price;
-        case "category":
-          return (a.category_name || "").localeCompare(b.category_name || "");
-        default:
-          return language === "ar"
-            ? (a.name_ar || a.name).localeCompare(b.name_ar || b.name)
-            : a.name.localeCompare(b.name);
+      if (cRes.status === "fulfilled") {
+        const cdata = (cRes.value.results ?? cRes.value.data) as Category[];
+        if (Array.isArray(cdata)) setCategories(cdata);
       }
-    });
-
-    return filtered;
-  }, [
-    products,
-    searchTerm,
-    selectedCategory,
-    selectedBrand,
-    priceRange,
-    sortBy,
-    language,
-  ]);
+      if (bRes.status === "fulfilled") {
+        const bdata = (bRes.value.results ?? bRes.value.data) as Brand[];
+        if (Array.isArray(bdata)) setBrands(bdata);
+      }
+    } catch (e) {
+      // ignore - selects will be manual
+      console.warn("categories/brands fetch failed", e);
+    }
+  };
 
   const ProductCard: React.FC<{ product: any }> = ({ product }) => {
     const [quantity, setQuantity] = useState(1);
@@ -309,13 +293,7 @@ const Products: React.FC = () => {
     );
   };
 
-  if (productsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4">
@@ -352,32 +330,34 @@ const Products: React.FC = () => {
               />
             </div>
 
-            {/* Category Filter */}
+            {/* Category */}
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 rtl:left-auto rtl:right-0 pl-3 rtl:pl-0 rtl:pr-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FunnelIcon className="h-5 w-5 text-gray-400" />
               </div>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="block w-full pl-10 rtl:pl-3 rtl:pr-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="block w-full pl-10 pr-3 py-2 border rounded-md"
               >
-                {categoryOptions.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+                <option value="">All</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Brand Filter */}
+            {/* Brand */}
             <div className="relative">
               <select
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="block w-full px-3 py-2 border rounded-md"
               >
-                {brandOptions.map((brand) => (
+                <option value="">All</option>
+                {brands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
                   </option>
@@ -392,19 +372,19 @@ const Products: React.FC = () => {
           layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          {filteredProducts.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </motion.div>
 
-        {filteredProducts.length === 0 && (
+        {products.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
             <p className="text-lg text-gray-500 dark:text-gray-400">
-              {productsLoading
+              {loading
                 ? language === "ar"
                   ? "جاري تحميل المنتجات..."
                   : "Loading products..."

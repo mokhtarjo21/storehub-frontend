@@ -223,13 +223,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // ==================
 
   // 1. جلب جميع المنتجات
-  const fetchProducts = async (): Promise<any[]> => {
+  const fetchProducts = async (params?: {
+    search?: string;
+    category?: string | number;
+    brand?: string | number;
+  }): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/`, {
+      const url = new URL(`${API_BASE_URL}/products/`);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== "" && value !== null && value !== undefined) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      const response = await fetch(url.toString(), {
         method: "GET",
         headers: getAuthHeaders(),
       });
+
       const data = await handleApiResponse(response);
       return data;
     } catch (error) {
@@ -297,13 +311,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${API_BASE_URL}/products/admin/products/${id}/update/`, {
-        method: "PUT",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/products/admin/products/${id}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: formData,
+        }
+      );
 
       const data = await handleApiResponse(response);
       toast.success("Product updated successfully!");
@@ -322,10 +339,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteProduct = async (id: string | number): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/a${id}/delete/`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/products/admin/products/${id}/delete/`,
+        {
+          method: "DELETE",
+          headers: getAuthHeaders(),
+        }
+      );
       await handleApiResponse(response);
       toast.success("Product deleted successfully!");
     } catch (error) {

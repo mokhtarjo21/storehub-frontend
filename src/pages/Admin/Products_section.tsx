@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { PlusCircleIcon, PencilSquareIcon, TrashIcon, PhotoIcon } from '@heroicons/react/24/outline'
-import toast from 'react-hot-toast'
-import { useLanguage } from '../../contexts/LanguageContext'
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  PlusCircleIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PhotoIcon,
+} from "@heroicons/react/24/outline";
+import toast from "react-hot-toast";
+import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 /**
  * AdminProductsSection.tsx
@@ -24,138 +29,140 @@ import { useAuth } from "../../contexts/AuthContext";
  *   fall back to text inputs for category_id / brand_id.
  */
 
-type Category = { id: number; name: string }
-type Brand = { id: number; name: string }
+type Category = { id: number; name: string };
+type Brand = { id: number; name: string };
 
 type ProductListItem = {
-  id: number
-  name: string
-  name_ar?: string
-  price: number
-  compare_price?: number | null
-  stock: number
-  category_name?: string
-  brand_name?: string | null
-  primary_image?: string | null
-  is_active?: boolean
-  is_featured?: boolean
-  slug?: string
-}
+  id: number;
+  name: string;
+  name_ar?: string;
+  price: number;
+  compare_price?: number | null;
+  stock: number;
+  category_name?: string;
+  brand_name?: string | null;
+  primary_image?: string | null;
+  is_active?: boolean;
+  is_featured?: boolean;
+  slug?: string;
+};
 
 // const API_BASE = '/api/admin/products/' // list
 // const CREATE_ENDPOINT = '/api/admin/products/create/'
 
 export default function AdminProductsSection() {
-  const { language } = useLanguage()
-  const [loading, setLoading] = useState(false)
-  const [products, setProducts] = useState<ProductListItem[]>([])
-  const [query, setQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState<string | number>('')
-  const [brandFilter, setBrandFilter] = useState<string | number>('')
-  const [categories, setCategories] = useState<Category[] | null>(null)
-  const [brands, setBrands] = useState<Brand[] | null>(null)
-   const { fetchProducts,fetchbrands,
-    fetchcategories,
-    deleteProduct,} = useAuth();
-   const API_BASE_URL = "http://192.168.1.7:8000";
+  const { language } = useLanguage();
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<ProductListItem[]>([]);
+  const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string | number>("");
+  const [brandFilter, setBrandFilter] = useState<string | number>("");
+  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [brands, setBrands] = useState<Brand[] | null>(null);
+  const { fetchProducts, fetchbrands, fetchcategories, deleteProduct } =
+    useAuth();
+  const API_BASE_URL = "http://192.168.1.7:8000";
 
-
-  const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<ProductListItem | null>(null)
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<ProductListItem | null>(null);
 
   // fetch list
   const getProducts = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const params: any = {}
-      if (query) params.search = query
-      if (categoryFilter) params.category = categoryFilter
-      if (brandFilter) params.brand = brandFilter
+      const params: any = {};
+      if (query) params.search = query;
+      if (categoryFilter) params.category = categoryFilter;
+      if (brandFilter) params.brand = brandFilter;
 
-      const res = await fetchProducts()
-      console.log('Fetched products:', res);
+      const res = await fetchProducts(params);
+      console.log("Fetched products:", res);
       // backend might return {results: [...]} or plain array
-      const data = res.results ?? res
-      setProducts(Array.isArray(data) ? data : [])
+      const data = res.results ?? res;
+      setProducts(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      console.error('fetchProducts error', err)
-      toast.error(language === 'ar' ? 'فشل في جلب المنتجات' : 'Failed to load products')
+      console.error("fetchProducts error", err);
+      toast.error(
+        language === "ar" ? "فشل في جلب المنتجات" : "Failed to load products"
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // try fetch categories and brands to populate selects
   const fetchCategoriesAndBrands = async () => {
     try {
       const [cRes, bRes] = await Promise.allSettled([
-      fetchcategories(),
-      fetchbrands()
-      ])
-      console.log(cRes,bRes);
-      
+        fetchcategories(),
+        fetchbrands(),
+      ]);
+      console.log(cRes, bRes);
 
-      if (cRes.status === 'fulfilled') {
-        const cdata = (cRes.value.results ?? cRes.value.data) as Category[]
-        if (Array.isArray(cdata)) setCategories(cdata)
+      if (cRes.status === "fulfilled") {
+        const cdata = (cRes.value.results ?? cRes.value.data) as Category[];
+        if (Array.isArray(cdata)) setCategories(cdata);
       }
-      if (bRes.status === 'fulfilled') {
-        const bdata = (bRes.value.results ?? bRes.value.data) as Brand[]
-        if (Array.isArray(bdata)) setBrands(bdata)
+      if (bRes.status === "fulfilled") {
+        const bdata = (bRes.value.results ?? bRes.value.data) as Brand[];
+        if (Array.isArray(bdata)) setBrands(bdata);
       }
     } catch (e) {
       // ignore - selects will be manual
-      console.warn('categories/brands fetch failed', e)
+      console.warn("categories/brands fetch failed", e);
     }
-  }
+  };
 
   useEffect(() => {
-    getProducts()
-    fetchCategoriesAndBrands()
+    getProducts();
+    fetchCategoriesAndBrands();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   useEffect(() => {
     // simple debounce for search
-    const t = setTimeout(() => getProducts(), 400)
-    return () => clearTimeout(t)
+    const t = setTimeout(() => getProducts(), 400);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, categoryFilter, brandFilter])
+  }, [query, categoryFilter, brandFilter]);
 
-  const handleDelete = async (id: number|string) => {
-    if (!confirm(language === 'ar' ? 'هل تريد حذف هذا المنتج؟' : 'Delete this product?')) return
+  const handleDelete = async (id: number | string) => {
+    if (
+      !confirm(
+        language === "ar" ? "هل تريد حذف هذا المنتج؟" : "Delete this product?"
+      )
+    )
+      return;
     try {
-      console.log('Deleting product with id:', id);
-      await deleteProduct(id)
-      toast.success(language === 'ar' ? 'تم الحذف' : 'Deleted')
-      setProducts((prev) => prev.filter((p) => p.id !== id))
+      console.log("Deleting product with id:", id);
+      await deleteProduct(id);
+      setProducts((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
-      console.error(err)
-      toast.error(language === 'ar' ? 'خطأ أثناء الحذف' : 'Delete failed')
+      console.error(err);
+      toast.error(language === "ar" ? "خطأ أثناء الحذف" : "Delete failed");
     }
-  }
+  };
 
   const openCreate = () => {
-    setEditing(null)
-    setShowForm(true)
-  }
+    setEditing(null);
+    setShowForm(true);
+  };
 
   const openEdit = (p: ProductListItem) => {
-    setEditing(p)
-    setShowForm(true)
-  }
+    setEditing(p);
+    setShowForm(true);
+  };
 
   const onFormSaved = (saved: ProductListItem) => {
     // if editing, replace, else prepend
-    setShowForm(false)
-    setEditing(null)
+    setShowForm(false);
+    setEditing(null);
     setProducts((prev) => {
-      const exists = prev.find((x) => x.id === saved.id)
-      if (exists) return prev.map((x) => (x.id === saved.id ? saved : x))
-      return [saved, ...prev]
-    })
-    toast.success(language === 'ar' ? 'تم الحفظ' : 'Saved')
-  }
+      const exists = prev.find((x) => x.id === saved.id);
+      if (exists) return prev.map((x) => (x.id === saved.id ? saved : x));
+      return [saved, ...prev];
+    });
+  };
 
   return (
     <div className="min-h-[70vh] p-6 bg-gray-50 dark:bg-gray-900">
@@ -164,7 +171,9 @@ export default function AdminProductsSection() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={language === 'ar' ? 'ابحث عن منتج...' : 'Search products...'}
+            placeholder={
+              language === "ar" ? "ابحث عن منتج..." : "Search products..."
+            }
             className="flex-1 p-2 border rounded bg-white dark:bg-gray-800"
           />
           <select
@@ -172,7 +181,9 @@ export default function AdminProductsSection() {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="p-2 border rounded bg-white dark:bg-gray-800"
           >
-            <option value="">{language === 'ar' ? 'كل الفئات' : 'All categories'}</option>
+            <option value="">
+              {language === "ar" ? "كل الفئات" : "All categories"}
+            </option>
             {categories?.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -184,7 +195,9 @@ export default function AdminProductsSection() {
             onChange={(e) => setBrandFilter(e.target.value)}
             className="p-2 border rounded bg-white dark:bg-gray-800"
           >
-            <option value="">{language === 'ar' ? 'كل العلامات' : 'All brands'}</option>
+            <option value="">
+              {language === "ar" ? "كل العلامات" : "All brands"}
+            </option>
             {brands?.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name}
@@ -199,7 +212,7 @@ export default function AdminProductsSection() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             <PlusCircleIcon className="w-5 h-5" />
-            <span>{language === 'ar' ? 'إضافة منتج' : 'Add product'}</span>
+            <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
           </button>
         </div>
       </div>
@@ -208,26 +221,40 @@ export default function AdminProductsSection() {
         <table className="min-w-full">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'صورة' : 'Image'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'الاسم' : 'Name'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'الفئة' : 'Category'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'البراند' : 'Brand'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'السعر' : 'Price'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'المخزون' : 'Stock'}</th>
-              <th className="px-4 py-3 text-left">{language === 'ar' ? 'التحكم' : 'Actions'}</th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "صورة" : "Image"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "الاسم" : "Name"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "الفئة" : "Category"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "البراند" : "Brand"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "السعر" : "Price"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "المخزون" : "Stock"}
+              </th>
+              <th className="px-4 py-3 text-left">
+                {language === "ar" ? "التحكم" : "Actions"}
+              </th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={7} className="p-6 text-center">
-                  {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                  {language === "ar" ? "جاري التحميل..." : "Loading..."}
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
                 <td colSpan={7} className="p-6 text-center text-gray-500">
-                  {language === 'ar' ? 'لا توجد منتجات' : 'No products found'}
+                  {language === "ar" ? "لا توجد منتجات" : "No products found"}
                 </td>
               </tr>
             ) : (
@@ -237,29 +264,33 @@ export default function AdminProductsSection() {
                     {p.primary_image ? (
                       // full URL expected from serializer
                       // keep image responsive and small
-                      <img src={API_BASE_URL + p.primary_image} alt={p.name} className="w-16 h-16 object-cover rounded" />
+                      <img
+                        src={API_BASE_URL + p.primary_image}
+                        alt={p.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
                     ) : (
                       <PhotoIcon className="w-10 h-10 text-gray-400" />
                     )}
                   </td>
                   <td className="px-4 py-3">{p.name}</td>
-                  <td className="px-4 py-3">{p.category_name ?? '—'}</td>
-                  <td className="px-4 py-3">{p.brand_name ?? '—'}</td>
-                  <td className="px-4 py-3">${Number(p.price).toFixed(2)}</td>
+                  <td className="px-4 py-3">{p.category_name ?? "—"}</td>
+                  <td className="px-4 py-3">{p.brand_name ?? "—"}</td>
+                  <td className="px-4 py-3">EGP {Number(p.price).toFixed(2)}</td>
                   <td className="px-4 py-3">{p.stock}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEdit(p)}
                         className="p-2 bg-yellow-100 rounded hover:bg-yellow-200"
-                        title={language === 'ar' ? 'تعديل' : 'Edit'}
+                        title={language === "ar" ? "تعديل" : "Edit"}
                       >
                         <PencilSquareIcon className="w-5 h-5 text-yellow-700" />
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
                         className="p-2 bg-red-100 rounded hover:bg-red-200"
-                        title={language === 'ar' ? 'حذف' : 'Delete'}
+                        title={language === "ar" ? "حذف" : "Delete"}
                       >
                         <TrashIcon className="w-5 h-5 text-red-700" />
                       </button>
@@ -275,8 +306,8 @@ export default function AdminProductsSection() {
       {showForm && (
         <ProductForm
           onClose={() => {
-            setShowForm(false)
-            setEditing(null)
+            setShowForm(false);
+            setEditing(null);
           }}
           onSaved={onFormSaved}
           initial={editing}
@@ -285,9 +316,8 @@ export default function AdminProductsSection() {
         />
       )}
     </div>
-  )
+  );
 }
-
 
 /**
  * ProductForm - handles create & update
@@ -301,30 +331,38 @@ function ProductForm({
   categories,
   brands,
 }: {
-  onClose: () => void
-  onSaved: (p: ProductListItem) => void
-  initial: ProductListItem | null
-  categories: Category[] | null
-  brands: Brand[] | null
+  onClose: () => void;
+  onSaved: (p: ProductListItem) => void;
+  initial: ProductListItem | null;
+  categories: Category[] | null;
+  brands: Brand[] | null;
 }) {
-  const { language } = useLanguage()
-  const [submitting, setSubmitting] = useState(false)
+  const { language } = useLanguage();
+  const [submitting, setSubmitting] = useState(false);
 
   // form state
-  const [name, setName] = useState(initial?.name ?? '')
-  const [nameAr, setNameAr] = useState(initial?.name_ar ?? '')
-  const [description, setDescription] = useState('')
-  const [descriptionAr, setDescriptionAr] = useState('')
-  const [price, setPrice] = useState(initial?.price ?? 0)
-  const [comparePrice, setComparePrice] = useState<number | ''>(initial?.compare_price ?? '')
-  const [stock, setStock] = useState(initial?.stock ?? 0)
-  const [categoryId, setCategoryId] = useState<number | ''>(initial?.id ? '' : '')
-  const [brandId, setBrandId] = useState<number | ''>('')
-  const [productType, setProductType] = useState('network-device')
-  const [isActive, setIsActive] = useState<boolean>((initial?.is_active as boolean) ?? true)
-  const [isFeatured, setIsFeatured] = useState<boolean>((initial?.is_featured as boolean) ?? false)
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const { fetchProduct,createProduct,updateProduct } =useAuth()
+  const [name, setName] = useState(initial?.name ?? "");
+  const [nameAr, setNameAr] = useState(initial?.name_ar ?? "");
+  const [description, setDescription] = useState("");
+  const [descriptionAr, setDescriptionAr] = useState("");
+  const [price, setPrice] = useState(initial?.price ?? 1);
+  const [comparePrice, setComparePrice] = useState<number | "">(
+    initial?.compare_price ?? ""
+  );
+  const [stock, setStock] = useState(initial?.stock ?? 0);
+  const [categoryId, setCategoryId] = useState<number | "">(
+    initial?.id ? "" : ""
+  );
+  const [brandId, setBrandId] = useState<number | "">("");
+  const [productType, setProductType] = useState("network-device");
+  const [isActive, setIsActive] = useState<boolean>(
+    (initial?.is_active as boolean) ?? true
+  );
+  const [isFeatured, setIsFeatured] = useState<boolean>(
+    (initial?.is_featured as boolean) ?? false
+  );
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { fetchProduct, createProduct, updateProduct } = useAuth();
   useEffect(() => {
     // if editing, try to pre-fill categoryId/brandId by fetching detail
     if (initial && initial.id) {
@@ -332,61 +370,62 @@ function ProductForm({
       // We'll try GET /api/admin/products/<id>/ (some backends expose id-based detail); fallback to nothing
       (async () => {
         try {
-          const res = await fetchProduct(initial.id)
-          const data = res.data
-          setName(data.name ?? '')
-          setNameAr(data.name_ar ?? '')
-          setDescription(data.description ?? '')
-          setDescriptionAr(data.description_ar ?? '')
-          setPrice(data.price ?? 0)
-          setComparePrice(data.compare_price ?? '')
-          setStock(data.stock ?? 0)
-          setProductType(data.product_type ?? 'network-device')
-          setIsActive(data.is_active ?? true)
-          setIsFeatured(data.is_featured ?? false)
-          if (data.category && data.category.id) setCategoryId(data.category.id)
-          if (data.brand && data.brand.id) setBrandId(data.brand.id)
+          const res = await fetchProduct(initial.slug || String(initial.id));
+          const data = res;
+          setName(data.name ?? "");
+          setNameAr(data.name_ar ?? "");
+          setDescription(data.description ?? "");
+          setDescriptionAr(data.description_ar ?? "");
+          setPrice(data.price ?? 0);
+          setComparePrice(data.compare_price ?? "");
+          setStock(data.stock ?? 0);
+          setProductType(data.product_type ?? "network-device");
+          setIsActive(data.is_active ?? true);
+          setIsFeatured(data.is_featured ?? false);
+          if (data.category && data.category.id)
+            setCategoryId(data.category.id);
+          if (data.brand && data.brand.id) setBrandId(data.brand.id);
         } catch (e) {
           // ignore - maybe endpoint uses slug lookup only
-          console.warn('fetch product detail failed', e)
+          console.warn("fetch product detail failed", e);
         }
-      })()
+      })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial])
+  }, [initial]);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null
-    setImageFile(f)
-  }
+    const f = e.target.files?.[0] ?? null;
+    setImageFile(f);
+  };
 
   const submit = async (e?: React.FormEvent) => {
-    e?.preventDefault()
-    setSubmitting(true)
+    e?.preventDefault();
+    setSubmitting(true);
     try {
-      const fd = new FormData()
-      fd.append('name', name)
-      if (nameAr) fd.append('name_ar', nameAr)
-      if (description) fd.append('description', description)
-      if (descriptionAr) fd.append('description_ar', descriptionAr)
-      fd.append('price', String(price))
-      if (comparePrice !== '') fd.append('compare_price', String(comparePrice))
-      fd.append('stock', String(stock))
-      if (categoryId) fd.append('category_id', String(categoryId))
-      if (brandId) fd.append('brand_id', String(brandId))
-      fd.append('product_type', productType)
-      fd.append('is_active', String(Number(isActive)))
-      fd.append('is_featured', String(Number(isFeatured)))
-      if (imageFile) fd.append('image', imageFile)
+      const fd = new FormData();
+      fd.append("name", name);
+      if (nameAr) fd.append("name_ar", nameAr);
+      if (description) fd.append("description", description);
+      if (descriptionAr) fd.append("description_ar", descriptionAr);
+      fd.append("price", String(price));
+      if (comparePrice !== "") fd.append("compare_price", String(comparePrice));
+      fd.append("stock", String(stock));
+      if (categoryId) fd.append("category_id", String(categoryId));
+      if (brandId) fd.append("brand_id", String(brandId));
+      fd.append("product_type", productType);
+      fd.append("is_active", String(Number(isActive)));
+      fd.append("is_featured", String(Number(isFeatured)));
+      if (imageFile) fd.append("image", imageFile);
 
-      let res
+      let res;
       if (initial && initial.id) {
-        res = await updateProduct(initial.id,fd)
+        res = await updateProduct(initial.id, fd);
       } else {
-        res = await createProduct(fd)
+        res = await createProduct(fd);
       }
 
-      const saved = res
+      const saved = res;
       // Normalize saved product for the list shape
       const normalized: ProductListItem = {
         id: saved.id,
@@ -401,180 +440,313 @@ function ProductForm({
         is_active: saved.is_active ?? true,
         is_featured: saved.is_featured ?? false,
         slug: saved.slug,
-      }
+      };
 
-      onSaved(normalized)
+      onSaved(normalized);
     } catch (err: any) {
-      console.error('save product error', err)
-      const msg = err?.response?.data || (language === 'ar' ? 'فشل الحفظ' : 'Save failed')
-      toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg))
+      console.error("save product error", err);
+      const msg =
+        err?.response?.data ||
+        (language === "ar" ? "فشل الحفظ" : "Save failed");
+      toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl p-6"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {initial ? (language === 'ar' ? 'تعديل المنتج' : 'Edit product') : language === 'ar' ? 'إضافة منتج' : 'Add product'}
+            {initial
+              ? language === "ar"
+                ? "تعديل المنتج"
+                : "Edit product"
+              : language === "ar"
+              ? "إضافة منتج"
+              : "Add product"}
           </h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 transition-colors"
+          >
             ✕
           </button>
         </div>
 
-        <form onSubmit={submit} className="grid grid-cols-1 gap-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={language === 'ar' ? 'اسم المنتج (انجليزي)' : 'Name'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-            <input
-              value={nameAr}
-              onChange={(e) => setNameAr(e.target.value)}
-              placeholder={language === 'ar' ? 'اسم المنتج (عربي)' : 'Name (AR)'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              required
-              type="number"
-              step="0.1"
-              value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              placeholder={language === 'ar' ? 'السعر' : 'Price'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-            <input
-              type="number"
-              step="0.01"
-              value={comparePrice as any}
-              onChange={(e) => setComparePrice(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder={language === 'ar' ? 'سعر المقارنة' : 'Compare price'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              required
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(Number(e.target.value))}
-              placeholder={language === 'ar' ? 'المخزون' : 'Stock'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-
-            {categories ? (
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(Number(e.target.value))}
+        <form onSubmit={submit} className="grid grid-cols-1 gap-4">
+          {/* الاسم بالإنجليزي والعربي */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "اسم المنتج (إنجليزي)" : "Name"}
+              </label>
+              <input
                 required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "اسم المنتج (عربي)" : "Name (AR)"}
+              </label>
+              <input
+                value={nameAr}
+                onChange={(e) => setNameAr(e.target.value)}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+          </div>
+
+          {/* السعر وسعر المقارنة */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "السعر" : "Price"}
+              </label>
+              <input
+                required
+                type="number"
+                step="1"
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "سعر المقارنة" : "Compare Price"}
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={comparePrice as any}
+                onChange={(e) =>
+                  setComparePrice(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+          </div>
+
+          {/* المخزون والفئة */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "المخزون" : "Stock"}
+              </label>
+              <input
+                required
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(Number(e.target.value))}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الفئة" : "Category"}
+              </label>
+              {categories ? (
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(Number(e.target.value))}
+                  required
+                  className="p-2 border rounded bg-white dark:bg-gray-900"
+                >
+                  <option value="">
+                    {language === "ar" ? "اختر فئة" : "Select category"}
+                  </option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={categoryId as any}
+                  onChange={(e) =>
+                    setCategoryId(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  placeholder={
+                    language === "ar"
+                      ? "رقم الفئة (category_id)"
+                      : "Category ID"
+                  }
+                  className="p-2 border rounded bg-white dark:bg-gray-900"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* البراند */}
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "البراند" : "Brand"}
+            </label>
+            {brands ? (
+              <select
+                value={brandId}
+                onChange={(e) =>
+                  setBrandId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
                 className="p-2 border rounded bg-white dark:bg-gray-900"
               >
-                <option value="">{language === 'ar' ? 'اختر فئة' : 'Select category'}</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
+                <option value="">
+                  {language === "ar"
+                    ? "اختر براند (اختياري)"
+                    : "Select brand (optional)"}
+                </option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
                   </option>
                 ))}
               </select>
             ) : (
               <input
-                value={categoryId as any}
-                onChange={(e) => setCategoryId(e.target.value === '' ? '' : Number(e.target.value))}
-                placeholder={language === 'ar' ? 'رقم الفئة (category_id)' : 'Category ID'}
+                value={brandId as any}
+                onChange={(e) =>
+                  setBrandId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                placeholder={
+                  language === "ar"
+                    ? "رقم البراند (brand_id) - اختياري"
+                    : "Brand ID (optional)"
+                }
                 className="p-2 border rounded bg-white dark:bg-gray-900"
               />
             )}
           </div>
 
-          {brands ? (
-            <select
-              value={brandId}
-              onChange={(e) => setBrandId(e.target.value === '' ? '' : Number(e.target.value))}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            >
-              <option value="">{language === 'ar' ? 'اختر براند (اختياري)' : 'Select brand (optional)'}</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
+          {/* الوصف بالإنجليزي والعربي */}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوصف (إنجليزي)" : "Description"}
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوصف (عربي)" : "Description (AR)"}
+              </label>
+              <textarea
+                value={descriptionAr}
+                onChange={(e) => setDescriptionAr(e.target.value)}
+                rows={2}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              />
+            </div>
+          </div>
+
+          {/* نوع المنتج والحالات */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "نوع المنتج" : "Product Type"}
+              </label>
+              <select
+                value={productType}
+                onChange={(e) => setProductType(e.target.value)}
+                className="p-2 border rounded bg-white dark:bg-gray-900"
+              >
+                <option value="network-device">
+                  {language === "ar" ? "جهاز شبكات" : "Network Device"}
                 </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              value={brandId as any}
-              onChange={(e) => setBrandId(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder={language === 'ar' ? 'رقم البراند (brand_id) - اختياري' : 'Brand ID (optional)'}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            />
-          )}
+                <option value="software-license">
+                  {language === "ar" ? "ترخيص برمجي" : "Software License"}
+                </option>
+                <option value="installation-service">
+                  {language === "ar" ? "خدمة تركيب" : "Installation Service"}
+                </option>
+              </select>
+            </div>
 
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder={language === 'ar' ? 'الوصف (انجليزي)' : 'Description'}
-            className="p-2 border rounded bg-white dark:bg-gray-900"
-            rows={3}
-          />
-          <textarea
-            value={descriptionAr}
-            onChange={(e) => setDescriptionAr(e.target.value)}
-            placeholder={language === 'ar' ? 'الوصف (عربي)' : 'Description (AR)'}
-            className="p-2 border rounded bg-white dark:bg-gray-900"
-            rows={2}
-          />
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+              />
+              <label className="text-sm">
+                {language === "ar" ? "نشط" : "Active"}
+              </label>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
-            <select
-              value={productType}
-              onChange={(e) => setProductType(e.target.value)}
-              className="p-2 border rounded bg-white dark:bg-gray-900"
-            >
-              <option value="network-device">{language === 'ar' ? 'جهاز شبكات' : 'Network Device'}</option>
-              <option value="software-license">{language === 'ar' ? 'ترخيص برمجي' : 'Software License'}</option>
-              <option value="installation-service">{language === 'ar' ? 'خدمة تركيب' : 'Installation Service'}</option>
-            </select>
-
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
-              <span className="text-sm">{language === 'ar' ? 'نشط' : 'Active'}</span>
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} />
-              <span className="text-sm">{language === 'ar' ? 'مميز' : 'Featured'}</span>
-            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={(e) => setIsFeatured(e.target.checked)}
+              />
+              <label className="text-sm">
+                {language === "ar" ? "مميز" : "Featured"}
+              </label>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* الصورة */}
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
+            </label>
             <input type="file" accept="image/*" onChange={handleFile} />
-            {imageFile && <span className="text-sm">{imageFile.name}</span>}
-            <div className="flex-1 text-right text-xs text-gray-500">{language === 'ar' ? 'الصورة للاستخدام كصورة رئيسية' : 'Primary image (optional)'}</div>
+            {imageFile && (
+              <span className="text-sm mt-1">{imageFile.name}</span>
+            )}
           </div>
 
+          {/* أزرار الحفظ والإلغاء */}
           <div className="flex justify-end gap-3 mt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 border rounded">
-              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border rounded"
+            >
+              {language === "ar" ? "إلغاء" : "Cancel"}
             </button>
-            <button type="submit" disabled={submitting} className="px-4 py-2 bg-blue-600 text-white rounded">
-              {submitting ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : language === 'ar' ? 'حفظ' : 'Save'}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              {submitting
+                ? language === "ar"
+                  ? "جاري الحفظ..."
+                  : "Saving..."
+                : language === "ar"
+                ? "حفظ"
+                : "Save"}
             </button>
           </div>
         </form>
       </motion.div>
     </div>
-  )
+  );
 }
