@@ -174,12 +174,12 @@ export default function AdminProductsSection() {
             placeholder={
               language === "ar" ? "ابحث عن منتج..." : "Search products..."
             }
-            className="flex-1 p-2 border rounded bg-white dark:bg-gray-800"
+            className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="p-2 border rounded bg-white dark:bg-gray-800"
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
               {language === "ar" ? "كل الفئات" : "All categories"}
@@ -193,7 +193,7 @@ export default function AdminProductsSection() {
           <select
             value={brandFilter}
             onChange={(e) => setBrandFilter(e.target.value)}
-            className="p-2 border rounded bg-white dark:bg-gray-800"
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
               {language === "ar" ? "كل العلامات" : "All brands"}
@@ -209,7 +209,7 @@ export default function AdminProductsSection() {
         <div className="flex items-center gap-2">
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
           >
             <PlusCircleIcon className="w-5 h-5" />
             <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
@@ -217,82 +217,101 @@ export default function AdminProductsSection() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
-        <table className="min-w-full">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "صورة" : "Image"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "الاسم" : "Name"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "الفئة" : "Category"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "البراند" : "Brand"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "السعر" : "Price"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "المخزون" : "Stock"}
               </th>
-              <th className="px-4 py-3 text-left">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {language === "ar" ? "التحكم" : "Actions"}
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={7} className="p-6 text-center">
+                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
                   {language === "ar" ? "جاري التحميل..." : "Loading..."}
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-gray-500">
+                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
                   {language === "ar" ? "لا توجد منتجات" : "No products found"}
                 </td>
               </tr>
             ) : (
               products.map((p) => (
-                <tr key={p.id} className="border-t dark:border-gray-700">
-                  <td className="px-4 py-3">
+                <tr 
+                  key={p.id} 
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 whitespace-nowrap">
                     {p.primary_image ? (
-                      // full URL expected from serializer
-                      // keep image responsive and small
                       <img
                         src={API_BASE_URL + p.primary_image}
                         alt={p.name}
-                        className="w-16 h-16 object-cover rounded"
+                        className="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600"
                       />
                     ) : (
-                      <PhotoIcon className="w-10 h-10 text-gray-400" />
+                      <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                     )}
                   </td>
-                  <td className="px-4 py-3">{p.name}</td>
-                  <td className="px-4 py-3">{p.category_name ?? "—"}</td>
-                  <td className="px-4 py-3">{p.brand_name ?? "—"}</td>
-                  <td className="px-4 py-3">EGP {Number(p.price).toFixed(2)}</td>
-                  <td className="px-4 py-3">{p.stock}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                    {p.name}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {p.category_name ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {p.brand_name ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
+                    EGP {Number(p.price).toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      p.stock > 10 
+                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" 
+                        : p.stock > 0 
+                        ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                    }`}>
+                      {p.stock}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
                     <div className="flex gap-2">
                       <button
                         onClick={() => openEdit(p)}
-                        className="p-2 bg-yellow-100 rounded hover:bg-yellow-200"
+                        className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"
                         title={language === "ar" ? "تعديل" : "Edit"}
                       >
-                        <PencilSquareIcon className="w-5 h-5 text-yellow-700" />
+                        <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
-                        className="p-2 bg-red-100 rounded hover:bg-red-200"
+                        className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
                         title={language === "ar" ? "حذف" : "Delete"}
                       >
-                        <TrashIcon className="w-5 h-5 text-red-700" />
+                        <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
                       </button>
                     </div>
                   </td>
@@ -473,7 +492,7 @@ function ProductForm({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             ✕
           </button>
@@ -490,7 +509,7 @@ function ProductForm({
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -501,7 +520,7 @@ function ProductForm({
               <input
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -518,7 +537,7 @@ function ProductForm({
                 step="1"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -535,7 +554,7 @@ function ProductForm({
                     e.target.value === "" ? "" : Number(e.target.value)
                   )
                 }
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -551,7 +570,7 @@ function ProductForm({
                 type="number"
                 value={stock}
                 onChange={(e) => setStock(Number(e.target.value))}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -564,7 +583,7 @@ function ProductForm({
                   value={categoryId}
                   onChange={(e) => setCategoryId(Number(e.target.value))}
                   required
-                  className="p-2 border rounded bg-white dark:bg-gray-900"
+                  className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">
                     {language === "ar" ? "اختر فئة" : "Select category"}
@@ -588,7 +607,7 @@ function ProductForm({
                       ? "رقم الفئة (category_id)"
                       : "Category ID"
                   }
-                  className="p-2 border rounded bg-white dark:bg-gray-900"
+                  className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               )}
             </div>
@@ -607,7 +626,7 @@ function ProductForm({
                     e.target.value === "" ? "" : Number(e.target.value)
                   )
                 }
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">
                   {language === "ar"
@@ -633,7 +652,7 @@ function ProductForm({
                     ? "رقم البراند (brand_id) - اختياري"
                     : "Brand ID (optional)"
                 }
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             )}
           </div>
@@ -648,7 +667,7 @@ function ProductForm({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -660,7 +679,7 @@ function ProductForm({
                 value={descriptionAr}
                 onChange={(e) => setDescriptionAr(e.target.value)}
                 rows={2}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -674,7 +693,7 @@ function ProductForm({
               <select
                 value={productType}
                 onChange={(e) => setProductType(e.target.value)}
-                className="p-2 border rounded bg-white dark:bg-gray-900"
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="network-device">
                   {language === "ar" ? "جهاز شبكات" : "Network Device"}
@@ -693,8 +712,9 @@ function ProductForm({
                 type="checkbox"
                 checked={isActive}
                 onChange={(e) => setIsActive(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label className="text-sm">
+              <label className="text-sm text-gray-700 dark:text-gray-300">
                 {language === "ar" ? "نشط" : "Active"}
               </label>
             </div>
@@ -704,8 +724,9 @@ function ProductForm({
                 type="checkbox"
                 checked={isFeatured}
                 onChange={(e) => setIsFeatured(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label className="text-sm">
+              <label className="text-sm text-gray-700 dark:text-gray-300">
                 {language === "ar" ? "مميز" : "Featured"}
               </label>
             </div>
@@ -718,7 +739,7 @@ function ProductForm({
             </label>
             <input type="file" accept="image/*" onChange={handleFile} />
             {imageFile && (
-              <span className="text-sm mt-1">{imageFile.name}</span>
+              <span className="text-sm mt-1 text-gray-600 dark:text-gray-400">{imageFile.name}</span>
             )}
           </div>
 
@@ -727,14 +748,14 @@ function ProductForm({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
             >
               {language === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             >
               {submitting
                 ? language === "ar"

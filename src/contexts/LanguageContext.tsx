@@ -11,8 +11,8 @@ const translations = {
   en: {
     // Navigation
        "pageTitle": "Orders Management",
-      "searchPlaceholder": "Search by order number or customer...",
-      "filterAll": "All",
+      "searchPlaceholder": "Search",
+      "filterAll": "All Statuses",
       "filterPending": "Pending",
       "filterConfirmed": "Confirmed",
       "filterShipped": "Shipped",
@@ -329,7 +329,7 @@ const translations = {
   },
   ar: {
       "pageTitle": "إدارة الطلبات",
-      "searchPlaceholder": "ابحث برقم الطلب أو اسم العميل...",
+      "searchPlaceholder": "بحث",
       "filterAll": "الكل",
       "filterPending": "قيد المراجعة",
       "filterConfirmed": "تم التأكيد",
