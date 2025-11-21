@@ -180,7 +180,7 @@ const Services: React.FC = () => {
             </span>
             <div className="ml-auto">
               {service.is_active === true ? (
-                <span className="text-[#E97132] dark:text-[#E97132] text-sm font-medium">
+                <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
                   {language === "ar" ? "متوفر" : "Available"} {service.stock}
                 </span>
               ) : (

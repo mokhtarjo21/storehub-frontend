@@ -135,44 +135,61 @@ const Cart: React.FC = () => {
                   <motion.div
                     key={item.id}
                     layout
-                    className="p-6 flex items-center space-x-4 rtl:space-x-reverse"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-6 flex items-center space-x-4 rtl:space-x-reverse hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                   >
-                    <img
-                      src={
-                        item.product?.image ||
-                        "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
-                      }
-                      alt={item.item_name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={
+                          item.product?.image ||
+                          item.service?.image ||
+                          "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
+                        }
+                        alt={item.item_name}
+                        className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {item.item_name}
                       </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {item.item_type === "product"
-                          ? t("orders.product")
-                          : t("orders.service")}
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            item.item_type === "product"
+                              ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                              : "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300"
+                          }`}
+                        >
+                          {item.item_type === "product"
+                            ? t("orders.product")
+                            : t("orders.service")}
+                        </span>
                       </p>
-                      <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-2">
-                        ${parseFloat(item.product?.price || 0).toLocaleString()}
+                      <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                        {parseFloat(
+                          item.product?.price || item.service?.price || 0
+                        ).toLocaleString()}{" "}
+                        EGP
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
                       <button
                         onClick={() =>
                           handelUpdate(
                             item.id,
                             item.quantity - 1,
-                            item.product.stock
+                            item.product?.stock || item.service?.stock || 999
                           )
                         }
-                        className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        disabled={item.quantity <= 1}
+                        className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <MinusIcon className="w-5 h-5" />
+                        <MinusIcon className="w-4 h-4" />
                       </button>
 
-                      <span className="w-12 text-center font-medium text-gray-900 dark:text-white">
+                      <span className="w-10 text-center font-semibold text-gray-900 dark:text-white text-sm">
                         {item.quantity}
                       </span>
 
@@ -181,21 +198,26 @@ const Cart: React.FC = () => {
                           handelUpdate(
                             item.id,
                             item.quantity + 1,
-                            item.product.stock
+                            item.product?.stock || item.service?.stock || 999
                           )
                         }
-                        disabled={item.quantity >= item.product?.stock || false}
-                        className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                        disabled={
+                          item.quantity >=
+                          (item.product?.stock || item.service?.stock || 999)
+                        }
+                        className="p-1.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <PlusIcon className="w-5 h-5" />
+                        <PlusIcon className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        onClick={() => itemRemove(item.id)}
+                        className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title={t("cart.remove") || "Remove item"}
+                      >
+                        <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
-                    <button
-                      onClick={() => itemRemove(item.id)}
-                      className="p-2 text-red-400 hover:text-red-600 transition-colors"
-                    >
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
                   </motion.div>
                 ))}
               </div>
@@ -216,12 +238,12 @@ const Cart: React.FC = () => {
               {/* Payment Method Selection */}
               {hasServices && (
                 <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <label className="block text-sm font-medium text-gray-900 dark:text-white mb-3">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-3">
                     {t("checkout.payment")}
                   </label>
 
                   <div className="space-y-3">
-                    <label className="flex items-start space-x-3 cursor-pointer">
+                    <label className="flex items-start space-x-3 rtl:space-x-reverse cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700/50 transition-colors">
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -230,7 +252,7 @@ const Cart: React.FC = () => {
                         onChange={(e) =>
                           setPaymentMethod(e.target.value as "cod")
                         }
-                        className="mt-1 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -242,7 +264,7 @@ const Cart: React.FC = () => {
                       </div>
                     </label>
 
-                    <label className="flex items-start space-x-3 cursor-pointer">
+                    <label className="flex items-start space-x-3 rtl:space-x-reverse cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-700/50 transition-colors">
                       <input
                         type="radio"
                         name="paymentMethod"
@@ -251,7 +273,7 @@ const Cart: React.FC = () => {
                         onChange={(e) =>
                           setPaymentMethod(e.target.value as "split")
                         }
-                        className="mt-1 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       />
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -276,10 +298,10 @@ const Cart: React.FC = () => {
                     type="text"
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                     placeholder={t("cart.promoCode.placeholder")}
                   />
-                  <button className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                  <button className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium">
                     {t("common.apply")}
                   </button>
                 </div>
@@ -287,61 +309,63 @@ const Cart: React.FC = () => {
 
               {/* Points */}
               {user && user.points > 0 && (
-                <div className="mb-4">
-                  <label className="flex items-center space-x-2 rtl:space-x-reverse">
+                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <label className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
                     <input
                       type="checkbox"
                       checked={usePoints}
                       onChange={(e) => setUsePoints(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t("cart.usePoints")} ({user.points} {t("common.points")})
                     </span>
                   </label>
                   {usePoints && (
-                    <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                      -{pointsDiscount.toFixed(2)} {t("cart.discount")}
-                    </p>
+                    <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
+                      <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                        -{pointsDiscount.toFixed(2)} EGP {t("cart.discount")}
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
 
               {/* Summary */}
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">
                     {t("cart.subtotal")}
                   </span>
-                  <span className="text-gray-900 dark:text-white">
-                    ${Number(total).toFixed(2)}
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {Number(total).toFixed(2)} EGP
                   </span>
                 </div>
                 {pointsDiscount > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">
+                    <span className="text-gray-600 dark:text-gray-400">
                       {t("cart.pointsDiscount")}
                     </span>
-                    <span className="text-green-600 dark:text-green-400">
-                      -${pointsDiscount.toFixed(2)}
+                    <span className="font-medium text-green-600 dark:text-green-400">
+                      -{pointsDiscount.toFixed(2)} EGP
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">
+                  <span className="text-gray-600 dark:text-gray-400">
                     {t("cart.shipping")}
                   </span>
-                  <span className="text-gray-900 dark:text-white">
+                  <span className="font-medium text-gray-900 dark:text-white">
                     {t("cart.freeShipping")}
                   </span>
                 </div>
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span className="text-gray-900 dark:text-white">
+                <div className="border-t border-gray-300 dark:border-gray-600 pt-3 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
                       {t("common.total")}
                     </span>
-                    <span className="text-gray-900 dark:text-white">
-                      ${finalTotal.toFixed(2)}
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {finalTotal.toFixed(2)} EGP
                     </span>
                   </div>
                 </div>
@@ -350,7 +374,7 @@ const Cart: React.FC = () => {
               {/* Checkout Button */}
               <button
                 onClick={handleCheckout}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 rtl:space-x-reverse shadow-sm hover:shadow-md"
               >
                 <CreditCardIcon className="w-5 h-5" />
                 <span>{t("cart.checkout")}</span>
@@ -358,7 +382,7 @@ const Cart: React.FC = () => {
 
               <button
                 onClick={cartClear}
-                className="w-full mt-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-lg transition-colors"
+                className="w-full mt-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2.5 px-4 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
               >
                 {t("cart.clear")}
               </button>

@@ -27,9 +27,9 @@ export default function AdminOrdersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
   const [orderStatus, setOrderStatus] = useState("");
   const [updating, setUpdating] = useState(false);
-  const [editingOrder, setEditingOrder] = useState(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders } = useAuth();
   const { t, language } = useLanguage();
@@ -158,7 +158,14 @@ export default function AdminOrdersPage() {
   const handleSelectOrder = (order) => {
     setSelectedOrder(order);
     setOrderStatus(order.order_status);
-    setEditingOrder({ ...order });
+    setEditingOrder({
+      user_name: order.user_name || "",
+      shipping_address: order.shipping_address || "",
+      total_price: order.total_price || 0,
+      order_status: order.order_status || "pending",
+      payment_status: order.payment_status || "",
+      // أي حقول تانية محتاج تعديلها
+    });
   };
 
   const handleCloseDetails = () => {
@@ -169,37 +176,57 @@ export default function AdminOrdersPage() {
 
   const handleEditField = (field, value) => {
     if (!editingOrder) return;
-    setEditingOrder({
-      ...editingOrder,
-      [field]: value,
-    });
+    setEditingOrder({ ...editingOrder, [field]: value });
   };
 
   const handleSaveOrder = async () => {
     if (!editingOrder || !selectedOrder) return;
 
     setUpdating(true);
+
     try {
-      // Update status if changed
+      const updates = {};
+
+      // مقارنة القيم القديمة بالجديدة
+      if (editingOrder.user_name !== selectedOrder.user_name) {
+        updates.user_name = editingOrder.user_name;
+      }
+      if (editingOrder.shipping_address !== selectedOrder.shipping_address) {
+        updates.shipping_address = editingOrder.shipping_address;
+      }
+      if (editingOrder.total_price !== selectedOrder.total_price) {
+        updates.total_price = editingOrder.total_price;
+      }
       if (editingOrder.order_status !== selectedOrder.order_status) {
-        await updateorders(
-          selectedOrder.order_number,
-          editingOrder.order_status
-        );
+        updates.order_status = editingOrder.order_status;
       }
 
-      // Here you can add more update logic for other fields
-      // For now, we'll just update the status and refresh
+      // إذا في تغييرات
+      if (Object.keys(updates).length > 0) {
+        // افترض إن updateorders تقبل (orderNumber, updates)
+        await updateorders(selectedOrder.order_number, updates);
 
-      await fetchOrders(search, status);
+        // تحديث المحلي
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.order_number === selectedOrder.order_number
+              ? { ...o, ...updates }
+              : o
+          )
+        );
 
-      toast.success(
-        language === "ar"
-          ? "تم حفظ التعديلات بنجاح"
-          : "Changes saved successfully"
-      );
+        setSelectedOrder((prev) => ({ ...prev, ...updates }));
 
-      setSelectedOrder(editingOrder);
+        toast.success(
+          language === "ar"
+            ? "تم حفظ التعديلات بنجاح"
+            : "Changes saved successfully"
+        );
+      } else {
+        toast.info(
+          language === "ar" ? "لا توجد تغييرات للحفظ" : "No changes to save"
+        );
+      }
     } catch (error) {
       console.error(error);
       toast.error(
@@ -656,310 +683,283 @@ export default function AdminOrdersPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 overflow-y-auto"
+            className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-opacity-50"
             onClick={handleCloseDetails}
           >
-            <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-opacity-50"
-                onClick={(e) => {
-                  // Only close if clicking directly on backdrop, not on modal content
-                  if (e.target === e.currentTarget) {
-                    handleCloseDetails();
-                  }
-                }}
-              />
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                }}
-                onMouseDown={(e) => e.stopPropagation()}
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    {t("orderDetails") ||
-                      (language === "ar" ? "تفاصيل الطلب" : "Order Details")}
-                  </h3>
-                  <button
-                    onClick={handleCloseDetails}
-                    className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
-                </div>
-
-                {/* Modal Content */}
-                <div
-                  className="px-6 py-4 max-h-[70vh] overflow-y-auto"
-                  onClick={(e) => e.stopPropagation()}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {t("orderDetails") ||
+                    (language === "ar" ? "تفاصيل الطلب" : "Order Details")}
+                </h3>
+                <button
+                  onClick={handleCloseDetails}
+                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Order Information */}
-                    <div
-                      className="space-y-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                          {language === "ar"
-                            ? "معلومات الطلب"
-                            : "Order Information"}
-                        </h4>
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {t("orderNumber") ||
-                                (language === "ar" ? "رقم الطلب" : "Order #")}
-                              :
-                            </span>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              #{selectedOrder.order_number}
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {t("total") ||
-                                (language === "ar" ? "المجموع" : "Total")}
-                              :
-                            </span>
-                            <input
-                              type="number"
-                              value={
-                                editingOrder?.total_price ||
-                                selectedOrder.total_price
-                              }
-                              onChange={(e) =>
-                                handleEditField("total_price", e.target.value)
-                              }
-                              className="text-sm font-bold text-gray-900 dark:text-white bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none w-24 text-right"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              EGP
-                            </span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {t("createdAt") ||
-                                (language === "ar"
-                                  ? "تاريخ الإنشاء"
-                                  : "Created At")}
-                              :
-                            </span>
-                            <span className="text-sm text-gray-900 dark:text-white">
-                              {new Date(
-                                selectedOrder.created_at
-                              ).toLocaleDateString(
-                                language === "ar" ? "ar-EG" : "en-GB"
-                              )}
-                            </span>
-                          </div>
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div
+                className="px-6 py-4 max-h-[70vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Order Information */}
+                  <div
+                    className="space-y-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {language === "ar"
+                          ? "معلومات الطلب"
+                          : "Order Information"}
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {t("orderNumber") ||
+                              (language === "ar" ? "رقم الطلب" : "Order #")}
+                            :
+                          </span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                            #{selectedOrder.order_number}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {t("total") ||
+                              (language === "ar" ? "المجموع" : "Total")}
+                            :
+                          </span>
+                          <input
+                            type="number"
+                            value={editingOrder?.total_price || ""}
+                            onChange={(e) =>
+                              handleEditField(
+                                "total_price",
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                            className="text-sm font-bold text-gray-900 dark:text-white bg-transparent border-b border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none w-24 text-right"
+                          />
+
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            EGP
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {t("createdAt") ||
+                              (language === "ar"
+                                ? "تاريخ الإنشاء"
+                                : "Created At")}
+                            :
+                          </span>
+                          <span className="text-sm text-gray-900 dark:text-white">
+                            {new Date(
+                              selectedOrder.created_at
+                            ).toLocaleDateString(
+                              language === "ar" ? "ar-EG" : "en-GB"
+                            )}
+                          </span>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Customer Information */}
+                    {/* Customer Information */}
+                    <div
+                      className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                        <UserIcon className="w-4 h-4" />
+                        {language === "ar"
+                          ? "معلومات العميل"
+                          : "Customer Information"}
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            {t("customer") ||
+                              (language === "ar" ? "العميل" : "Customer")}
+                            :
+                          </label>
+                          <input
+                            type="text"
+                            value={editingOrder?.user_name || ""}
+                            onChange={(e) =>
+                              handleEditField("user_name", e.target.value)
+                            }
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-start gap-1">
+                            <MapPinIcon className="w-4 h-4 mt-0.5" />
+                            {t("shippingAddress") ||
+                              (language === "ar"
+                                ? "عنوان الشحن"
+                                : "Shipping Address")}
+                            :
+                          </label>
+                          <textarea
+                            value={editingOrder?.shipping_address || ""}
+                            onChange={(e) =>
+                              handleEditField(
+                                "shipping_address",
+                                e.target.value
+                              )
+                            }
+                            rows={3}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Management */}
+                  <div
+                    className="space-y-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                        {t("manageStatus") ||
+                          (language === "ar"
+                            ? "إدارة الحالة"
+                            : "Manage Status")}
+                      </h4>
+                      <div className="space-y-4">
+                        <label className="block">
+                          <span className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t("changeStatus") ||
+                              (language === "ar"
+                                ? "تغيير الحالة"
+                                : "Change Status")}
+                          </span>
+                          <select
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            value={editingOrder?.order_status || ""}
+                            onChange={(e) =>
+                              handleEditField("order_status", e.target.value)
+                            }
+                          >
+                            <option value="pending">
+                              {t("filterPending") || "Pending"}
+                            </option>
+                            <option value="processing">
+                              {t("filterPending") || "Processing"}
+                            </option>
+                            <option value="confirmed">
+                              {t("filterConfirmed") || "Confirmed"}
+                            </option>
+                            <option value="shipped">
+                              {t("filterShipped") || "Shipped"}
+                            </option>
+                            <option value="delivered">
+                              {t("filterDelivered") || "Delivered"}
+                            </option>
+                            <option value="cancelled">
+                              {t("filterCancelled") || "Cancelled"}
+                            </option>
+                          </select>
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveOrder();
+                            }}
+                            disabled={updating}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {updating ? (
+                              <>
+                                <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                <span>
+                                  {language === "ar"
+                                    ? "جاري الحفظ..."
+                                    : "Saving..."}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircleIcon className="w-4 h-4" />
+                                <span>
+                                  {language === "ar"
+                                    ? "حفظ التعديلات"
+                                    : "Save Changes"}
+                                </span>
+                              </>
+                            )}
+                          </button>
+                          {selectedOrder.order_status !== "cancelled" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancelOrder();
+                              }}
+                              disabled={updating}
+                              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {t("cancelOrderBtn") ||
+                                (language === "ar"
+                                  ? "إلغاء الطلب"
+                                  : "Cancel Order")}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Information */}
+                    {selectedOrder.payment_status && (
                       <div
                         className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                          <UserIcon className="w-4 h-4" />
-                          {language === "ar"
-                            ? "معلومات العميل"
-                            : "Customer Information"}
-                        </h4>
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-                              {t("customer") ||
-                                (language === "ar" ? "العميل" : "Customer")}
-                              :
-                            </label>
-                            <input
-                              type="text"
-                              value={
-                                editingOrder?.user_name ||
-                                selectedOrder.user_name ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleEditField("user_name", e.target.value)
-                              }
-                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1 flex items-start gap-1">
-                              <MapPinIcon className="w-4 h-4 mt-0.5" />
-                              {t("shippingAddress") ||
-                                (language === "ar"
-                                  ? "عنوان الشحن"
-                                  : "Shipping Address")}
-                              :
-                            </label>
-                            <textarea
-                              value={
-                                editingOrder?.shipping_address ||
-                                selectedOrder.shipping_address ||
-                                ""
-                              }
-                              onChange={(e) =>
-                                handleEditField(
-                                  "shipping_address",
-                                  e.target.value
-                                )
-                              }
-                              rows={3}
-                              className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Status Management */}
-                    <div
-                      className="space-y-4"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                          {t("manageStatus") ||
+                          <CreditCardIcon className="w-4 h-4" />
+                          {t("paymentMethod") ||
                             (language === "ar"
-                              ? "إدارة الحالة"
-                              : "Manage Status")}
+                              ? "معلومات الدفع"
+                              : "Payment Information")}
                         </h4>
-                        <div className="space-y-4">
-                          <label className="block">
-                            <span className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {t("changeStatus") ||
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                              {t("paymentMethod") ||
                                 (language === "ar"
-                                  ? "تغيير الحالة"
-                                  : "Change Status")}
+                                  ? "طريقة الدفع"
+                                  : "Payment Method")}
+                              :
                             </span>
-                            <select
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              value={editingOrder?.order_status || orderStatus}
-                              onChange={(e) => {
-                                setOrderStatus(e.target.value);
-                                handleEditField("order_status", e.target.value);
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <option value="pending">
-                                {t("filterPending") || "Pending"}
-                              </option>
-                              <option value="processing">
-                                {t("filterPending") || "Processing"}
-                              </option>
-                              <option value="confirmed">
-                                {t("filterConfirmed") || "Confirmed"}
-                              </option>
-                              <option value="shipped">
-                                {t("filterShipped") || "Shipped"}
-                              </option>
-                              <option value="delivered">
-                                {t("filterDelivered") || "Delivered"}
-                              </option>
-                              <option value="cancelled">
-                                {t("filterCancelled") || "Cancelled"}
-                              </option>
-                            </select>
-                          </label>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSaveOrder();
-                              }}
-                              disabled={updating}
-                              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {updating ? (
-                                <>
-                                  <ArrowPathIcon className="w-4 h-4 animate-spin" />
-                                  <span>
-                                    {language === "ar"
-                                      ? "جاري الحفظ..."
-                                      : "Saving..."}
-                                  </span>
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircleIcon className="w-4 h-4" />
-                                  <span>
-                                    {language === "ar"
-                                      ? "حفظ التعديلات"
-                                      : "Save Changes"}
-                                  </span>
-                                </>
-                              )}
-                            </button>
-                            {selectedOrder.order_status !== "cancelled" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCancelOrder();
-                                }}
-                                disabled={updating}
-                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {t("cancelOrderBtn") ||
-                                  (language === "ar"
-                                    ? "إلغاء الطلب"
-                                    : "Cancel Order")}
-                              </button>
-                            )}
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">
+                              {selectedOrder.payment_status}
+                            </span>
                           </div>
                         </div>
                       </div>
-
-                      {/* Payment Information */}
-                      {selectedOrder.payment_status && (
-                        <div
-                          className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                            <CreditCardIcon className="w-4 h-4" />
-                            {t("paymentMethod") ||
-                              (language === "ar"
-                                ? "معلومات الدفع"
-                                : "Payment Information")}
-                          </h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
-                                {t("paymentMethod") ||
-                                  (language === "ar"
-                                    ? "طريقة الدفع"
-                                    : "Payment Method")}
-                                :
-                              </span>
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.payment_status}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
-              </motion.div>
-            </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

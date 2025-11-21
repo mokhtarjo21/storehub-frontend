@@ -272,8 +272,8 @@ const Products: React.FC = () => {
           <div className="flex items-center pt-4 space-x-2 rtl:space-x-reverse">
             {product.stock > 0 ? (
               <>
-                <div className="w-3 h-3 bg-[#E97132] dark:bg-[#E97132] rounded-full"></div>
-                <span className="text-[#E97132] dark:text-[#E97132] font-medium">
+                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
+                <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
                   {language === "ar" ? "الكمية المتوفرة" : " In Stock"}{" "}
                   {product.stock}
                 </span>
@@ -292,8 +292,6 @@ const Products: React.FC = () => {
       </motion.div>
     );
   };
-
- 
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4">
@@ -332,15 +330,15 @@ const Products: React.FC = () => {
 
             {/* Category */}
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FunnelIcon className="h-5 w-5 text-gray-400" />
-              </div>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border rounded-md"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All</option>
+                <option value="">
+                  {language === "ar" ? "كل الفئات" : "All Categories"}
+                </option>
+
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -354,9 +352,11 @@ const Products: React.FC = () => {
               <select
                 value={selectedBrand}
                 onChange={(e) => setSelectedBrand(e.target.value)}
-                className="block w-full px-3 py-2 border rounded-md"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                <option value="">All</option>
+                <option value="">
+                  {language === "ar" ? "كل الماركات" : "All Brands"}
+                </option>
                 {brands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}

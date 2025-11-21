@@ -211,9 +211,9 @@ const ProductDetail: React.FC = () => {
             <div className="flex items-center space-x-2 rtl:space-x-reverse pt-2">
               {product.stock > 0 ? (
                 <>
-                  <div className="w-3 h-3 bg-[#E97132] rounded-full"></div>
-                  <span className="text-[#E97132] font-medium text-sm">
-                    {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
+                  <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
+                    {language === "ar" ? "الكمية المتوفرة" : " In Stock"}{" "}
                     {product.stock}
                   </span>
                 </>

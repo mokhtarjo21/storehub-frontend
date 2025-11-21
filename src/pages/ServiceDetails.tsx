@@ -169,7 +169,7 @@ const ServiceDetails: React.FC = () => {
 
                 {/* Availability */}
                 {service.is_active ? (
-                  <span className="text-[#E97132] dark:text-[#E97132] text-lg font-medium">
+                  <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
                     {language === "ar" ? "متوفر" : "Available"} {service.stock}
                   </span>
                 ) : (
