@@ -9,8 +9,8 @@ interface AuthContextType {
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
-  fetchorders: (search :any,status:any) => Promise<any[]>;
-  updateorders: (order_number :any,orderStatus:any) => Promise<any[]>;
+  fetchorders: (search: any, status: any) => Promise<any[]>;
+  updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
   fetchProducts: () => Promise<any[]>;
   fetchcategories: () => Promise<any[]>;
@@ -396,13 +396,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-   const fetchorders = async (search :any,status:any): Promise<any[]> => {
+  const fetchorders = async (search: any, status: any): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/admin/orders/?search=${search}&status=${status}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/orders/admin/orders/?search=${search}&status=${status}`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
       const data = await handleApiResponse(response);
       return data;
     } catch (error) {
@@ -414,19 +417,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-  const updateorders = async (order_number :any,orderStatus:any): Promise<any[]> => {
+  const updateorders = async (
+    order_number: any,
+    updates: any
+  ): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/admin/orders/${order_number}/update-status/`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-         body: JSON.stringify({ order_status: orderStatus}),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/orders/admin/orders/${order_number}/update-status/`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(updates), 
+        }
+      );
       const data = await handleApiResponse(response);
       return data;
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to fetch products"
+        error instanceof Error ? error.message : "Failed to update order"
       );
       throw error;
     } finally {

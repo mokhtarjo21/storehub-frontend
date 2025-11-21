@@ -19,6 +19,7 @@ import {
   UserIcon,
   MapPinIcon,
   CreditCardIcon,
+  PencilIcon,
 } from "@heroicons/react/24/outline";
 
 export default function AdminOrdersPage() {
@@ -39,7 +40,10 @@ export default function AdminOrdersPage() {
     const total = orders.length;
     const pending = orders.filter((o) => o.order_status === "pending").length;
     const confirmed = orders.filter(
-      (o) => o.order_status === "confirmed" || o.order_status === "processing"
+      (o) => o.order_status === "confirmed" || o.order_status === "confirmed"
+    ).length;
+    const processing = orders.filter(
+      (o) => o.order_status === "processing"
     ).length;
     const shipped = orders.filter((o) => o.order_status === "shipped").length;
     const delivered = orders.filter(
@@ -56,6 +60,7 @@ export default function AdminOrdersPage() {
       total,
       pending,
       confirmed,
+      processing,
       shipped,
       delivered,
       cancelled,
@@ -347,12 +352,44 @@ export default function AdminOrdersPage() {
       iconColor: "text-yellow-600 dark:text-yellow-400",
     },
     {
+      name: language === "ar" ? "تم التاكيد" : "Confirmed",
+      value: stats.confirmed,
+      icon: CheckCircleIcon,
+      color: "green",
+      bgColor: "bg-green-100 dark:bg-green-900/30",
+      iconColor: "text-green-600 dark:text-green-400",
+    },
+    {
+      name: language === "ar" ? "قيد التجهيز" : "Processing",
+      value: stats.processing,
+      icon: CheckCircleIcon,
+      color: "green",
+      bgColor: "bg-green-100 dark:bg-green-900/30",
+      iconColor: "text-green-600 dark:text-green-400",
+    },
+    {
+      name: language === "ar" ? "تم التجهيز" : "shipped",
+      value: stats.shipped,
+      icon: CheckCircleIcon,
+      color: "green",
+      bgColor: "bg-green-100 dark:bg-green-900/30",
+      iconColor: "text-green-600 dark:text-green-400",
+    },
+    {
       name: language === "ar" ? "تم التسليم" : "Delivered",
       value: stats.delivered,
       icon: CheckCircleIcon,
       color: "green",
       bgColor: "bg-green-100 dark:bg-green-900/30",
       iconColor: "text-green-600 dark:text-green-400",
+    },
+    {
+      name: language === "ar" ? "تم الغاء" : "Cancelled",
+      value: stats.cancelled,
+      icon: CheckCircleIcon,
+      color: "red",
+      bgColor: "bg-red-100 dark:bg-red-900/30",
+      iconColor: "text-red-600 dark:text-red-400",
     },
     {
       name: language === "ar" ? "إجمالي الإيرادات" : "Total Revenue",
@@ -383,7 +420,7 @@ export default function AdminOrdersPage() {
               : "Manage and track all orders"}
           </p>
         </div>
-        <button
+        {/* <button
           onClick={fetchOrders}
           disabled={loading}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
@@ -396,7 +433,7 @@ export default function AdminOrdersPage() {
               ? t("loading") || "Loading..."
               : t("refreshBtn") || "Refresh"}
           </span>
-        </button>
+        </button> */}
       </div>
 
       {/* Stats Cards */}
@@ -404,7 +441,7 @@ export default function AdminOrdersPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
         {statsCards.map((stat, index) => (
           <motion.div
@@ -474,7 +511,7 @@ export default function AdminOrdersPage() {
               {t("filterConfirmed") || "Confirmed"}
             </option>
             <option value="processing">
-              {t("filterPending") || "Processing"}
+              {t("filterProcessing") || "Processing"}
             </option>
             <option value="shipped">{t("filterShipped") || "Shipped"}</option>
             <option value="delivered">
@@ -663,7 +700,11 @@ export default function AdminOrdersPage() {
                               language === "ar" ? "تعديل الطلب" : "Edit order"
                             }
                           >
-                            <span className="text-xs">✎</span>
+                            <PencilIcon className="w-4 h-4" />
+                            <span className="hidden sm:inline">
+                              {t("edit") ||
+                                (language === "ar" ? "تعديل" : "Edit")}
+                            </span>
                           </button>
                         </div>
                       </td>
