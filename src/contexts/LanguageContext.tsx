@@ -9,6 +9,37 @@ interface LanguageContextType {
 
 const translations = {
   en: {
+    // Orders
+  "orderDetails": "Order Details",
+  "orderInformation": "Order Information",
+  "orderNumber": "Order Number",
+  "total": "Total",
+  "status": "Status",
+  "createdAt": "Created At",
+
+  "customerInformation": "Customer Information",
+  "customerName": "Customer Name",
+  "shippingAddress": "Shipping Address",
+  "phone": "Phone",
+
+  "manageStatus": "Manage Status",
+  "changeStatus": "Change Order Status",
+  "saveChanges": "Save Changes",
+  "cancelOrder": "Cancel Order",
+
+  "paymentInformation": "Payment Information",
+  "paymentMethod": "Payment Method",
+  "paymentStatus": "Payment Status",
+
+  "orderItems": "Order Items",
+
+  "orderTimeline": "Order Timeline",
+
+  "rawData": "Raw JSON Data",
+
+  "searchPlaceholder": "Search by order number or customer name..."
+
+,
     // Navigation
        "pageTitle": "Orders Management",
       "searchPlaceholder": "Search",
@@ -178,6 +209,25 @@ const translations = {
     "orders.items": "Order Items",
     "orders.product": "Product",
     "orders.service": "Service",
+    "orders.backToDashboard": "Back to Dashboard",
+    "orders.placedOn": "Placed on",
+    "orders.orderStatus": "Order Status",
+    "orders.trackingInformation": "Tracking Information",
+    "orders.trackingNumber": "Tracking Number",
+    "orders.carrier": "Carrier",
+    "orders.orderSummary": "Order Summary",
+    "orders.subtotal": "Subtotal",
+    "orders.tax": "Tax",
+    "orders.shipping": "Shipping",
+    "orders.free": "Free",
+    "orders.discount": "Discount",
+    "orders.shippingAddress": "Shipping Address",
+    "orders.points": "Points",
+    "orders.pointsUsed": "Points Used",
+    "orders.pointsEarned": "Points Earned",
+    "orders.orderNotes": "Order Notes",
+    "orders.sku": "SKU",
+    "orders.totalItem": "Total",
 
     // Home
     "home.stats.customers": "Happy Customers",
@@ -247,6 +297,12 @@ const translations = {
     "dashboard.paymentPending": "Payment Pending",
     "dashboard.estimatedDelivery": "Estimated delivery",
     "dashboard.processingOrders": "Processing Orders",
+    "dashboard.overview": "Overview",
+    "dashboard.monthlyOrders": "Monthly Orders & Revenue",
+    "dashboard.purchaseCategories": "Purchase Categories",
+    "dashboard.viewDetails": "View Details",
+    "dashboard.cancelOrder": "Cancel Order",
+    "dashboard.cannotCancel": "Cannot cancel this order",
 
     // Admin
     "admin.title": "Admin Dashboard",
@@ -271,7 +327,7 @@ const translations = {
     "auth.role.company_staff": "Company Staff",
     "auth.role.affiliate": "Sales By Commission",
     "auth.companyName": "Company Name",
-
+"cannotCancel": "This order cannot be cancelled",
     "auth.register.companyName": "Company Name",
     "auth.register.companyName.placeholder": "Enter company name",
     "auth.register.companyEmail": "Company Email",
@@ -330,6 +386,37 @@ const translations = {
     "auth.login.noAccount": "Don't have an account?",
   },
   ar: {
+    
+  "orderDetails": "تفاصيل الطلب",
+  "orderInformation": "معلومات الطلب",
+  "orderNumber": "رقم الطلب",
+  "total": "المجموع",
+  "status": "الحالة",
+  "createdAt": "تاريخ الإنشاء",
+
+  "customerInformation": "معلومات العميل",
+  "customerName": "اسم العميل",
+  "shippingAddress": "عنوان الشحن",
+  "phone": "رقم الهاتف",
+
+  "manageStatus": "إدارة الحالة",
+  "changeStatus": "تغيير حالة الطلب",
+  "saveChanges": "حفظ التعديلات",
+  "cancelOrder": "إلغاء الطلب",
+
+  "paymentInformation": "معلومات الدفع",
+  "paymentMethod": "طريقة الدفع",
+  "paymentStatus": "حالة الدفع",
+
+  "orderItems": "المنتجات داخل الطلب",
+
+  "orderTimeline": "سجل حالة الطلب",
+
+  "rawData": "البيانات الخام",
+
+  "searchPlaceholder": "ابحث برقم الطلب أو اسم العميل...",
+
+
       "pageTitle": "إدارة الطلبات",
       "searchPlaceholder": "بحث",
       "filterAll": "الكل",
@@ -385,7 +472,7 @@ const translations = {
     "common.chooseFile": "اختر ملف",
     "common.noFileChosen": "لم يتم اختيار ملف",
     "common.sending": "جاري الإرسال...",
-
+"cannotCancel": "لا يمكن إلغاء هذا الطلب",
     // Home
     "home.hero.title": "مركز حلول الشبكات الرائد",
     "home.hero.subtitle":
@@ -500,6 +587,25 @@ const translations = {
     "orders.items": "عناصر الطلب",
     "orders.product": "منتج",
     "orders.service": "خدمة",
+    "orders.backToDashboard": "العودة إلى لوحة التحكم",
+    "orders.placedOn": "تم الطلب في",
+    "orders.orderStatus": "حالة الطلب",
+    "orders.trackingInformation": "معلومات التتبع",
+    "orders.trackingNumber": "رقم التتبع",
+    "orders.carrier": "شركة الشحن",
+    "orders.orderSummary": "ملخص الطلب",
+    "orders.subtotal": "المجموع الفرعي",
+    "orders.tax": "الضريبة",
+    "orders.shipping": "الشحن",
+    "orders.free": "مجاني",
+    "orders.discount": "الخصم",
+    "orders.shippingAddress": "عنوان الشحن",
+    "orders.points": "النقاط",
+    "orders.pointsUsed": "النقاط المستخدمة",
+    "orders.pointsEarned": "النقاط المكتسبة",
+    "orders.orderNotes": "ملاحظات الطلب",
+    "orders.sku": "رمز المنتج",
+    "orders.totalItem": "الإجمالي",
 
     // Home
     "home.stats.customers": "عملاء سعداء",
@@ -522,6 +628,12 @@ const translations = {
     "dashboard.paymentPending": "الدفع معلق",
     "dashboard.estimatedDelivery": "التسليم المتوقع",
     "dashboard.processingOrders": "الطلبات قيد المعالجة",
+    "dashboard.overview": "نظرة عامة",
+    "dashboard.monthlyOrders": "الطلبات والإيرادات الشهرية",
+    "dashboard.purchaseCategories": "فئات المشتريات",
+    "dashboard.viewDetails": "عرض التفاصيل",
+    "dashboard.cancelOrder": "إلغاء الطلب",
+    "dashboard.cannotCancel": "لا يمكن إلغاء هذا الطلب",
 
     // Profile
     "profile.title": "إعدادات الملف الشخصي",

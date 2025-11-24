@@ -13,6 +13,7 @@ interface AuthContextType {
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
   fetchProducts: () => Promise<any[]>;
+  fechorder: (order_number: string | number) => Promise<any>;
   fetchcategories: () => Promise<any[]>;
   fetchbrands: () => Promise<any[]>;
   fetchProduct: (id: string | number) => Promise<any>;
@@ -442,6 +443,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
+  const fechorder=async (order_number: string | number): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/orders/admin/orders/${order_number}/`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
+      const data = await handleApiResponse(response);
+      return data;    
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch order"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);  
+
+    }
+  };
   return (
     <AuthContext.Provider
       value={{
@@ -454,6 +477,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchProducts,
         fetchorders,
         updateorders,
+        fechorder,
         fetchbrands,
         fetchcategories,
         fetchProduct,

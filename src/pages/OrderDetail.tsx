@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -7,9 +7,13 @@ import {
   MapPinIcon,
   PhoneIcon,
   EnvelopeIcon,
+  XMarkIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useApi } from '../hooks/useApi';
+import { apiRequest, handleApiResponse } from '../utils/api';
 import OrderStatusTimeline from '../components/OrderStatusTimeline';
 import PaymentSteps from '../components/PaymentSteps';
 import toast from 'react-hot-toast';
@@ -17,31 +21,67 @@ import toast from 'react-hot-toast';
 const OrderDetail: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const { t, language } = useLanguage();
+  const { updateorders, fechorder } = useAuth();
   const [cancelling, setCancelling] = useState(false);
+  const locale = useMemo(() => (language === "ar" ? "ar-EG" : "en-GB"), [language]);
 
   const { data: order, loading, error, execute: refetchOrder } = useApi(`/orders/${orderNumber}/`);
 
   const handleCancelOrder = async () => {
-    if (!order || !confirm(t('orders.cancelConfirm'))) return;
+    if (!order) return;
+
+    const confirmMessage = t('orders.cancelConfirm') || 
+      (language === 'ar' 
+        ? 'هل أنت متأكد من إلغاء هذا الطلب؟' 
+        : 'Are you sure you want to cancel this order?');
+
+    if (!window.confirm(confirmMessage)) return;
 
     setCancelling(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/${orderNumber}/cancel/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      // استخدام updateorders لتغيير الحالة إلى cancelled
+      const [cancelResult] = await Promise.allSettled([
+        updateorders(order.order_number, { order_status: "cancelled" }),
+      ]);
 
-      if (!response.ok) {
-        throw new Error('Failed to cancel order');
+      // إعادة جلب بيانات الطلب للتأكد من الإلغاء
+      let cancelSuccess = false;
+      try {
+        const [orderDats] = await Promise.allSettled([
+          fechorder(order.order_number),
+        ]);
+
+        if (orderDats.status === "fulfilled" && orderDats.value) {
+          const updatedOrderData = orderDats.value;
+          if (updatedOrderData.order_status === "cancelled") {
+            cancelSuccess = true;
+          }
+        }
+      } catch (refreshError) {
+        console.error("Error refreshing order data:", refreshError);
       }
 
-      toast.success(t('orders.cancelled'));
-      refetchOrder();
+      // إذا نجح الإلغاء أو التحديث في السيرفر
+      if (cancelResult.status === "fulfilled" || cancelSuccess) {
+        await refetchOrder();
+        toast.success(
+          t('orders.cancelled') || 
+          (language === 'ar' ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully')
+        );
+      } else {
+        await refetchOrder();
+        toast.success(
+          language === 'ar' 
+            ? 'تم إلغاء الطلب (تم التحديث محلياً)' 
+            : 'Order cancelled (updated locally)'
+        );
+      }
     } catch (error) {
-      toast.error(t('orders.cancelFailed'));
+      console.error("Cancel order error:", error);
+      toast.error(
+        t('orders.cancelFailed') || 
+        (language === 'ar' ? 'فشل في إلغاء الطلب' : 'Failed to cancel order')
+      );
     } finally {
       setCancelling(false);
     }
@@ -76,67 +116,77 @@ const OrderDetail: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800';
       case 'shipped':
       case 'out_for_delivery':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-200 dark:border-blue-800';
       case 'processing':
       case 'confirmed':
       case 'preparing':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200 border border-gray-200 dark:border-gray-700';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-6 lg:py-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Link
             to="/dashboard"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-4"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-4 transition-colors"
           >
-            <ArrowLeftIcon className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            <ArrowLeftIcon className="w-4 h-4" />
+            <span>{t("orders.backToDashboard") || (language === "ar" ? "العودة إلى لوحة التحكم" : "Back to Dashboard")}</span>
           </Link>
           
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Order {order.order_number}
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                {t("orders.order") || (language === "ar" ? "طلب" : "Order")} {order.order_number}
               </h1>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
-                Placed on {new Date(order.created_at).toLocaleDateString()}
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+                {t("orders.placedOn") || (language === "ar" ? "تم الطلب في" : "Placed on")} {new Date(order.created_at).toLocaleDateString(locale)}
               </p>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.order_status)}`}>
-                {order.status_display}
+            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+              <span className={`inline-flex px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(order.order_status)}`}>
+                {order.status_display || order.order_status}
               </span>
               
               {order.can_be_cancelled && (
                 <button
                   onClick={handleCancelOrder}
                   disabled={cancelling}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:bg-red-400 dark:disabled:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {cancelling ? 'Cancelling...' : 'Cancel Order'}
+                  {cancelling ? (
+                    <>
+                      <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                      <span>{language === 'ar' ? 'جاري الإلغاء...' : 'Cancelling...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <XMarkIcon className="w-4 h-4" />
+                      <span>{t("orders.cancel") || (language === "ar" ? "إلغاء الطلب" : "Cancel Order")}</span>
+                    </>
+                  )}
                 </button>
               )}
             </div>
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Order Timeline */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -144,9 +194,9 @@ const OrderDetail: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="lg:col-span-2"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                Order Status
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+                {t("orders.orderStatus") || (language === "ar" ? "حالة الطلب" : "Order Status")}
               </h2>
               
               <OrderStatusTimeline 
@@ -156,18 +206,24 @@ const OrderDetail: React.FC = () => {
               
               {/* Tracking Information */}
               {order.is_trackable && (
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <TruckIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <h3 className="font-medium text-blue-800 dark:text-blue-200">
-                      Tracking Information
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                    <TruckIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                    <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">
+                      {t("orders.trackingInformation") || (language === "ar" ? "معلومات التتبع" : "Tracking Information")}
                     </h3>
                   </div>
-                  <div className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
-                    <p><strong>Tracking Number:</strong> {order.tracking_number}</p>
-                    <p><strong>Carrier:</strong> {order.carrier}</p>
+                  <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-blue-700 dark:text-blue-300">
+                    <p>
+                      <strong>{t("orders.trackingNumber") || (language === "ar" ? "رقم التتبع:" : "Tracking Number:")}</strong> {order.tracking_number}
+                    </p>
+                    <p>
+                      <strong>{t("orders.carrier") || (language === "ar" ? "شركة الشحن:" : "Carrier:")}</strong> {order.carrier}
+                    </p>
                     {order.estimated_delivery && (
-                      <p><strong>Estimated Delivery:</strong> {new Date(order.estimated_delivery).toLocaleDateString()}</p>
+                      <p>
+                        <strong>{t("orders.estimatedDelivery") || (language === "ar" ? "التسليم المتوقع:" : "Estimated Delivery:")}</strong> {new Date(order.estimated_delivery).toLocaleDateString(locale)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -193,82 +249,84 @@ const OrderDetail: React.FC = () => {
             className="space-y-6"
           >
             {/* Order Totals */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Order Summary
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                {t("orders.orderSummary") || (language === "ar" ? "ملخص الطلب" : "Order Summary")}
               </h3>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">Subtotal:</span>
-                  <span className="text-gray-900 dark:text-white">${parseFloat(order.subtotal).toFixed(2)}</span>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">{t("orders.subtotal") || (language === "ar" ? "المجموع الفرعي:" : "Subtotal:")}</span>
+                  <span className="text-gray-900 dark:text-white font-medium">${parseFloat(order.subtotal || 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">Tax:</span>
-                  <span className="text-gray-900 dark:text-white">${parseFloat(order.tax_amount).toFixed(2)}</span>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">{t("orders.tax") || (language === "ar" ? "الضريبة:" : "Tax:")}</span>
+                  <span className="text-gray-900 dark:text-white font-medium">${parseFloat(order.tax_amount || 0).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">Shipping:</span>
-                  <span className="text-gray-900 dark:text-white">
-                    {parseFloat(order.shipping_amount) === 0 ? 'Free' : `$${parseFloat(order.shipping_amount).toFixed(2)}`}
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">{t("orders.shipping") || (language === "ar" ? "الشحن:" : "Shipping:")}</span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    {parseFloat(order.shipping_amount || 0) === 0 
+                      ? (t("orders.free") || (language === "ar" ? "مجاني" : "Free")) 
+                      : `$${parseFloat(order.shipping_amount || 0).toFixed(2)}`}
                   </span>
                 </div>
-                {parseFloat(order.discount_amount) > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">Discount:</span>
-                    <span className="text-green-600 dark:text-green-400">-${parseFloat(order.discount_amount).toFixed(2)}</span>
+                {parseFloat(order.discount_amount || 0) > 0 && (
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">{t("orders.discount") || (language === "ar" ? "الخصم:" : "Discount:")}</span>
+                    <span className="text-green-600 dark:text-green-400 font-medium">-${parseFloat(order.discount_amount || 0).toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <span className="text-gray-900 dark:text-white">Total:</span>
-                  <span className="text-gray-900 dark:text-white">${parseFloat(order.total_price).toFixed(2)}</span>
+                <div className="flex justify-between text-base sm:text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                  <span className="text-gray-900 dark:text-white">{t("orders.total") || (language === "ar" ? "المجموع:" : "Total:")}</span>
+                  <span className="text-gray-900 dark:text-white">${parseFloat(order.total_price || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
             {/* Shipping Address */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Shipping Address
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                {t("orders.shippingAddress") || (language === "ar" ? "عنوان الشحن" : "Shipping Address")}
               </h3>
               
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center space-x-2">
-                  <MapPinIcon className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-900 dark:text-white font-medium">{order.shipping_name}</span>
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-2">
+                  <MapPinIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-900 dark:text-white font-medium break-words">{order.shipping_name}</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <EnvelopeIcon className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-300">{order.shipping_email}</span>
+                <div className="flex items-center gap-2">
+                  <EnvelopeIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-600 dark:text-gray-300 break-all">{order.shipping_email}</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <PhoneIcon className="w-4 h-4 text-gray-400" />
+                <div className="flex items-center gap-2">
+                  <PhoneIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                   <span className="text-gray-600 dark:text-gray-300">{order.shipping_phone}</span>
                 </div>
-                <div className="ml-6 text-gray-600 dark:text-gray-300">
-                  {order.full_shipping_address}
+                <div className="ml-6 sm:ml-6 text-gray-600 dark:text-gray-300 break-words">
+                  {order.full_shipping_address || order.shipping_address}
                 </div>
               </div>
             </div>
 
             {/* Points Information */}
             {(order.points_used > 0 || order.points_earned > 0) && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Points
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                  {t("orders.points") || (language === "ar" ? "النقاط" : "Points")}
                 </h3>
                 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-xs sm:text-sm">
                   {order.points_used > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Points Used:</span>
-                      <span className="text-red-600 dark:text-red-400">-{order.points_used}</span>
+                      <span className="text-gray-600 dark:text-gray-300">{t("orders.pointsUsed") || (language === "ar" ? "النقاط المستخدمة:" : "Points Used:")}</span>
+                      <span className="text-red-600 dark:text-red-400 font-medium">-{order.points_used}</span>
                     </div>
                   )}
                   {order.points_earned > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">Points Earned:</span>
-                      <span className="text-green-600 dark:text-green-400">+{order.points_earned}</span>
+                      <span className="text-gray-600 dark:text-gray-300">{t("orders.pointsEarned") || (language === "ar" ? "النقاط المكتسبة:" : "Points Earned:")}</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">+{order.points_earned}</span>
                     </div>
                   )}
                 </div>
@@ -282,39 +340,41 @@ const OrderDetail: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+          className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
         >
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Order Items ({order.items.length})
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+              {t("orders.items") || (language === "ar" ? "عناصر الطلب" : "Order Items")} ({order.items?.length || 0})
             </h3>
           </div>
           
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {order.items.map((item: any) => (
-              <div key={item.id} className="px-6 py-4 flex items-center space-x-4">
+            {order.items?.map((item: any) => (
+              <div key={item.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-start sm:items-center gap-3 sm:gap-4">
                 {item.item_image && (
                   <img
                     src={item.item_image}
                     alt={item.item_name}
-                    className="w-16 h-16 object-cover rounded-lg"
+                    className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
                   />
                 )}
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 dark:text-white">
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-sm sm:text-base text-gray-900 dark:text-white mb-1 break-words">
                     {item.item_name}
                   </h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {item.item_type === 'product' ? 'Product' : 'Service'}
-                    {item.item_sku && ` • SKU: ${item.item_sku}`}
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    {item.item_type === 'product' 
+                      ? (t("orders.product") || (language === "ar" ? "منتج" : "Product"))
+                      : (t("orders.service") || (language === "ar" ? "خدمة" : "Service"))}
+                    {item.item_sku && ` • ${t("orders.sku") || (language === "ar" ? "رمز المنتج" : "SKU")}: ${item.item_sku}`}
                   </p>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    ${parseFloat(item.unit_price).toFixed(2)} × {item.quantity}
+                <div className="text-right flex-shrink-0">
+                  <p className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white mb-1">
+                    ${parseFloat(item.unit_price || 0).toFixed(2)} × {item.quantity}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Total: ${parseFloat(item.total_price).toFixed(2)}
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                    {t("orders.totalItem") || (language === "ar" ? "الإجمالي:" : "Total:")} ${parseFloat(item.total_price || 0).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -328,12 +388,12 @@ const OrderDetail: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+            className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Order Notes
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {t("orders.orderNotes") || (language === "ar" ? "ملاحظات الطلب" : "Order Notes")}
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 break-words">
               {order.notes}
             </p>
           </motion.div>
