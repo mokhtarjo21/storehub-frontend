@@ -2,16 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useApi } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
 import { Order } from '../../types';
 
 const MyOrders: React.FC = () => {
   const { language } = useLanguage();
-  // const { data: orders, loading, error } = useApi('/orders/');
-const { data, loading, error } = useApi('/orders/');
+  const { fetchorders, isloading } = useAuth();
+
+  const data = fetchorders();
+  console.log(data);
+  
 const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
 
-  if (loading) {
+  if (isloading) {
     return (
       <div className="flex justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -19,13 +22,13 @@ const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
     );
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400">Failed to load orders</p>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="text-center py-12">
+  //       <p className="text-red-600 dark:text-red-400">Failed to load orders</p>
+  //     </div>
+  //   );
+  // }
 
   if (!orders || orders.length === 0) {
     return (

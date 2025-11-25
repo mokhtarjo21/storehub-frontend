@@ -112,14 +112,10 @@ export default function AdminServicesSection() {
     try {
       
       const res =await deleteService(id);
-      if (res.ok) {
-        setServices((prev) => prev.filter((s) => s.id !== id));
-        toast.success(
-          language === "ar" ? "تم الحذف بنجاح" : "Deleted successfully"
-        );
-      } else {
-        throw new Error("Delete failed");
-      }
+     
+      setServices((prev) => prev.filter((s) => s.id !== id));
+        
+     
     } catch (err) {
       console.error(err);
       toast.error(language === "ar" ? "خطأ أثناء الحذف" : "Delete failed");
@@ -436,7 +432,7 @@ function ServiceForm({
       if (duration === "custom" && customDuration?.trim()) {
         fd.append("custom_duration", customDuration.trim());
       }
-      fd.append("category", String(categoryId));
+      fd.append("category_id", String(categoryId));
       fd.append("is_active", String(Number(isActive)));
       fd.append("is_featured", String(Number(isFeatured)));
       if (imageFile) fd.append("image", imageFile);
