@@ -16,9 +16,11 @@ const MyOrders: React.FC = () => {
     try {
       const response = await myorders(page); // تمرير رقم الصفحة إلى API
       const { results, count, next, previous } = response;
-
+      
+      
       if (Array.isArray(results)) {
         setOrders(results);
+        
         setTotalPages(Math.ceil(count / 10)); // حساب إجمالي الصفحات (10 عناصر لكل صفحة)
       }
     } catch (error) {
@@ -104,20 +106,20 @@ const MyOrders: React.FC = () => {
     <div className="space-y-4">
       {orders.map((order: Order, index: number) => (
         <motion.div
-          key={order.id}
+          key={order.order_number}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.05 }}
         >
           <Link
-            to={`/orders/${order.id}`}
+            to={`/orders/${order.order_number}`}
             className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    Order #{order.id}
+                    Order #{order.order_number}
                   </h3>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.order_status)}`}>
                     {order.order_status.replace('_', ' ').toUpperCase()}

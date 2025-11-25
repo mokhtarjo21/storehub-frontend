@@ -48,8 +48,8 @@ export interface Order {
   id: string;
   userId: string;
   items: OrderItem[];
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  total_price: number;
+  order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: string;
   shippingAddress: Address;
   paymentMethod: 'cod' | 'split' | 'card' | 'bank_transfer';
