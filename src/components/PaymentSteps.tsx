@@ -1,27 +1,45 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from "react";
+import { motion } from "framer-motion";
 import {
   CheckCircleIcon,
   ClockIcon,
   CurrencyDollarIcon,
-  ExclamationCircleIcon
-} from '@heroicons/react/24/outline';
-import { PaymentTransaction } from '../types';
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
+import { PaymentTransaction } from "../types";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface PaymentStepsProps {
   transactions: PaymentTransaction[];
   totalAmount: number;
 }
 
-const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }) => {
+const PaymentSteps: React.FC<PaymentStepsProps> = ({
+  transactions,
+  totalAmount,
+}) => {
+  const { t, language } = useLanguage();
+  const locale = useMemo(
+    () => (language === "ar" ? "ar-EG" : "en-GB"),
+    [language]
+  );
+  const formatDateTime = (value?: string | null) => {
+    if (!value) return null;
+    try {
+      return new Date(value).toLocaleString(locale);
+    } catch {
+      return new Date(value).toLocaleString();
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return <CheckCircleIcon className="w-6 h-6 text-green-500" />;
-      case 'failed':
-      case 'cancelled':
+      case "failed":
+      case "cancelled":
         return <ExclamationCircleIcon className="w-6 h-6 text-red-500" />;
-      case 'processing':
+      case "processing":
         return <ClockIcon className="w-6 h-6 text-yellow-500 animate-pulse" />;
       default:
         return <ClockIcon className="w-6 h-6 text-gray-400" />;
@@ -30,52 +48,77 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300 dark:border-green-700';
-      case 'failed':
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-300 dark:border-red-700';
-      case 'processing':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700';
+      case "completed":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300 dark:border-green-700";
+      case "failed":
+      case "cancelled":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-300 dark:border-red-700";
+      case "processing":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600";
     }
   };
 
-  const depositTransaction = transactions.find(t => t.transaction_type === 'deposit');
-  const finalTransaction = transactions.find(t => t.transaction_type === 'final');
-  const fullTransaction = transactions.find(t => t.transaction_type === 'full');
+  const depositTransaction = transactions.find(
+    (t) => t.transaction_type === "deposit"
+  );
+  const finalTransaction = transactions.find(
+    (t) => t.transaction_type === "final"
+  );
+  const fullTransaction = transactions.find(
+    (t) => t.transaction_type === "full"
+  );
 
   if (fullTransaction) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <CurrencyDollarIcon className="w-5 h-5 mr-2" />
-          Payment Information
+          {t("payments.title.full") ||
+            (language === "ar" ? "معلومات الدفع" : "Payment Information")}
         </h3>
 
         <div className="space-y-4">
-          <div className={`p-4 rounded-lg border ${getStatusColor(fullTransaction.transaction_status)}`}>
+          <div
+            className={`p-4 rounded-lg border ${getStatusColor(
+              fullTransaction.transaction_status
+            )}`}
+          >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(fullTransaction.transaction_status)}
-                <span className="font-medium">{fullTransaction.transaction_type_display}</span>
+                <span className="font-medium">
+                  {fullTransaction.transaction_type_display}
+                </span>
               </div>
-              <span className="text-sm">{fullTransaction.transaction_status_display}</span>
+              <span className="text-sm">
+                {fullTransaction.transaction_status_display}
+              </span>
             </div>
 
             <div className="text-2xl font-bold mb-2">
-              ${parseFloat(fullTransaction.amount.toString()).toFixed(2)}
+              EGP {parseFloat(fullTransaction.amount.toString()).toFixed(2)}
             </div>
 
             <div className="text-sm">
-              <p>Payment Method: {fullTransaction.payment_method_display}</p>
+              <p>
+                {t("payments.paymentMethod") ||
+                  (language === "ar" ? "طريقة الدفع" : "Payment Method")}
+                : {fullTransaction.payment_method_display}
+              </p>
               {fullTransaction.transaction_id && (
-                <p className="mt-1">Transaction ID: {fullTransaction.transaction_id}</p>
+                <p className="mt-1">
+                  {t("payments.transactionId") ||
+                    (language === "ar" ? "رقم العملية" : "Transaction ID")}
+                  : {fullTransaction.transaction_id}
+                </p>
               )}
               {fullTransaction.completed_at && (
                 <p className="mt-1">
-                  Completed: {new Date(fullTransaction.completed_at).toLocaleString()}
+                  {t("payments.completedAt") ||
+                    (language === "ar" ? "اكتملت في" : "Completed")}
+                  : {formatDateTime(fullTransaction.completed_at)}
                 </p>
               )}
             </div>
@@ -88,19 +131,29 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
   const depositPaid = depositTransaction?.is_completed || false;
   const finalPaid = finalTransaction?.is_completed || false;
   const totalPaid =
-    (depositTransaction?.is_completed ? parseFloat(depositTransaction.amount.toString()) : 0) +
-    (finalTransaction?.is_completed ? parseFloat(finalTransaction.amount.toString()) : 0);
+    (depositTransaction?.is_completed
+      ? parseFloat(depositTransaction.amount.toString())
+      : 0) +
+    (finalTransaction?.is_completed
+      ? parseFloat(finalTransaction.amount.toString())
+      : 0);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
         <CurrencyDollarIcon className="w-5 h-5 mr-2" />
-        Split Payment Information
+        {t("payments.title.split") ||
+          (language === "ar"
+            ? "تفاصيل الدفع المقسّم"
+            : "Split Payment Information")}
       </h3>
 
       <div className="mb-6">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-600 dark:text-gray-300">Payment Progress</span>
+          <span className="text-gray-600 dark:text-gray-300">
+            {t("payments.progress") ||
+              (language === "ar" ? "تقدم الدفع" : "Payment Progress")}
+          </span>
           <span className="font-medium text-gray-900 dark:text-white">
             ${totalPaid.toFixed(2)} / ${totalAmount.toFixed(2)}
           </span>
@@ -120,14 +173,23 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className={`p-4 rounded-lg border ${getStatusColor(depositTransaction.transaction_status)}`}
+            className={`p-4 rounded-lg border ${getStatusColor(
+              depositTransaction.transaction_status
+            )}`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(depositTransaction.transaction_status)}
-                <span className="font-medium">Step 1: {depositTransaction.transaction_type_display}</span>
+                <span className="font-medium">
+                  {`${
+                    t("payments.step") ||
+                    (language === "ar" ? "الخطوة" : "Step")
+                  } 1: ${depositTransaction.transaction_type_display}`}
+                </span>
               </div>
-              <span className="text-sm">{depositTransaction.transaction_status_display}</span>
+              <span className="text-sm">
+                {depositTransaction.transaction_status_display}
+              </span>
             </div>
 
             <div className="text-2xl font-bold mb-2">
@@ -135,18 +197,31 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
             </div>
 
             <div className="text-sm">
-              <p>Payment Method: {depositTransaction.payment_method_display}</p>
+              <p>
+                {t("payments.paymentMethod") ||
+                  (language === "ar" ? "طريقة الدفع" : "Payment Method")}
+                : {depositTransaction.payment_method_display}
+              </p>
               {depositTransaction.transaction_id && (
-                <p className="mt-1">Transaction ID: {depositTransaction.transaction_id}</p>
+                <p className="mt-1">
+                  {t("payments.transactionId") ||
+                    (language === "ar" ? "رقم العملية" : "Transaction ID")}
+                  : {depositTransaction.transaction_id}
+                </p>
               )}
               {depositTransaction.completed_at && (
                 <p className="mt-1">
-                  Completed: {new Date(depositTransaction.completed_at).toLocaleString()}
+                  {t("payments.completedAt") ||
+                    (language === "ar" ? "اكتملت في" : "Completed")}
+                  : {formatDateTime(depositTransaction.completed_at)}
                 </p>
               )}
               {!depositTransaction.is_completed && (
                 <p className="mt-2 text-xs italic">
-                  Initial deposit required to confirm service booking
+                  {t("payments.depositHint") ||
+                    (language === "ar"
+                      ? "مطلوب دفع العربون لتأكيد الحجز"
+                      : "Initial deposit required to confirm service booking")}
                 </p>
               )}
             </div>
@@ -164,14 +239,23 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
-            className={`p-4 rounded-lg border ${getStatusColor(finalTransaction.transaction_status)}`}
+            className={`p-4 rounded-lg border ${getStatusColor(
+              finalTransaction.transaction_status
+            )}`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(finalTransaction.transaction_status)}
-                <span className="font-medium">Step 2: {finalTransaction.transaction_type_display}</span>
+                <span className="font-medium">
+                  {`${
+                    t("payments.step") ||
+                    (language === "ar" ? "الخطوة" : "Step")
+                  } 2: ${finalTransaction.transaction_type_display}`}
+                </span>
               </div>
-              <span className="text-sm">{finalTransaction.transaction_status_display}</span>
+              <span className="text-sm">
+                {finalTransaction.transaction_status_display}
+              </span>
             </div>
 
             <div className="text-2xl font-bold mb-2">
@@ -179,23 +263,39 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
             </div>
 
             <div className="text-sm">
-              <p>Payment Method: {finalTransaction.payment_method_display}</p>
+              <p>
+                {t("payments.paymentMethod") ||
+                  (language === "ar" ? "طريقة الدفع" : "Payment Method")}
+                : {finalTransaction.payment_method_display}
+              </p>
               {finalTransaction.transaction_id && (
-                <p className="mt-1">Transaction ID: {finalTransaction.transaction_id}</p>
+                <p className="mt-1">
+                  {t("payments.transactionId") ||
+                    (language === "ar" ? "رقم العملية" : "Transaction ID")}
+                  : {finalTransaction.transaction_id}
+                </p>
               )}
               {finalTransaction.completed_at && (
                 <p className="mt-1">
-                  Completed: {new Date(finalTransaction.completed_at).toLocaleString()}
+                  {t("payments.completedAt") ||
+                    (language === "ar" ? "اكتملت في" : "Completed")}
+                  : {formatDateTime(finalTransaction.completed_at)}
                 </p>
               )}
               {!finalTransaction.is_completed && depositPaid && (
                 <p className="mt-2 text-xs italic">
-                  Final payment due upon service completion
+                  {t("payments.finalHint") ||
+                    (language === "ar"
+                      ? "يستحق الدفع النهائي بعد إتمام الخدمة"
+                      : "Final payment due upon service completion")}
                 </p>
               )}
               {!depositPaid && (
                 <p className="mt-2 text-xs italic text-gray-500 dark:text-gray-400">
-                  Available after deposit is paid
+                  {t("payments.awaitingDeposit") ||
+                    (language === "ar"
+                      ? "متاح بعد دفع العربون"
+                      : "Available after deposit is paid")}
                 </p>
               )}
             </div>
@@ -211,7 +311,10 @@ const PaymentSteps: React.FC<PaymentStepsProps> = ({ transactions, totalAmount }
         >
           <div className="flex items-center text-green-700 dark:text-green-300">
             <CheckCircleIcon className="w-5 h-5 mr-2" />
-            <span className="font-medium">Payment Complete</span>
+            <span className="font-medium">
+              {t("payments.complete") ||
+                (language === "ar" ? "اكتمل الدفع" : "Payment Complete")}
+            </span>
           </div>
         </motion.div>
       )}

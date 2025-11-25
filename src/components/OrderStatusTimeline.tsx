@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircleIcon,
@@ -8,6 +8,7 @@ import {
   HomeIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon as CheckCircleSolidIcon } from "@heroicons/react/24/solid";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface TimelineStep {
   status: string;
@@ -25,6 +26,37 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
   timeline,
   currentStatus,
 }) => {
+  const { t, language, isRTL } = useLanguage();
+  const locale = useMemo(
+    () => (language === "ar" ? "ar-EG" : "en-GB"),
+    [language]
+  );
+
+  const getLabel = (status: string, fallback: string) => {
+    const key = `orders.timeline.${status}`;
+    const translated = t(key);
+    if (translated && translated !== key) {
+      return translated;
+    }
+    const defaultLabel = t("orders.timeline.default");
+    if (defaultLabel && defaultLabel !== "orders.timeline.default") {
+      return defaultLabel;
+    }
+    return fallback || (language === "ar" ? "تحديث الحالة" : "Status update");
+  };
+
+  const formatTimestamp = (timestamp: string | null) => {
+    if (!timestamp) return null;
+    try {
+      return new Date(timestamp).toLocaleString(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+    } catch {
+      return new Date(timestamp).toLocaleString();
+    }
+  };
+
   const getStepIcon = (
     status: string,
     completed: boolean,
@@ -76,17 +108,25 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
 
   return (
     <div className="flow-root">
-      <ul className="-mb-8">
+      <ul className="-mb-8 space-y-2">
         {timeline.map((step, stepIdx) => {
           const isActive = step.status === currentStatus;
           const isLast = stepIdx === timeline.length - 1;
+          const translatedLabel =
+            getLabel(step.status, step.label) ||
+            t("orders.timeline.default") ||
+            step.label;
 
           return (
             <li key={step.status}>
-              <div className="relative pb-8">
+              <div className="relative pb-6">
                 {!isLast && (
                   <span
-                    className={`absolute top-4 ltr:left-4 rtl:right-4 ltr:-ml-px rtl:-mr-px h-full w-0.5 ${
+                    className={`absolute top-4 ${
+                      isRTL
+                        ? "rtl:right-4 rtl:-mr-px"
+                        : "ltr:left-4 ltr:-ml-px"
+                    } h-full w-0.5 ${
                       step.completed
                         ? "bg-green-500"
                         : "bg-gray-300 dark:bg-gray-700"
@@ -94,8 +134,8 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
                     aria-hidden="true"
                   />
                 )}
-                <div className="relative flex space-x-3">
-                  <div>
+                <div className="relative flex items-start gap-3 rtl:flex-row-reverse">
+                  <div className="flex-shrink-0">
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
@@ -111,7 +151,7 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
                       {getStepIcon(step.status, step.completed, isActive)}
                     </motion.span>
                   </div>
-                  <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                  <div className="flex min-w-0 flex-1 justify-between gap-4 pt-1.5 rtl:flex-row-reverse rtl:text-right">
                     <div>
                       <p
                         className={`text-sm font-medium ${
@@ -120,11 +160,11 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
                             : "text-gray-500 dark:text-gray-400"
                         }`}
                       >
-                        {step.label}
+                        {translatedLabel}
                       </p>
                       {step.timestamp && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(step.timestamp).toLocaleString()}
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                          {formatTimestamp(step.timestamp)}
                         </p>
                       )}
                     </div>

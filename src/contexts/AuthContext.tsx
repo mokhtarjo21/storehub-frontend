@@ -12,6 +12,8 @@ interface AuthContextType {
   fetchorders: (search: any, status: any) => Promise<any[]>;
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
+  fetchServices: () => Promise<any[]>;
+   fetchService: (slug: string | number) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
   fechorder: (order_number: string | number) => Promise<any>;
   fetchcategories: () => Promise<any[]>;
@@ -465,14 +467,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     }
   };
+  const fetchService=async (slug: string | number): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/services/${slug}/`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
+      const data = await handleApiResponse(response);
+      return data;    
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch order"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);  
+
+    }
+  };
+   const fetchServices=async (): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/services/`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
+      const data = await handleApiResponse(response);
+      return data;    
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch order"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);  
+
+    }
+  };
   return (
     <AuthContext.Provider
       value={{
+        fetchService,
         user,
         login,
         logout,
         register,
         isLoading,
+        fetchServices,
         isInitializing,
         fetchProducts,
         fetchorders,

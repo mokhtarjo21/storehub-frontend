@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   BellIcon,
@@ -12,24 +12,30 @@ import { Notification } from "../types";
 import toast from "react-hot-toast";
 
 const Notifications: React.FC = () => {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
 
-  const notificationTypes = [
-    { value: "all", label: "All Types" },
-    { value: "order", label: "Order" },
-    { value: "company", label: "Company" },
-    { value: "points", label: "Points" },
-    { value: "service", label: "Service" },
-    { value: "marketing", label: "Marketing" },
-    { value: "security", label: "Security" },
-  ];
+  const notificationTypes = useMemo(
+    () => [
+      { value: "all", label: t("notifications.types.all") || "All Types" },
+      { value: "order", label: t("notifications.types.order") || "Order" },
+      { value: "company", label: t("notifications.types.company") || "Company" },
+      { value: "points", label: t("notifications.types.points") || "Points" },
+      { value: "service", label: t("notifications.types.service") || "Service" },
+      {
+        value: "marketing",
+        label: t("notifications.types.marketing") || "Marketing",
+      },
+      { value: "security", label: t("notifications.types.security") || "Security" },
+    ],
+    [t]
+  );
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
       let url = "http://localhost:8000/api/accounts/notifications/";
@@ -62,11 +68,18 @@ const Notifications: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, typeFilter]);
 
   useEffect(() => {
     fetchNotifications();
-  }, [filter, typeFilter]);
+  }, [fetchNotifications]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchNotifications]);
 
   const getNotificationIcon = (type: string) => {
     const iconClass = "w-6 h-6";
@@ -107,10 +120,20 @@ const Notifications: React.FC = () => {
             n.id === notificationId ? { ...n, is_read: true } : n
           )
         );
-        toast.success("Marked as read");
+        toast.success(
+          t("notifications.markReadSuccess") ||
+            (language === "ar"
+              ? "تم تحديد الإشعار كمقروء"
+              : "Marked as read")
+        );
       }
     } catch (error) {
-      toast.error("Failed to mark as read");
+      toast.error(
+        t("notifications.markReadError") ||
+          (language === "ar"
+            ? "فشل تحديد الإشعار كمقروء"
+            : "Failed to mark as read")
+      );
     }
   };
 
@@ -129,10 +152,20 @@ const Notifications: React.FC = () => {
 
       if (response.ok) {
         fetchNotifications();
-        toast.success("All notifications marked as read");
+        toast.success(
+          t("notifications.markAllSuccess") ||
+            (language === "ar"
+              ? "تم تحديد جميع الإشعارات كمقروءة"
+              : "All notifications marked as read")
+        );
       }
     } catch (error) {
-      toast.error("Failed to mark all as read");
+      toast.error(
+        t("notifications.markAllError") ||
+          (language === "ar"
+            ? "فشل تحديد كل الإشعارات كمقروءة"
+            : "Failed to mark all as read")
+      );
     }
   };
 
@@ -150,15 +183,28 @@ const Notifications: React.FC = () => {
 
       if (response.ok) {
         setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-        toast.success("Notification deleted");
+        toast.success(
+          t("notifications.deleteSuccess") ||
+            (language === "ar" ? "تم حذف الإشعار" : "Notification deleted")
+        );
       }
     } catch (error) {
-      toast.error("Failed to delete notification");
+      toast.error(
+        t("notifications.deleteError") ||
+          (language === "ar"
+            ? "فشل حذف الإشعار"
+            : "Failed to delete notification")
+      );
     }
   };
 
   const clearAll = async () => {
-    if (!confirm("Are you sure you want to delete all notifications?")) return;
+    const confirmMessage =
+      t("notifications.clearConfirm") ||
+      (language === "ar"
+        ? "هل أنت متأكد من حذف جميع الإشعارات؟"
+        : "Are you sure you want to delete all notifications?");
+    if (!confirm(confirmMessage)) return;
 
     try {
       const response = await fetch(
@@ -173,10 +219,18 @@ const Notifications: React.FC = () => {
 
       if (response.ok) {
         setNotifications([]);
-        toast.success("All notifications deleted");
+        toast.success(
+          t("notifications.clearSuccess") ||
+            (language === "ar" ? "تم حذف جميع الإشعارات" : "All notifications deleted")
+        );
       }
     } catch (error) {
-      toast.error("Failed to delete all notifications");
+      toast.error(
+        t("notifications.clearError") ||
+          (language === "ar"
+            ? "فشل حذف الإشعارات"
+            : "Failed to delete all notifications")
+      );
     }
   };
 
@@ -212,14 +266,14 @@ const Notifications: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                My Notifications
+                {t("notifications.title") || "Notifications"}
               </h1>
               <p className="mt-2 text-gray-600 dark:text-gray-300">
                 {unreadCount > 0
-                  ? `${unreadCount} unread notification${
-                      unreadCount > 1 ? "s" : ""
+                  ? `${unreadCount} ${
+                      t("notifications.unread") || "unread notifications"
                     }`
-                  : "All caught up!"}
+                  : t("notifications.allRead") || "All caught up!"}
               </p>
             </div>
             <div className="flex items-center space-x-4 rtl:space-x-reverse">
@@ -229,7 +283,7 @@ const Notifications: React.FC = () => {
                   className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                 >
                   <CheckIcon className="w-4 h-4" />
-                  <span>Mark all read</span>
+                  <span>{t("notifications.markAllRead") || "Mark all read"}</span>
                 </button>
               )}
               {notifications.length > 0 && (
@@ -238,7 +292,7 @@ const Notifications: React.FC = () => {
                   className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                 >
                   <TrashIcon className="w-4 h-4" />
-                  <span>Clear all</span>
+                  <span>{t("notifications.clearAll") || "Clear all"}</span>
                 </button>
               )}
             </div>
@@ -302,10 +356,10 @@ const Notifications: React.FC = () => {
             <div className="text-center py-12">
               <BellIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" />
               <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-                No notifications
+                {t("notifications.empty.title") || "No notifications"}
               </h3>
               <p className="mt-2 text-gray-500 dark:text-gray-400">
-                You're all caught up!
+                {t("notifications.empty.subtitle") || "You're all caught up!"}
               </p>
             </div>
           ) : (
@@ -352,7 +406,7 @@ const Notifications: React.FC = () => {
                           <button
                             onClick={() => markAsRead(notification.id)}
                             className="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                            title="Mark as read"
+                            title={t("notifications.markRead") || "Mark as read"}
                           >
                             <CheckIcon className="w-5 h-5" />
                           </button>
@@ -360,7 +414,7 @@ const Notifications: React.FC = () => {
                         <button
                           onClick={() => deleteNotification(notification.id)}
                           className="p-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-                          title="Delete"
+                          title={t("notifications.delete") || "Delete"}
                         >
                           <TrashIcon className="w-5 h-5" />
                         </button>
@@ -381,3 +435,4 @@ const Notifications: React.FC = () => {
 };
 
 export default Notifications;
+

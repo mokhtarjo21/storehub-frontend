@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   ArrowLeftIcon,
   TruckIcon,
@@ -9,31 +9,40 @@ import {
   EnvelopeIcon,
   XMarkIcon,
   ArrowPathIcon,
-} from '@heroicons/react/24/outline';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useAuth } from '../contexts/AuthContext';
-import { useApi } from '../hooks/useApi';
-import { apiRequest, handleApiResponse } from '../utils/api';
-import OrderStatusTimeline from '../components/OrderStatusTimeline';
-import PaymentSteps from '../components/PaymentSteps';
-import toast from 'react-hot-toast';
+} from "@heroicons/react/24/outline";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useAuth } from "../contexts/AuthContext";
+import { useApi } from "../hooks/useApi";
+import { apiRequest, handleApiResponse } from "../utils/api";
+import OrderStatusTimeline from "../components/OrderStatusTimeline";
+import PaymentSteps from "../components/PaymentSteps";
+import toast from "react-hot-toast";
 
 const OrderDetail: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const { t, language } = useLanguage();
   const { updateorders, fechorder } = useAuth();
   const [cancelling, setCancelling] = useState(false);
-  const locale = useMemo(() => (language === "ar" ? "ar-EG" : "en-GB"), [language]);
+  const locale = useMemo(
+    () => (language === "ar" ? "ar-EG" : "en-GB"),
+    [language]
+  );
 
-  const { data: order, loading, error, execute: refetchOrder } = useApi(`/orders/${orderNumber}/`);
+  const {
+    data: order,
+    loading,
+    error,
+    execute: refetchOrder,
+  } = useApi(`/orders/${orderNumber}/`);
 
   const handleCancelOrder = async () => {
     if (!order) return;
 
-    const confirmMessage = t('orders.cancelConfirm') || 
-      (language === 'ar' 
-        ? 'هل أنت متأكد من إلغاء هذا الطلب؟' 
-        : 'Are you sure you want to cancel this order?');
+    const confirmMessage =
+      t("orders.cancelConfirm") ||
+      (language === "ar"
+        ? "هل أنت متأكد من إلغاء هذا الطلب؟"
+        : "Are you sure you want to cancel this order?");
 
     if (!window.confirm(confirmMessage)) return;
 
@@ -65,22 +74,24 @@ const OrderDetail: React.FC = () => {
       if (cancelResult.status === "fulfilled" || cancelSuccess) {
         await refetchOrder();
         toast.success(
-          t('orders.cancelled') || 
-          (language === 'ar' ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully')
+          t("orders.cancelled") ||
+            (language === "ar"
+              ? "تم إلغاء الطلب بنجاح"
+              : "Order cancelled successfully")
         );
       } else {
         await refetchOrder();
         toast.success(
-          language === 'ar' 
-            ? 'تم إلغاء الطلب (تم التحديث محلياً)' 
-            : 'Order cancelled (updated locally)'
+          language === "ar"
+            ? "تم إلغاء الطلب (تم التحديث محلياً)"
+            : "Order cancelled (updated locally)"
         );
       }
     } catch (error) {
       console.error("Cancel order error:", error);
       toast.error(
-        t('orders.cancelFailed') || 
-        (language === 'ar' ? 'فشل في إلغاء الطلب' : 'Failed to cancel order')
+        t("orders.cancelFailed") ||
+          (language === "ar" ? "فشل في إلغاء الطلب" : "Failed to cancel order")
       );
     } finally {
       setCancelling(false);
@@ -115,19 +126,19 @@ const OrderDetail: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800';
-      case 'shipped':
-      case 'out_for_delivery':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-200 dark:border-blue-800';
-      case 'processing':
-      case 'confirmed':
-      case 'preparing':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800';
+      case "delivered":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800";
+      case "shipped":
+      case "out_for_delivery":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 border border-blue-200 dark:border-blue-800";
+      case "processing":
+      case "confirmed":
+      case "preparing":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200 border border-gray-200 dark:border-gray-700';
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200 border border-gray-200 dark:border-gray-700";
     }
   };
 
@@ -140,29 +151,31 @@ const OrderDetail: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 sm:mb-8"
         >
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mb-4 transition-colors"
-          >
-            <ArrowLeftIcon className="w-4 h-4" />
-            <span>{t("orders.backToDashboard") || (language === "ar" ? "العودة إلى لوحة التحكم" : "Back to Dashboard")}</span>
-          </Link>
-          
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-                {t("orders.order") || (language === "ar" ? "طلب" : "Order")} {order.order_number}
+                {t("orders.orderNumber") ||
+                  (language === "ar" ? "رقم الطلب #" : "Order Number #")}{" "}
+                {order.order_number}
               </h1>
               <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-                {t("orders.placedOn") || (language === "ar" ? "تم الطلب في" : "Placed on")} {new Date(order.created_at).toLocaleDateString(locale)}
+                {t("orders.placedOn") ||
+                  (language === "ar" ? "تم الطلب في" : "Placed on")}{" "}
+                {new Date(order.created_at).toLocaleDateString(locale)}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-              <span className={`inline-flex px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(order.order_status)}`}>
+              <span
+                className={`inline-flex px-3 py-2 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(
+                  order.order_status
+                )}`}
+              >
+                {t("orders.orderStatus") ||
+                  (language === "ar" ? "حالة الطلب" : "Order Status")}{" "}
                 {order.status_display || order.order_status}
               </span>
-              
+
               {order.can_be_cancelled && (
                 <button
                   onClick={handleCancelOrder}
@@ -172,12 +185,19 @@ const OrderDetail: React.FC = () => {
                   {cancelling ? (
                     <>
                       <ArrowPathIcon className="w-4 h-4 animate-spin" />
-                      <span>{language === 'ar' ? 'جاري الإلغاء...' : 'Cancelling...'}</span>
+                      <span>
+                        {language === "ar"
+                          ? "جاري الإلغاء..."
+                          : "Cancelling..."}
+                      </span>
                     </>
                   ) : (
                     <>
                       <XMarkIcon className="w-4 h-4" />
-                      <span>{t("orders.cancel") || (language === "ar" ? "إلغاء الطلب" : "Cancel Order")}</span>
+                      <span>
+                        {t("orders.cancel") ||
+                          (language === "ar" ? "إلغاء الطلب" : "Cancel Order")}
+                      </span>
                     </>
                   )}
                 </button>
@@ -196,33 +216,55 @@ const OrderDetail: React.FC = () => {
           >
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
               <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
-                {t("orders.orderStatus") || (language === "ar" ? "حالة الطلب" : "Order Status")}
+                {t("orders.orderStatus") ||
+                  (language === "ar" ? "حالة الطلب" : "Order Status")}
               </h2>
-              
-              <OrderStatusTimeline 
-                timeline={order.timeline} 
+
+              <OrderStatusTimeline
+                timeline={order.timeline}
                 currentStatus={order.order_status}
               />
-              
+
               {/* Tracking Information */}
               {order.is_trackable && (
                 <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                   <div className="flex items-center gap-2 mb-2 sm:mb-3">
                     <TruckIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                     <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">
-                      {t("orders.trackingInformation") || (language === "ar" ? "معلومات التتبع" : "Tracking Information")}
+                      {t("orders.trackingInformation") ||
+                        (language === "ar"
+                          ? "معلومات التتبع"
+                          : "Tracking Information")}
                     </h3>
                   </div>
                   <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-blue-700 dark:text-blue-300">
                     <p>
-                      <strong>{t("orders.trackingNumber") || (language === "ar" ? "رقم التتبع:" : "Tracking Number:")}</strong> {order.tracking_number}
+                      <strong>
+                        {t("orders.trackingNumber") ||
+                          (language === "ar"
+                            ? "رقم التتبع:"
+                            : "Tracking Number:")}
+                      </strong>{" "}
+                      {order.tracking_number}
                     </p>
                     <p>
-                      <strong>{t("orders.carrier") || (language === "ar" ? "شركة الشحن:" : "Carrier:")}</strong> {order.carrier}
+                      <strong>
+                        {t("orders.carrier") ||
+                          (language === "ar" ? "شركة الشحن:" : "Carrier:")}
+                      </strong>{" "}
+                      {order.carrier}
                     </p>
                     {order.estimated_delivery && (
                       <p>
-                        <strong>{t("orders.estimatedDelivery") || (language === "ar" ? "التسليم المتوقع:" : "Estimated Delivery:")}</strong> {new Date(order.estimated_delivery).toLocaleDateString(locale)}
+                        <strong>
+                          {t("orders.estimatedDelivery") ||
+                            (language === "ar"
+                              ? "التسليم المتوقع:"
+                              : "Estimated Delivery:")}
+                        </strong>{" "}
+                        {new Date(order.estimated_delivery).toLocaleDateString(
+                          locale
+                        )}
                       </p>
                     )}
                   </div>
@@ -231,14 +273,15 @@ const OrderDetail: React.FC = () => {
             </div>
 
             {/* Payment Steps - Only show if has payment transactions */}
-            {order.payment_transactions && order.payment_transactions.length > 0 && (
-              <div className="mt-8">
-                <PaymentSteps
-                  transactions={order.payment_transactions}
-                  totalAmount={parseFloat(order.total_price)}
-                />
-              </div>
-            )}
+            {order.payment_transactions &&
+              order.payment_transactions.length > 0 && (
+                <div className="mt-8">
+                  <PaymentSteps
+                    transactions={order.payment_transactions}
+                    totalAmount={parseFloat(order.total_price)}
+                  />
+                </div>
+              )}
           </motion.div>
 
           {/* Order Summary */}
@@ -251,35 +294,60 @@ const OrderDetail: React.FC = () => {
             {/* Order Totals */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-                {t("orders.orderSummary") || (language === "ar" ? "ملخص الطلب" : "Order Summary")}
+                {t("orders.orderSummary") ||
+                  (language === "ar" ? "ملخص الطلب" : "Order Summary")}
               </h3>
 
               <div className="space-y-2">
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">{t("orders.subtotal") || (language === "ar" ? "المجموع الفرعي:" : "Subtotal:")}</span>
-                  <span className="text-gray-900 dark:text-white font-medium">${parseFloat(order.subtotal || 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">{t("orders.tax") || (language === "ar" ? "الضريبة:" : "Tax:")}</span>
-                  <span className="text-gray-900 dark:text-white font-medium">${parseFloat(order.tax_amount || 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">{t("orders.shipping") || (language === "ar" ? "الشحن:" : "Shipping:")}</span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t("orders.subtotal") ||
+                      (language === "ar" ? "المجموع الفرعي:" : "Subtotal:")}
+                  </span>
                   <span className="text-gray-900 dark:text-white font-medium">
-                    {parseFloat(order.shipping_amount || 0) === 0 
-                      ? (t("orders.free") || (language === "ar" ? "مجاني" : "Free")) 
-                      : `$${parseFloat(order.shipping_amount || 0).toFixed(2)}`}
+                    {parseFloat(order.subtotal || 0).toFixed(2)} EGP
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t("orders.tax") ||
+                      (language === "ar" ? "الضريبة:" : "Tax:")}
+                  </span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    {parseFloat(order.tax_amount || 0).toFixed(2)} EGP
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t("orders.shipping") ||
+                      (language === "ar" ? "الشحن:" : "Shipping:")}
+                  </span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    {parseFloat(order.shipping_amount || 0) === 0
+                      ? t("orders.free") ||
+                        (language === "ar" ? "مجاني" : "Free")
+                      : `${parseFloat(order.shipping_amount || 0).toFixed(2)} EGP`}
                   </span>
                 </div>
                 {parseFloat(order.discount_amount || 0) > 0 && (
                   <div className="flex justify-between text-xs sm:text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">{t("orders.discount") || (language === "ar" ? "الخصم:" : "Discount:")}</span>
-                    <span className="text-green-600 dark:text-green-400 font-medium">-${parseFloat(order.discount_amount || 0).toFixed(2)}</span>
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {t("orders.discount") ||
+                        (language === "ar" ? "الخصم:" : "Discount:")}
+                    </span>
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      -${parseFloat(order.discount_amount || 0).toFixed(2)}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between text-base sm:text-lg font-semibold border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <span className="text-gray-900 dark:text-white">{t("orders.total") || (language === "ar" ? "المجموع:" : "Total:")}</span>
-                  <span className="text-gray-900 dark:text-white">${parseFloat(order.total_price || 0).toFixed(2)}</span>
+                  <span className="text-gray-900 dark:text-white">
+                    {t("orders.total") ||
+                      (language === "ar" ? "المجموع:" : "Total:")}
+                  </span>
+                  <span className="text-gray-900 dark:text-white">
+                    {parseFloat(order.total_price || 0).toFixed(2)} EGP
+                  </span>
                 </div>
               </div>
             </div>
@@ -287,21 +355,28 @@ const OrderDetail: React.FC = () => {
             {/* Shipping Address */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-                {t("orders.shippingAddress") || (language === "ar" ? "عنوان الشحن" : "Shipping Address")}
+                {t("orders.shippingAddress") ||
+                  (language === "ar" ? "عنوان الشحن" : "Shipping Address")}
               </h3>
-              
+
               <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                 <div className="flex items-center gap-2">
                   <MapPinIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-900 dark:text-white font-medium break-words">{order.shipping_name}</span>
+                  <span className="text-gray-900 dark:text-white font-medium break-words">
+                    {order.shipping_name}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <EnvelopeIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-600 dark:text-gray-300 break-all">{order.shipping_email}</span>
+                  <span className="text-gray-600 dark:text-gray-300 break-all">
+                    {order.shipping_email}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <PhoneIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-600 dark:text-gray-300">{order.shipping_phone}</span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {order.shipping_phone}
+                  </span>
                 </div>
                 <div className="ml-6 sm:ml-6 text-gray-600 dark:text-gray-300 break-words">
                   {order.full_shipping_address || order.shipping_address}
@@ -313,20 +388,35 @@ const OrderDetail: React.FC = () => {
             {(order.points_used > 0 || order.points_earned > 0) && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-                  {t("orders.points") || (language === "ar" ? "النقاط" : "Points")}
+                  {t("orders.points") ||
+                    (language === "ar" ? "النقاط" : "Points")}
                 </h3>
-                
+
                 <div className="space-y-2 text-xs sm:text-sm">
                   {order.points_used > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">{t("orders.pointsUsed") || (language === "ar" ? "النقاط المستخدمة:" : "Points Used:")}</span>
-                      <span className="text-red-600 dark:text-red-400 font-medium">-{order.points_used}</span>
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {t("orders.pointsUsed") ||
+                          (language === "ar"
+                            ? "النقاط المستخدمة:"
+                            : "Points Used:")}
+                      </span>
+                      <span className="text-red-600 dark:text-red-400 font-medium">
+                        -{order.points_used}
+                      </span>
                     </div>
                   )}
                   {order.points_earned > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600 dark:text-gray-300">{t("orders.pointsEarned") || (language === "ar" ? "النقاط المكتسبة:" : "Points Earned:")}</span>
-                      <span className="text-green-600 dark:text-green-400 font-medium">+{order.points_earned}</span>
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {t("orders.pointsEarned") ||
+                          (language === "ar"
+                            ? "النقاط المكتسبة:"
+                            : "Points Earned:")}
+                      </span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">
+                        +{order.points_earned}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -344,13 +434,19 @@ const OrderDetail: React.FC = () => {
         >
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-              {t("orders.items") || (language === "ar" ? "عناصر الطلب" : "Order Items")} ({order.items?.length || 0})
+              {t("orders.items") ||
+                (language === "ar" ? "عناصر الطلب" : "Order Items")}{" "}
+              ({order.items?.length || 0})
             </h3>
           </div>
-          
+
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {order.items?.map((item: any) => (
-              <div key={item.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-start sm:items-center gap-3 sm:gap-4">
+              console.log(item),            
+              <div
+                key={item.id}
+                className="px-4 sm:px-6 py-3 sm:py-4 flex items-start sm:items-center gap-3 sm:gap-4"
+              >
                 {item.item_image && (
                   <img
                     src={item.item_image}
@@ -363,18 +459,26 @@ const OrderDetail: React.FC = () => {
                     {item.item_name}
                   </h4>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    {item.item_type === 'product' 
-                      ? (t("orders.product") || (language === "ar" ? "منتج" : "Product"))
-                      : (t("orders.service") || (language === "ar" ? "خدمة" : "Service"))}
-                    {item.item_sku && ` • ${t("orders.sku") || (language === "ar" ? "رمز المنتج" : "SKU")}: ${item.item_sku}`}
+                    {item.item_type === "product"
+                      ? t("orders.product") ||
+                        (language === "ar" ? "منتج" : "Product")
+                      : t("orders.service") ||
+                        (language === "ar" ? "خدمة" : "Service")}
+                    {item.item_sku &&
+                      ` • ${
+                        t("orders.sku") ||
+                        (language === "ar" ? "رمز المنتج" : "SKU")
+                      }: ${item.item_sku}`}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white mb-1">
-                    ${parseFloat(item.unit_price || 0).toFixed(2)} × {item.quantity}
+                    {parseFloat(item.unit_price || 0).toFixed(2)} EGP
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    {t("orders.totalItem") || (language === "ar" ? "الإجمالي:" : "Total:")} ${parseFloat(item.total_price || 0).toFixed(2)}
+                    {t("orders.totalItem") ||
+                      (language === "ar" ? "الإجمالي:" : "Total:")}{" "}
+                    {parseFloat(item.total_price || 0).toFixed(2)} EGP
                   </p>
                 </div>
               </div>
@@ -391,7 +495,8 @@ const OrderDetail: React.FC = () => {
             className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
           >
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-              {t("orders.orderNotes") || (language === "ar" ? "ملاحظات الطلب" : "Order Notes")}
+              {t("orders.orderNotes") ||
+                (language === "ar" ? "ملاحظات الطلب" : "Order Notes")}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 break-words">
               {order.notes}

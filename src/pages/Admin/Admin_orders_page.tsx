@@ -65,23 +65,41 @@ export default function AdminOrdersPage() {
   const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
 
   // Calculate statistics
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      const matchesStatus = status ? order.order_status === status : true;
+      if (!matchesStatus) return false;
+
+      if (!search.trim()) return true;
+      const searchTerm = search.toLowerCase();
+      const orderNumber = String(order.order_number || "").toLowerCase();
+      const userName = (order.user_name || "").toLowerCase();
+      const shippingName = (order.shipping_name || "").toLowerCase();
+      return (
+        orderNumber.includes(searchTerm) ||
+        userName.includes(searchTerm) ||
+        shippingName.includes(searchTerm)
+      );
+    });
+  }, [orders, search, status]);
+
   const stats = useMemo(() => {
-    const total = orders.length;
-    const pending = orders.filter((o) => o.order_status === "pending").length;
-    const confirmed = orders.filter(
+    const total = filteredOrders.length;
+    const pending = filteredOrders.filter((o) => o.order_status === "pending").length;
+    const confirmed = filteredOrders.filter(
       (o) => o.order_status === "confirmed" || o.order_status === "confirmed"
     ).length;
-    const processing = orders.filter(
+    const processing = filteredOrders.filter(
       (o) => o.order_status === "processing"
     ).length;
-    const shipped = orders.filter((o) => o.order_status === "shipped").length;
-    const delivered = orders.filter(
+    const shipped = filteredOrders.filter((o) => o.order_status === "shipped").length;
+    const delivered = filteredOrders.filter(
       (o) => o.order_status === "delivered"
     ).length;
-    const cancelled = orders.filter(
+    const cancelled = filteredOrders.filter(
       (o) => o.order_status === "cancelled"
     ).length;
-    const totalRevenue = orders
+    const totalRevenue = filteredOrders
       .filter((o) => o.order_status !== "cancelled")
       .reduce((sum, o) => sum + (parseFloat(o.total_price) || 0), 0);
 
@@ -95,7 +113,7 @@ export default function AdminOrdersPage() {
       cancelled,
       totalRevenue: totalRevenue.toFixed(2),
     };
-  }, [orders]);
+  }, [filteredOrders]);
 
   // Get status badge color
   const getStatusBadge = (status: string) => {
@@ -814,7 +832,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {loading && orders.length === 0 ? (
+                {loading && filteredOrders.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center">
                       <div className="flex flex-col items-center justify-center">
@@ -828,7 +846,7 @@ export default function AdminOrdersPage() {
                       </div>
                     </td>
                   </tr>
-                ) : orders.length === 0 ? (
+                ) : filteredOrders.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-12 text-center">
                       <ShoppingBagIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -847,7 +865,7 @@ export default function AdminOrdersPage() {
                     </td>
                   </tr>
                 ) : (
-                  orders.map((order, index) => {
+                  filteredOrders.map((order, index) => {
                     const statusBadge = getStatusBadge(order.order_status);
                     const StatusIcon = statusBadge.icon;
                     return (

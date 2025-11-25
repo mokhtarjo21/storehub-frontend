@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   MagnifyingGlassIcon,
@@ -9,13 +9,13 @@ import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
-import { useApi } from "../hooks/useApi";
+
 import toast from "react-hot-toast";
 import ServiceFormModal, { CustomerInfo } from "../components/ServiceFormModal";
 
 const Services: React.FC = () => {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user,fetchcategories , fetchServices,isLoading} = useAuth();
   const { addService } = useCart();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,21 +24,32 @@ const Services: React.FC = () => {
   const [sortBy, setSortBy] = useState<"title" | "price">("title");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState<any>([]);
+  const [services, setServiceList] = useState<any>([]);
+ const getServices = async () => {
+   const [servicesData]  = await Promise.allSettled([fetchServices(),]);
+    if (servicesData.status === "fulfilled") {
+        const cdata = (servicesData.value.results ?? servicesData.value.data) 
+        if (Array.isArray(cdata)) setServiceList(cdata);
+        console.log(cdata);
+        
+      }
+      console.log(services);
+      
 
-  // Fetch data from API
-  const { data: services = [], loading: servicesLoading } = useApi(
-    "/products/services/"
-  );
-  console.log(services);
-
-  // const { data: categories = [] } = useApi('/products/categories/');
-  const { data: categoriesData } = useApi("/products/categories/");
-
-  const categories = Array.isArray(categoriesData)
-    ? categoriesData
-    : Array.isArray(categoriesData?.results)
-    ? categoriesData.results
-    : [];
+ }
+                                                                      
+  const getCategories = async () => {
+    
+    const  [categoriesData]  = await Promise.allSettled([fetchcategories(),]); 
+     if (categoriesData.status === "fulfilled") {
+        const cdata = (categoriesData.value.results ?? categoriesData.value.data) 
+        if (Array.isArray(cdata)) setCategories(cdata);
+        console.log(cdata);
+        
+      } 
+                                                             
+  }
 
   const categoryOptions = [
     { id: "all", name: t("products.category.all") },
@@ -47,7 +58,10 @@ const Services: React.FC = () => {
       name: language === "ar" ? cat.name_ar || cat.name : cat.name,
     })),
   ];
-
+ useEffect(() => {
+   getServices();
+   getCategories();
+ }, []);
   const durationOptions = [
     { id: "all", name: t("services.allDurations") },
     { id: "1-2_hours", name: t("services.duration.1-2_hours") },
@@ -60,42 +74,43 @@ const Services: React.FC = () => {
     { id: "custom", name: t("services.duration.custom") },
   ];
 
-  const filteredServices = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
+ const filteredServices = useMemo(() => {
+  const term = searchTerm.toLowerCase().trim();
 
-    return (services?.results || [])
-      .filter((service: any) => {
-        // البحث على الإنجليزي + العربي
-        const titleMatch =
-          service.title?.toLowerCase().includes(term) ||
-          service.title_ar?.toLowerCase().includes(term);
+  const list = Array.isArray(services) ? services : [];
 
-        // فلاتر أخرى
-        const categoryMatch =
-          selectedCategory === "all" ||
-          service.category?.toString() === selectedCategory;
+  return list
+    .filter((service: any) => {
+      const titleMatch =
+        service.title?.toLowerCase().includes(term) ||
+        service.title_ar?.toLowerCase().includes(term);
 
-        const durationMatch =
-          selectedDuration === "all" || service.duration === selectedDuration;
+      const categoryMatch =
+        selectedCategory === "all" ||
+        service.category?.toString() === selectedCategory;
 
-        return titleMatch && categoryMatch && durationMatch;
-      })
-      .sort((a, b) => {
-        if (sortBy === "price")
-          return parseFloat(a.price) - parseFloat(b.price);
-        // sort by title with fallback to Arabic
-        const titleA = language === "ar" ? a.title_ar || a.title : a.title;
-        const titleB = language === "ar" ? b.title_ar || b.title : b.title;
-        return titleA.localeCompare(titleB);
-      });
-  }, [
-    services,
-    searchTerm,
-    selectedCategory,
-    selectedDuration,
-    sortBy,
-    language,
-  ]);
+      const durationMatch =
+        selectedDuration === "all" || service.duration === selectedDuration;
+
+      return titleMatch && categoryMatch && durationMatch;
+    })
+    .sort((a, b) => {
+      if (sortBy === "price")
+        return parseFloat(a.price) - parseFloat(b.price);
+
+      const titleA = language === "ar" ? a.title_ar || a.title : a.title;
+      const titleB = language === "ar" ? b.title_ar || b.title : b.title;
+
+      return titleA.localeCompare(titleB);
+    });
+}, [
+  services,
+  searchTerm,
+  selectedCategory,
+  selectedDuration,
+  sortBy,
+  language,
+]);
 
   const handleRequestService = (service: any) => {
     if (!user) {
@@ -123,7 +138,6 @@ const Services: React.FC = () => {
       );
       setIsModalOpen(false);
       setSelectedService(null);
-      // Navigate to checkout page
       navigate("/checkout");
     } catch (error) {
       console.error("Error adding service:", error);
@@ -169,43 +183,40 @@ const Services: React.FC = () => {
             ? service.description_ar || service.description
             : service.description}
         </p>
-
-        {/* Prices */}
-        <div className="pb-4">
-          <div className="flex items-center gap-2 rtl:space-x-reverse">
-            {/* Main Price */}
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
-              {language === "ar" ? "جنية" : "EGP"}{" "}
-              {parseFloat(service.price).toLocaleString()}
-            </span>
-            <div className="ml-auto">
-              {service.is_active === true ? (
-                <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                  {language === "ar" ? "متوفر" : "Available"} {service.stock}
-                </span>
-              ) : (
-                <span className="text-red-600 dark:text-red-400 text-sm font-medium">
-                  {language === "ar" ? "غير متوفر" : "Not Available"}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
         <button
           onClick={(e) => {
-            e.stopPropagation(); // ← مهم جداً علشان ما يفتحش صفحة التفاصيل!
+            e.stopPropagation();
             handleRequestService(service);
           }}
-          className="w-full bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white font-medium py-3 rounded-lg"
+          disabled={service.is_active !== true} 
+          className={`
+    w-full font-medium py-3 rounded-lg text-white
+    ${
+      service.is_active
+        ? "bg-[#155F82]/80 hover:bg-[#155F82]/90 cursor-pointer"
+        : "bg-gray-400 cursor-not-allowed"
+    }
+  `}
         >
           {t("services.requestService")}
         </button>
+
+        <div className="pt-8 text-center">
+          {service.is_active === true ? (
+            <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
+              {language === "ar" ? "متوفر" : "Available"} {service.stock}
+            </span>
+          ) : (
+            <span className="text-[#DF1783] dark:text-[#DF1783]/80 text-sm font-medium">
+              {language === "ar" ? "غير متوفر" : "Not Available"}
+            </span>
+          )}
+        </div>
       </div>
     </motion.div>
   );
 
-  if (servicesLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -258,7 +269,7 @@ const Services: React.FC = () => {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {categoryOptions.map((category) => (
+                 {categoryOptions.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
                   </option>
@@ -315,7 +326,7 @@ const Services: React.FC = () => {
             className="text-center py-12"
           >
             <p className="text-lg text-gray-500 dark:text-gray-400">
-              {servicesLoading
+              {isLoading
                 ? t("services.loading")
                 : t("services.noServices")}
             </p>

@@ -358,6 +358,8 @@ const Products: React.FC = () => {
                   {language === "ar" ? "كل الماركات" : "All Brands"}
                 </option>
                 {brands.map((brand) => (
+                  console.log(brands),
+                  
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
                   </option>

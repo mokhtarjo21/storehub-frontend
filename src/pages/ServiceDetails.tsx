@@ -14,7 +14,7 @@ const API_BASE_URL = "http://192.168.1.7:8000/api";
 const ServiceDetails: React.FC = () => {
   const { slug } = useParams();
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user ,fetchService} = useAuth();
   const { addService } = useCart();
   const Navigate = useNavigate();
   const [service, setService] = useState<any>(null);
@@ -23,20 +23,17 @@ const ServiceDetails: React.FC = () => {
 
   // Fetch service by slug
   useEffect(() => {
-    const fetchService = async () => {
+    const fetchServiceData = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/products/services/${slug}/`);
-        const data = await res.json();
-        setService(data);
-      } catch (e) {
-        console.error(e);
-        toast.error("Failed to load service");
+        const response = await fetchService(slug!);
+        setService(response);
+      } catch (error) {
+        console.error("Failed to fetch service:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchService();
+    fetchServiceData();
   }, [slug]);
 
   const handleRequestService = () => {
@@ -157,36 +154,36 @@ const ServiceDetails: React.FC = () => {
                 ? service.description_ar || service.description
                 : service.description}
             </p>
-
-            {/* Prices & Availability */}
-            <div className="pb-4">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                {/* Main Price */}
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {language === "ar" ? "جنية" : "EGP"}{" "}
-                  {parseFloat(service.price).toLocaleString()}
-                </span>
-
-                {/* Availability */}
-                {service.is_active ? (
-                  <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                    {language === "ar" ? "متوفر" : "Available"} {service.stock}
-                  </span>
-                ) : (
-                  <span className="text-red-600 dark:text-red-400 text-sm font-medium">
-                    {language === "ar" ? "غير متوفر" : "Not Available"}
-                  </span>
-                )}
-              </div>
-            </div>
-
             {/* Request Button */}
             <button
-              onClick={handleRequestService}
-              className="w-full py-3 bg-[#155F82] hover:bg-[#124b66] text-white rounded-xl text-lg font-medium shadow-md transition-all"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleRequestService(service);
+              }}
+              disabled={service.is_active !== true} // ⬅️ لو مش متوفر يبقى disabled
+              className={`
+    w-full font-medium py-3 rounded-lg text-white
+    ${
+      service.is_active
+        ? "bg-[#155F82]/80 hover:bg-[#155F82]/90 cursor-pointer"
+        : "bg-gray-400 cursor-not-allowed"
+    }
+  `}
             >
               {t("services.requestService")}
             </button>
+
+            <div className=" text-center">
+              {service.is_active === true ? (
+                <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
+                  {language === "ar" ? "متوفر" : "Available"} {service.stock}
+                </span>
+              ) : (
+                <span className="text-[#DF1783] dark:text-[#DF1783]/80 text-sm font-medium">
+                  {language === "ar" ? "غير متوفر" : "Not Available"}
+                </span>
+              )}
+            </div>
           </motion.div>
         </div>
         {/* FORM MODAL */}
