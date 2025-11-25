@@ -1,20 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, number } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Order } from '../../types';
 
 const MyOrders: React.FC = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentPage, setCurrentPage] = useState(1); // الصفحة الحالية
+  const [totalPages, setTotalPages] = useState(1); // إجمالي عدد الصفحات
   const { language } = useLanguage();
-  const { fetchorders, isloading } = useAuth();
+  const { myorders, isLoading } = useAuth();
 
-  const data = fetchorders();
-  console.log(data);
-  
-const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
+  const getOrders = async (page: number) => {
+    try {
+      const response = await myorders(page); // تمرير رقم الصفحة إلى API
+      const { results, count, next, previous } = response;
 
-  if (isloading) {
+      if (Array.isArray(results)) {
+        setOrders(results);
+        setTotalPages(Math.ceil(count / 10)); // حساب إجمالي الصفحات (10 عناصر لكل صفحة)
+      }
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    }
+  };
+
+  useEffect(() => {
+    getOrders(currentPage); // جلب الطلبات عند تغيير الصفحة
+  }, [currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="flex justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -97,8 +119,8 @@ const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     Order #{order.id}
                   </h3>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
-                    {order.status.replace('_', ' ').toUpperCase()}
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.order_status)}`}>
+                    {order.order_status.replace('_', ' ').toUpperCase()}
                   </span>
                 </div>
 
@@ -117,7 +139,8 @@ const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
 
               <div className="text-right">
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  ${order.total.toFixed(2)}
+                  ${Number(order.total_price).toFixed(2)
+}
                 </p>
                 {order.pointsEarned > 0 && (
                   <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -151,6 +174,27 @@ const orders: Order[] = Array.isArray(data) ? data : data?.orders || [];
           </Link>
         </motion.div>
       ))}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center py-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+        >
+          {language === 'ar' ? 'السابق' : 'Previous'}
+        </button>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {language === 'ar' ? 'الصفحة' : 'Page'} {currentPage} / {totalPages}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+        >
+          {language === 'ar' ? 'التالي' : 'Next'}
+        </button>
+      </div>
     </div>
   );
 };
