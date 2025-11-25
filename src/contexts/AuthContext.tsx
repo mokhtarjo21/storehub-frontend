@@ -316,7 +316,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${API_BASE_URL}/services/`, {
+      const response = await fetch(`${API_BASE_URL}/products/services/`, {
         method: "POST",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
