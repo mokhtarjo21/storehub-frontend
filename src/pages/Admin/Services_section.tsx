@@ -11,7 +11,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
-const API_BASE_URL = "http://192.168.1.7:8000";
+
 
 type Category = { id: number; name: string; name_ar?: string };
 
@@ -46,8 +46,10 @@ export default function AdminServicesSection() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ServiceListItem | null>(null);
-  const { fetchServices, isLoading, fetchcategories } = useAuth();
+  const { fetchServices, isLoading,deleteService, fetchcategories } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+
+
   const getServices = async () => {
     const [servicesData] = await Promise.allSettled([fetchServices()]);
     if (servicesData.status === "fulfilled") {
@@ -108,16 +110,8 @@ export default function AdminServicesSection() {
     )
       return;
     try {
-      const token = localStorage.getItem("access_token");
-      const res = await fetch(
-        `${API_BASE_URL}/api/products/admin/services/${id}/delete/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      
+      const res =await deleteService(id);
       if (res.ok) {
         setServices((prev) => prev.filter((s) => s.id !== id));
         toast.success(
@@ -365,6 +359,7 @@ function ServiceForm({
   initial: ServiceListItem | null;
   categories: Category[];
 }) {
+  const {user,updateservice,createService} = useAuth();
   const { language } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -408,8 +403,8 @@ function ServiceForm({
     e?.preventDefault();
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
+      
+      if (!user) {
         toast.error(
           language === "ar" ? "يرجى تسجيل الدخول" : "Please login first"
         );
@@ -454,43 +449,19 @@ function ServiceForm({
         duration,
         hasImage: !!imageFile,
       });
-
-      let url = `${API_BASE_URL}/api/products/admin/services/`;
-      let method = "POST";
+      let res
       if (initial && initial.id) {
-        url = `${API_BASE_URL}/api/products/admin/services/${initial.id}/update/`;
-        method = "PUT";
+       res = await updateservice(initial.id,fd)
       }
-
-      console.log("API Request:", { url, method });
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: fd,
-      });
-
-      const responseData = await res.json().catch(() => ({}));
-
-      if (res.ok) {
-        const saved = responseData;
-        console.log("Service saved successfully:", saved);
-        onSaved(saved);
-        toast.success(
-          language === "ar" ? "تم الحفظ بنجاح" : "Saved successfully"
-        );
-      } else {
-        console.error("API Error Response:", responseData);
-        const errorMessage =
-          responseData.detail ||
-          responseData.message ||
-          (typeof responseData === "string" ? responseData : null) ||
-          Object.values(responseData).flat().join(", ") ||
-          `HTTP ${res.status}: ${res.statusText}`;
-        throw new Error(errorMessage);
+      else{
+        res = await createService(fd)
       }
+      console.log(res);
+      
+      onSaved(res);
+      
+
+      
     } catch (err: any) {
       console.error("Save error", err);
       const errorMessage =

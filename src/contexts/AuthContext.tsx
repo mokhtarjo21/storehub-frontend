@@ -12,6 +12,7 @@ interface AuthContextType {
   fetchorders: (search: any, status: any) => Promise<any[]>;
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
+  
   fetchServices: () => Promise<any[]>;
    fetchService: (slug: string | number) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
@@ -20,7 +21,10 @@ interface AuthContextType {
   fetchbrands: () => Promise<any[]>;
   fetchProduct: (id: string | number) => Promise<any>;
   createProduct: (productData: any) => Promise<any>;
+  createService: (productData: any) => Promise<any>;
   updateProduct: (id: string | number, productData: any) => Promise<any>;
+  updateservice: (id: string | number, productData: any) => Promise<any>;
+  deleteService:(id: string | number) => Promise<void>;
   deleteProduct: (id: string | number) => Promise<void>;
 }
 
@@ -261,6 +265,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  
   // 2. جلب منتج واحد
   const fetchProduct = async (id: string | number): Promise<any> => {
     setIsLoading(true);
@@ -306,6 +311,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
+    const createService = async (formData: FormData): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(`${API_BASE_URL}/services/`, {
+        method: "POST",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: formData,
+      });
+
+      const data = await handleApiResponse(response);
+      toast.success("Product created successfully!");
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   // 4. تحديث منتج
   const updateProduct = async (
@@ -340,12 +371,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+    const updateservice = async (
+    id: string | number,
+    formData: FormData
+  ): Promise<any> => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const response = await fetch(
+        `${API_BASE_URL}/products/admin/services/${id}/update/`,
+        {
+          method: "PUT",
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: formData,
+        }
+      );
+
+      const data = await handleApiResponse(response);
+      toast.success("Product updated successfully!");
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
   // 5. حذف منتج
   const deleteProduct = async (id: string | number): Promise<void> => {
     setIsLoading(true);
     try {
       const response = await fetch(
         `${API_BASE_URL}/products/admin/products/${id}/delete/`,
+        {
+          method: "DELETE",
+          headers: getAuthHeaders(),
+        }
+      );
+      await handleApiResponse(response);
+      toast.success("Product deleted successfully!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete product"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+    const deleteService = async (id: string | number): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/admin/services/${id}/delete/`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
@@ -522,6 +607,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         fetchServices,
         isInitializing,
+        createService,
         fetchProducts,
         fetchorders,
         updateorders,
@@ -531,7 +617,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchProduct,
         createProduct,
         updateProduct,
+        updateservice,
         deleteProduct,
+        deleteService,
       }}
     >
       {children}
