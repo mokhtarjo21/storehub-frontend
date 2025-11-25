@@ -15,7 +15,7 @@ import { useApi } from "../hooks/useApi";
 import { useActivityTracker } from "../hooks/useActivityTracker";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
-import { set } from "react-hook-form";
+
 const Products: React.FC = () => {
   const { t, language } = useLanguage();
   const { addItem, items } = useCart();
@@ -23,26 +23,29 @@ const Products: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | number>("");
   const [selectedBrand, setSelectedBrand] = useState<string | number>("");
-  const API_BASE_URL = "http://192.168.1.7:8000";
+  
   const [loading, setLoading] = useState(false);
   const { user, fetchProducts, fetchcategories, fetchbrands } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10); // عدد العناصر في كل صفحة
   // const { data: productsData, loading: productsLoading } = useApi("/products/")
   let productsData: any = null;
   const [products, setProducts] = useState<any[]>([]);
   const getProducts = async () => {
     setLoading(true);
     try {
-      const params: any = {};
+      const params: any = {
+        page: currentPage,
+        page_size: pageSize, // أو أي اسم يستخدمه الـ API
+      };
       if (searchTerm) params.search = searchTerm;
       if (selectedCategory) params.category = selectedCategory;
       if (selectedBrand) params.brand = selectedBrand;
 
       productsData = await fetchProducts(params);
       console.log("Fetched products:", productsData);
-      // backend might return {results: [...]} or plain array
       setProducts(productsData.results ?? productsData);
     } catch (err: any) {
       console.error("fetchProducts error", err);
@@ -64,7 +67,7 @@ const Products: React.FC = () => {
     }, 400);
 
     return () => clearTimeout(t);
-  }, [searchTerm, selectedCategory, selectedBrand]);
+  }, [searchTerm, selectedCategory, selectedBrand, currentPage]);
 
   const fetchCategoriesAndBrands = async () => {
     try {
@@ -172,7 +175,7 @@ const Products: React.FC = () => {
             {/* Image */}
             <img
               src={
-                API_BASE_URL + product.primary_image ||
+                product.primary_image ||
                 "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
               }
               alt={
@@ -359,7 +362,7 @@ const Products: React.FC = () => {
                 </option>
                 {brands.map((brand) => (
                   console.log(brands),
-                  
+
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
                   </option>
@@ -396,6 +399,26 @@ const Products: React.FC = () => {
             </p>
           </motion.div>
         )}
+
+        {/* Pagination */}
+        <div className="flex justify-center items-center mt-8">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50"
+          >
+            {language === "ar" ? "السابق" : "Previous"}
+          </button>
+          <span className="px-4 py-2 mx-1">
+            {language === "ar" ? `الصفحة ${currentPage}` : `Page ${currentPage}`}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-4 py-2 mx-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+          >
+            {language === "ar" ? "التالي" : "Next"}
+          </button>
+        </div>
       </div>
     </div>
   );

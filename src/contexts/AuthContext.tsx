@@ -9,7 +9,7 @@ interface AuthContextType {
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
-  fetchorders: (search: any, status: any) => Promise<any[]>;
+  fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
   myorders: (page:any) => Promise<any>;
@@ -484,11 +484,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-  const fetchorders = async (search: any, status: any): Promise<any[]> => {
+  const fetchorders = async (search: any, status: any,page:any): Promise<any[]> => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/?search=${search}&status=${status}`,
+        `${API_BASE_URL}/orders/admin/orders/?page=${page}&search=${search}&status=${status}`,
         {
           method: "GET",
           headers: getAuthHeaders(),
