@@ -8,7 +8,7 @@ const Layout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <ApiStatus />
-      <Navbar />
+      <Navbar/>
       <main className="pt-16">
         <Outlet />
       </main>

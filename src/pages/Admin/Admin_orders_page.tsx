@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-
+import { apiRequest, handleApiResponse } from "../../utils/api";
 import toast from "react-hot-toast";
 import {
   MagnifyingGlassIcon,
@@ -57,9 +57,6 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
-  const [currentPage, setCurrentPage] = useState(1); // الصفحة الحالية
-  const [pageSize, setPageSize] = useState(10); // عدد العناصر لكل صفحة
-  const [totalOrders, setTotalOrders] = useState(0); // إجمالي الطلبات
   const { t, language } = useLanguage();
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
@@ -155,29 +152,27 @@ export default function AdminOrdersPage() {
     return statusMap[status] || statusMap.pending;
   };
 
-  const fetchOrders = async (
-    searchTerm = search,
-    statusFilter = status,
-    page = currentPage,
-    size = pageSize
-  ) => {
+  const fetchOrders = async (searchTerm = search, statusFilter = status) => {
     setLoading(true);
     try {
-      console.log("Fetching orders with:", { searchTerm, statusFilter, page, size });
+      console.log("Fetching orders with:", { searchTerm, statusFilter });
       const [cRes] = await Promise.allSettled([
-        fetchorders(searchTerm || "", statusFilter || "", page, size),
+        fetchorders(searchTerm || "", statusFilter || ""),
       ]);
 
       if (cRes.status === "fulfilled") {
-        const cdata = cRes.value;
+        const cdata = cRes.value.results ?? cRes.value.data ?? cRes.value;
         console.log("Orders data received:", cdata);
-
-        if (Array.isArray(cdata.results)) {
-          setOrders(cdata.results);
-          setTotalOrders(cdata.count); // Update total orders
+        if (Array.isArray(cdata)) {
+          setOrders(cdata);
+          if (cdata.length === 0 && (searchTerm || statusFilter)) {
+            toast(
+              language === "ar" ? "لا توجد نتائج للبحث" : "No results found",
+              { icon: "ℹ️" }
+            );
+          }
         } else {
           setOrders([]);
-          setTotalOrders(0);
         }
       } else {
         console.error("Failed to fetch orders:", cRes.reason);
@@ -980,39 +975,6 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       </motion.div>
-             <button
-                  onClick={() => {
-                    if (currentPage > 1) {
-                      setCurrentPage(currentPage - 1);
-                      fetchOrders(search, status, currentPage - 1, pageSize);
-                    }
-                  }}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
-                >
-                  {language === "ar" ? "السابق" : "Previous"}
-                </button>
-
-                {/* Page Info */}
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {language === "ar"
-                    ? `الصفحة ${currentPage} من ${Math.ceil(totalOrders / pageSize)}`
-                    : `Page ${currentPage} of ${Math.ceil(totalOrders / pageSize)}`}
-                </span>
-
-                {/* Next Button */}
-                <button
-                  onClick={() => {
-                    if (currentPage < Math.ceil(totalOrders / pageSize)) {
-                      setCurrentPage(currentPage + 1);
-                      fetchOrders(search, status, currentPage + 1, pageSize);
-                    }
-                  }}
-                  disabled={currentPage === Math.ceil(totalOrders / pageSize)}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
-                >
-                  {language === "ar" ? "التالي" : "Next"}
-                </button>
 
       {/* Order Details Modal */}
       <AnimatePresence>
@@ -1551,12 +1513,6 @@ export default function AdminOrdersPage() {
                   </div>
                 </aside>
               </div>
-
-              {/* Pagination Controls */}
-              <motion.div className="flex flex-col sm:flex-row items-center justify-between mt-4">
-                {/* Previous Button */}
-               
-              </motion.div>
             </motion.div>
           </motion.div>
         )}

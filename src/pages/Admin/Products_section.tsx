@@ -61,7 +61,7 @@ export default function AdminProductsSection() {
   const [brands, setBrands] = useState<Brand[] | null>(null);
   const { fetchProducts, fetchbrands, fetchcategories, deleteProduct } =
     useAuth();
-  const API_BASE_URL = "http://192.168.1.7:8000";
+  
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ProductListItem | null>(null);
@@ -266,7 +266,7 @@ export default function AdminProductsSection() {
                   <td className="px-4 py-3 whitespace-nowrap">
                     {p.primary_image ? (
                       <img
-                        src={API_BASE_URL + p.primary_image}
+                        src={ p.primary_image}
                         alt={p.name}
                         className="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600"
                       />

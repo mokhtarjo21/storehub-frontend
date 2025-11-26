@@ -11,7 +11,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 
-
+const API_BASE_URL = "http://192.168.1.7:8000";
 
 type Category = { id: number; name: string; name_ar?: string };
 
@@ -46,10 +46,8 @@ export default function AdminServicesSection() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ServiceListItem | null>(null);
-  const { fetchServices, isLoading,deleteService, fetchcategories } = useAuth();
+  const { fetchServices, isLoading, fetchcategories } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
-
-
   const getServices = async () => {
     const [servicesData] = await Promise.allSettled([fetchServices()]);
     if (servicesData.status === "fulfilled") {
@@ -110,12 +108,24 @@ export default function AdminServicesSection() {
     )
       return;
     try {
-      
-      const res =await deleteService(id);
-     
-      setServices((prev) => prev.filter((s) => s.id !== id));
-        
-     
+      const token = localStorage.getItem("access_token");
+      const res = await fetch(
+        `${API_BASE_URL}/api/products/admin/services/${id}/delete/`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        setServices((prev) => prev.filter((s) => s.id !== id));
+        toast.success(
+          language === "ar" ? "تم الحذف بنجاح" : "Deleted successfully"
+        );
+      } else {
+        throw new Error("Delete failed");
+      }
     } catch (err) {
       console.error(err);
       toast.error(language === "ar" ? "خطأ أثناء الحذف" : "Delete failed");
@@ -355,7 +365,6 @@ function ServiceForm({
   initial: ServiceListItem | null;
   categories: Category[];
 }) {
-  const {user,updateservice,createService} = useAuth();
   const { language } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState(initial?.title ?? "");
@@ -399,8 +408,8 @@ function ServiceForm({
     e?.preventDefault();
     setSubmitting(true);
     try {
-      
-      if (!user) {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
         toast.error(
           language === "ar" ? "يرجى تسجيل الدخول" : "Please login first"
         );
@@ -432,7 +441,7 @@ function ServiceForm({
       if (duration === "custom" && customDuration?.trim()) {
         fd.append("custom_duration", customDuration.trim());
       }
-      fd.append("category_id", String(categoryId));
+      fd.append("category", String(categoryId));
       fd.append("is_active", String(Number(isActive)));
       fd.append("is_featured", String(Number(isFeatured)));
       if (imageFile) fd.append("image", imageFile);
@@ -445,19 +454,43 @@ function ServiceForm({
         duration,
         hasImage: !!imageFile,
       });
-      let res
-      if (initial && initial.id) {
-       res = await updateservice(initial.id,fd)
-      }
-      else{
-        res = await createService(fd)
-      }
-      console.log(res);
-      
-      onSaved(res);
-      
 
-      
+      let url = `${API_BASE_URL}/api/products/admin/services/`;
+      let method = "POST";
+      if (initial && initial.id) {
+        url = `${API_BASE_URL}/api/products/admin/services/${initial.id}/update/`;
+        method = "PUT";
+      }
+
+      console.log("API Request:", { url, method });
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: fd,
+      });
+
+      const responseData = await res.json().catch(() => ({}));
+
+      if (res.ok) {
+        const saved = responseData;
+        console.log("Service saved successfully:", saved);
+        onSaved(saved);
+        toast.success(
+          language === "ar" ? "تم الحفظ بنجاح" : "Saved successfully"
+        );
+      } else {
+        console.error("API Error Response:", responseData);
+        const errorMessage =
+          responseData.detail ||
+          responseData.message ||
+          (typeof responseData === "string" ? responseData : null) ||
+          Object.values(responseData).flat().join(", ") ||
+          `HTTP ${res.status}: ${res.statusText}`;
+        throw new Error(errorMessage);
+      }
     } catch (err: any) {
       console.error("Save error", err);
       const errorMessage =
