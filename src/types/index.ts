@@ -45,7 +45,7 @@ export interface PaymentTransaction {
 }
 
 export interface Order {
-  id: string;
+  order_number: string;
   userId: string;
   items: OrderItem[];
   total_price: number;

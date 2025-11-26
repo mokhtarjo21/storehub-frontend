@@ -9,6 +9,13 @@ import {
   MoonIcon,
   ShoppingCartIcon,
   GlobeAltIcon,
+  HomeIcon,
+  CubeIcon,
+  WrenchScrewdriverIcon,
+  ChartBarSquareIcon,
+  ShieldCheckIcon,
+  BuildingStorefrontIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -25,20 +32,37 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const navigation = [
-    { name: t("nav.home"), href: "/" },
-    { name: t("nav.products"), href: "/products" },
-    { name: t("nav.services"), href: "/services" },
+    { name: t("nav.home"), href: "/", icon: HomeIcon },
+    { name: t("nav.products"), href: "/products", icon: CubeIcon },
+    { name: t("nav.services"), href: "/services", icon: WrenchScrewdriverIcon },
   ];
+
   if (user) {
-    navigation.push({ name: t("nav.dashboard"), href: "/dashboard" });
+    navigation.push({
+      name: t("nav.dashboard"),
+      href: "/dashboard",
+      icon: ChartBarSquareIcon,
+    });
     if (user.role === "company_admin") {
-      navigation.push({ name: "Company", href: "/company" });
+      navigation.push({
+        name: "Company",
+        href: "/company",
+        icon: BuildingStorefrontIcon,
+      });
     }
     if (user.role === "affiliate") {
-      navigation.push({ name: "Affiliate", href: "/affiliate" });
+      navigation.push({
+        name: "Affiliate",
+        href: "/affiliate",
+        icon: UserGroupIcon,
+      });
     }
     if (user.role === "super_admin") {
-      navigation.push({ name: t("nav.admin"), href: "/admin" });
+      navigation.push({
+        name: t("nav.admin"),
+        href: "/admin",
+        icon: ShieldCheckIcon,
+      });
     }
   }
 
@@ -210,24 +234,147 @@ const Navbar: React.FC = () => {
               </div>
             </div>
           </div>
+          {open && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-30 z-40 sm:hidden"
+              onClick={() => {
+                // هذا يغلق الـ drawer بالضغط على الخلفية
+                const toggleButton = document.querySelector(
+                  'button[aria-expanded="true"]'
+                ) as HTMLElement;
+                toggleButton?.click();
+              }}
+            />
+          )}
+          {/* Mobile menu - IMPROVED VERSION */}
+          <Disclosure.Panel className="sm:hidden fixed top-0 left-0 h-screen w-60 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50">
+            <div className="px-3 pt-3 pb-4 space-y-2">
+              {/* Navigation Links */}
+              {navigation.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <Disclosure.Button
+                    key={item.name}
+                    as={Link}
+                    to={item.href}
+                    className={`flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all ${
+                      location.pathname === item.href
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-r-2 border-blue-500"
+                        : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <IconComponent className="h-5 w-5 mr-2" />
+                    <span>{item.name}</span>
+                  </Disclosure.Button>
+                );
+              })}
 
-          {/* Mobile menu */}
-          <Disclosure.Panel className="sm:hidden">
-            <div className="space-y-1 pb-3 pt-2">
-              {navigation.map((item) => (
-                <Disclosure.Button
-                  key={item.name}
-                  as={Link}
-                  to={item.href}
-                  className={`block border-l-4 py-2 pl-3 pr-4 text-base font-medium transition-colors ${
-                    location.pathname === item.href
-                      ? "border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-                  }`}
-                >
-                  {item.name}
-                </Disclosure.Button>
-              ))}
+              {/* Theme & Language */}
+              <Disclosure.Button
+                onClick={toggleTheme}
+                className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                {theme === "light" ? (
+                  <MoonIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                ) : (
+                  <SunIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                )}
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {theme === "light" ? "Dark Mode" : "Light Mode"}
+                </span>
+              </Disclosure.Button>
+
+              <Disclosure.Button
+                onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+                className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <GlobeAltIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {language === "en" ? "العربية" : "English"}
+                </span>
+              </Disclosure.Button>
+
+              {/* User Specific Actions */}
+              {user && (
+                <>
+                  {/* Cart */}
+                  <Disclosure.Button
+                    as={Link}
+                    to="/cart"
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 relative"
+                  >
+                    <ShoppingCartIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Cart
+                      {itemCount > 0 && (
+                        <span className="ml-2 inline-block h-4 w-4 rounded-full bg-blue-500 text-xs text-white text-center">
+                          {itemCount}
+                        </span>
+                      )}
+                    </span>
+                  </Disclosure.Button>
+
+                  {/* Notifications */}
+                  <Disclosure.Button className="flex items-center w-full rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <NotificationBell />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Notifications
+                    </span>
+                  </Disclosure.Button>
+
+                  {/* Profile & Logout */}
+                  <Disclosure.Button
+                    as="button"
+                    onClick={() => navigate("/profile")}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <UserIcon className="h-5 w-5 mr-2" />
+                    <span>{t("nav.profile")}</span>
+                  </Disclosure.Button>
+
+                  <Disclosure.Button
+                    as="button"
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <svg
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    <span>{t("nav.logout")}</span>
+                  </Disclosure.Button>
+                </>
+              )}
+
+              {/* Auth Buttons for Non-Users */}
+              {!user && (
+                <>
+                  <Disclosure.Button
+                    as="button"
+                    onClick={() => navigate("/login")}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <span>{t("nav.login")}</span>
+                  </Disclosure.Button>
+
+                  <Disclosure.Button
+                    as="button"
+                    onClick={() => navigate("/register")}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <span>{t("nav.register")}</span>
+                  </Disclosure.Button>
+                </>
+              )}
             </div>
           </Disclosure.Panel>
         </>
