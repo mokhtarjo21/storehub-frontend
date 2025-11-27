@@ -43,7 +43,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mai
         <img
           src={currentImage}
           alt={`Product ${selectedImage + 1}`}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-fill"
         />
       </motion.div>
 
@@ -62,7 +62,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mai
               <img
                 src={img.image}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-fill"
               />
             </button>
           ))}

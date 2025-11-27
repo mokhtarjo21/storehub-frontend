@@ -81,7 +81,6 @@ type ProductListItem = {
   updated_at: string;
 };
 
-
 // const API_BASE = '/api/admin/products/' // list
 // const CREATE_ENDPOINT = '/api/admin/products/create/'
 
@@ -96,7 +95,6 @@ export default function AdminProductsSection() {
   const [brands, setBrands] = useState<Brand[] | null>(null);
   const { fetchProducts, fetchbrands, fetchcategories, deleteProduct } =
     useAuth();
-  
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ProductListItem | null>(null);
@@ -116,7 +114,6 @@ export default function AdminProductsSection() {
       const data = res.results ?? res;
       setProducts(Array.isArray(data) ? data : []);
       console.log(products);
-      
     } catch (err: any) {
       console.error("fetchProducts error", err);
       toast.error(
@@ -200,11 +197,10 @@ export default function AdminProductsSection() {
       return [saved, ...prev];
     });
   };
-
   return (
     <div className="min-h-[70vh] p-6 bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        <div className="flex gap-2 w-full md:w-1/2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-1/2">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -284,26 +280,32 @@ export default function AdminProductsSection() {
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={7}
+                  className="p-6 text-center text-gray-500 dark:text-gray-400"
+                >
                   {language === "ar" ? "جاري التحميل..." : "Loading..."}
                 </td>
               </tr>
             ) : products.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                <td
+                  colSpan={7}
+                  className="p-6 text-center text-gray-500 dark:text-gray-400"
+                >
                   {language === "ar" ? "لا توجد منتجات" : "No products found"}
                 </td>
               </tr>
             ) : (
               products.map((p) => (
-                <tr 
-                  key={p.id} 
+                <tr
+                  key={p.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
                 >
                   <td className="px-4 py-3 whitespace-nowrap">
                     {p.primary_image ? (
                       <img
-                        src={ p.primary_image}
+                        src={p.primary_image}
                         alt={p.name}
                         className="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600"
                       />
@@ -324,13 +326,15 @@ export default function AdminProductsSection() {
                     EGP {Number(p.price).toFixed(2)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      p.stock > 10 
-                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" 
-                        : p.stock > 0 
-                        ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        p.stock > 10
+                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                          : p.stock > 0
+                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                      }`}
+                    >
                       {p.stock}
                     </span>
                   </td>
@@ -400,48 +404,74 @@ function ProductForm({
   const [name, setName] = useState(initial?.name ?? "");
   const [nameAr, setNameAr] = useState(initial?.name_ar ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
-  const [descriptionAr, setDescriptionAr] = useState(initial?.description_ar ?? "");
+  const [descriptionAr, setDescriptionAr] = useState(
+    initial?.description_ar ?? ""
+  );
   const [price, setPrice] = useState(initial?.price ?? 1);
-  const [comparePrice, setComparePrice] = useState<number | "">(initial?.compare_price ?? "");
-  const [costPrice, setCostPrice] = useState<number | "">(initial?.cost_price ?? "");
+  const [comparePrice, setComparePrice] = useState<number | "">(
+    initial?.compare_price ?? ""
+  );
+  const [costPrice, setCostPrice] = useState<number | "">(
+    initial?.cost_price ?? ""
+  );
   const [stock, setStock] = useState(initial?.stock ?? 0);
-  const [lowStockThreshold, setLowStockThreshold] = useState(initial?.low_stock_threshold ?? 10);
+  const [lowStockThreshold, setLowStockThreshold] = useState(
+    initial?.low_stock_threshold ?? 10
+  );
   const [barcode, setBarcode] = useState(initial?.barcode ?? "");
   const [weight, setWeight] = useState(initial?.weight ?? "");
   const [dimensions, setDimensions] = useState(initial?.dimensions ?? "");
-  const [categoryId, setCategoryId] = useState<number | "">(initial?.category?.id ?? "");
+  const [categoryId, setCategoryId] = useState<number | "">(
+    initial?.category?.id ?? ""
+  );
   const [brandId, setBrandId] = useState<number | "">(initial?.brand?.id ?? "");
-  const [productType, setProductType] = useState(initial?.product_type ?? "network-device");
+  const [productType, setProductType] = useState(
+    initial?.product_type ?? "network-device"
+  );
   const [isActive, setIsActive] = useState<boolean>(initial?.is_active ?? true);
-  const [isFeatured, setIsFeatured] = useState<boolean>(initial?.is_featured ?? false);
+  const [isFeatured, setIsFeatured] = useState<boolean>(
+    initial?.is_featured ?? false
+  );
   const [isDigital, setIsDigital] = useState(initial?.is_digital ?? false);
-  const [requiresShipping, setRequiresShipping] = useState(initial?.requires_shipping ?? true);
+  const [requiresShipping, setRequiresShipping] = useState(
+    initial?.requires_shipping ?? true
+  );
   const [metaTitle, setMetaTitle] = useState(initial?.meta_title ?? "");
-  const [metaDescription, setMetaDescription] = useState(initial?.meta_description ?? "");
+  const [metaDescription, setMetaDescription] = useState(
+    initial?.meta_description ?? ""
+  );
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [productRole, setProductRole] = useState(initial?.product_role ?? "tocart");
-  const { fetchProduct, createProduct, updateProduct } = useAuth()
-  const [specifications, setSpecifications] = useState(initial?.specifications ?? []);
+  const [productRole, setProductRole] = useState(
+    initial?.product_role ?? "tocart"
+  );
+  const { fetchProduct, createProduct, updateProduct } = useAuth();
+  const [specifications, setSpecifications] = useState(
+    initial?.specifications ?? []
+  );
   const [imageFile, setImageFile] = useState<File | null>(null);
-// إضافة صف جديد
-const addSpec = () => setSpecifications([...specifications, { name: "", value: "" ,id:0, name_ar: "", value_ar: "", sort_order:0}]);
-const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // إضافة صف جديد
+  const addSpec = () =>
+    setSpecifications([
+      ...specifications,
+      { name: "", value: "", id: 0, name_ar: "", value_ar: "", sort_order: 0 },
+    ]);
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
     setImageFile(f);
   };
-// تحديث صف
-const updateSpec = (index: number, key: 'name' | 'value', value: string) => {
-  const newSpecs = [...specifications];
-  newSpecs[index][key] = value;
-  setSpecifications(newSpecs);
-};
+  // تحديث صف
+  const updateSpec = (index: number, key: "name" | "value", value: string) => {
+    const newSpecs = [...specifications];
+    newSpecs[index][key] = value;
+    setSpecifications(newSpecs);
+  };
 
-// حذف صف
-const removeSpec = (index: number) => {
-  const newSpecs = [...specifications];
-  newSpecs.splice(index, 1);
-  setSpecifications(newSpecs);
-};
+  // حذف صف
+  const removeSpec = (index: number) => {
+    const newSpecs = [...specifications];
+    newSpecs.splice(index, 1);
+    setSpecifications(newSpecs);
+  };
 
   useEffect(() => {
     if (initial && initial.id) {
@@ -478,20 +508,19 @@ const removeSpec = (index: number) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
 
- const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = e.target.files ? Array.from(e.target.files) : [];
-  setImageFiles(files);
-};
-
+  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    setImageFiles(files);
+  };
 
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setSubmitting(true);
     try {
       const fd = new FormData();
-      imageFiles.forEach((file) => fd.append('images', file));
-fd.append('specifications', JSON.stringify(specifications));
-fd.append("name", name);
+      imageFiles.forEach((file) => fd.append("images", file));
+      fd.append("specifications", JSON.stringify(specifications));
+      fd.append("name", name);
       if (nameAr) fd.append("name_ar", nameAr);
       if (description) fd.append("description", description);
       if (descriptionAr) fd.append("description_ar", descriptionAr);
@@ -513,10 +542,12 @@ fd.append("name", name);
       fd.append("product_role", productRole);
       if (metaTitle) fd.append("meta_title", metaTitle);
       if (metaDescription) fd.append("meta_description", metaDescription);
-       if (imageFile) fd.append("image", imageFile);
+      if (imageFile) fd.append("image", imageFile);
       console.log(fd);
-      
-      const res = initial?.id ? await updateProduct(initial.id, fd) : await createProduct(fd);
+
+      const res = initial?.id
+        ? await updateProduct(initial.id, fd)
+        : await createProduct(fd);
 
       const saved = res;
       const normalized: ProductListItem = {
@@ -537,7 +568,9 @@ fd.append("name", name);
       onSaved(normalized);
     } catch (err: any) {
       console.error("save product error", err);
-      const msg = err?.response?.data || (language === "ar" ? "فشل الحفظ" : "Save failed");
+      const msg =
+        err?.response?.data ||
+        (language === "ar" ? "فشل الحفظ" : "Save failed");
       toast.error(typeof msg === "string" ? msg : JSON.stringify(msg));
     } finally {
       setSubmitting(false);
@@ -561,7 +594,12 @@ fd.append("name", name);
               ? "إضافة منتج"
               : "Add product"}
           </h3>
-          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">✕</button>
+          <button
+            onClick={onClose}
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          >
+            ✕
+          </button>
         </div>
 
         <form onSubmit={submit} className="grid grid-cols-1 gap-4">
@@ -569,371 +607,436 @@ fd.append("name", name);
           {/* مثال: */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">{language === "ar" ? "اسم المنتج (إنجليزي)" : "Name"}</label>
-              <input required value={name} onChange={e => setName(e.target.value)} className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "اسم المنتج (إنجليزي)" : "Name"}
+              </label>
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">{language === "ar" ? "اسم المنتج (عربي)" : "Name (AR)"}</label>
-              <input value={nameAr} onChange={e => setNameAr(e.target.value)} className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "اسم المنتج (عربي)" : "Name (AR)"}
+              </label>
+              <input
+                value={nameAr}
+                onChange={(e) => setNameAr(e.target.value)}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             </div>
           </div>
-              {/* الوصف بالإنجليزي والعربي */}
-<div className="grid grid-cols-1 gap-4">
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "الوصف (إنجليزي)" : "Description"}
-    </label>
-    <textarea
-      value={description}
-      onChange={(e) => setDescription(e.target.value)}
-      rows={3}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+          {/* الوصف بالإنجليزي والعربي */}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوصف (إنجليزي)" : "Description"}
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "الوصف (عربي)" : "Description (AR)"}
-    </label>
-    <textarea
-      value={descriptionAr}
-      onChange={(e) => setDescriptionAr(e.target.value)}
-      rows={3}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
-</div>
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
-  </label>
-  <input type="file" accept="image/*" onChange={handleFile} />
-  {imageFile && (
-    <span className="text-sm mt-1 text-gray-600 dark:text-gray-400">{imageFile.name}</span>
-  )}
-</div>
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوصف (عربي)" : "Description (AR)"}
+              </label>
+              <textarea
+                value={descriptionAr}
+                onChange={(e) => setDescriptionAr(e.target.value)}
+                rows={3}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
+            </label>
+            <input type="file" accept="image/*" onChange={handleFile} />
+            {imageFile && (
+              <span className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+                {imageFile.name}
+              </span>
+            )}
+          </div>
 
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "الفئة" : "Category"}
-  </label>
-  {categories ? (
-    <select
-      value={categoryId}
-      onChange={(e) => setCategoryId(Number(e.target.value))}
-      required
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    >
-      <option value="">
-        {language === "ar" ? "اختر فئة" : "Select category"}
-      </option>
-      {categories.map((c) => (
-        <option key={c.id} value={c.id}>
-          {c.name}
-        </option>
-      ))}
-    </select>
-  ) : (
-    <input
-      value={categoryId as any}
-      onChange={(e) =>
-        setCategoryId(e.target.value === "" ? "" : Number(e.target.value))
-      }
-      placeholder={language === "ar" ? "رقم الفئة" : "Category ID"}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  )}
-</div>
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "البراند" : "Brand"}
-  </label>
-  {brands ? (
-    <select
-      value={brandId}
-      onChange={(e) => setBrandId(e.target.value === "" ? "" : Number(e.target.value))}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    >
-      <option value="">
-        {language === "ar" ? "اختر براند (اختياري)" : "Select brand (optional)"}
-      </option>
-      {brands.map((b) => (
-        <option key={b.id} value={b.id}>
-          {b.name}
-        </option>
-      ))}
-    </select>
-  ) : (
-    <input
-      value={brandId as any}
-      onChange={(e) =>
-        setBrandId(e.target.value === "" ? "" : Number(e.target.value))
-      }
-      placeholder={language === "ar" ? "رقم البراند (اختياري)" : "Brand ID (optional)"}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  )}
-</div>
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "نوع المنتج" : "Product Type"}
-  </label>
-  <select
-    value={productType}
-    onChange={(e) => setProductType(e.target.value)}
-    className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  >
-    <option value="network-device">{language === "ar" ? "جهاز شبكات" : "Network Device"}</option>
-    <option value="software-license">{language === "ar" ? "ترخيص برمجي" : "Software License"}</option>
-    <option value="installation-service">{language === "ar" ? "خدمة تركيب" : "Installation Service"}</option>
-  </select>
-</div>
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "دور المنتج" : "Product Role"}
-  </label>
-  <select
-    value={productRole}
-    onChange={(e) => setProductRole(e.target.value)}
-    className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  >
-    <option value="tocart">{language === "ar" ? "الي السله" : "To Cart"}</option>
-    <option value="toform">{language === "ar" ? "املا قائمة" : "To Form"}</option>
-    
-  </select>
-</div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "الفئة" : "Category"}
+            </label>
+            {categories ? (
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(Number(e.target.value))}
+                required
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">
+                  {language === "ar" ? "اختر فئة" : "Select category"}
+                </option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                value={categoryId as any}
+                onChange={(e) =>
+                  setCategoryId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                placeholder={language === "ar" ? "رقم الفئة" : "Category ID"}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            )}
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "البراند" : "Brand"}
+            </label>
+            {brands ? (
+              <select
+                value={brandId}
+                onChange={(e) =>
+                  setBrandId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">
+                  {language === "ar"
+                    ? "اختر براند (اختياري)"
+                    : "Select brand (optional)"}
+                </option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                value={brandId as any}
+                onChange={(e) =>
+                  setBrandId(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                placeholder={
+                  language === "ar"
+                    ? "رقم البراند (اختياري)"
+                    : "Brand ID (optional)"
+                }
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            )}
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "نوع المنتج" : "Product Type"}
+            </label>
+            <select
+              value={productType}
+              onChange={(e) => setProductType(e.target.value)}
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="network-device">
+                {language === "ar" ? "جهاز شبكات" : "Network Device"}
+              </option>
+              <option value="software-license">
+                {language === "ar" ? "ترخيص برمجي" : "Software License"}
+              </option>
+              <option value="installation-service">
+                {language === "ar" ? "خدمة تركيب" : "Installation Service"}
+              </option>
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "دور المنتج" : "Product Role"}
+            </label>
+            <select
+              value={productRole}
+              onChange={(e) => setProductRole(e.target.value)}
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="tocart">
+                {language === "ar" ? "الي السله" : "To Cart"}
+              </option>
+              <option value="toform">
+                {language === "ar" ? "املا قائمة" : "To Form"}
+              </option>
+            </select>
+          </div>
 
+          <div className="grid grid-cols-1 gap-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "مواصفات المنتج" : "Product Specifications"}
+            </label>
 
-  
+            {specifications.map((spec, idx) => (
+              <div key={idx} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder={language === "ar" ? "اسم" : "Name"}
+                  value={spec.name}
+                  onChange={(e) => updateSpec(idx, "name", e.target.value)}
+                  className="p-2 border rounded flex-1"
+                />
+                <input
+                  type="text"
+                  placeholder={language === "ar" ? "القيمة" : "Value"}
+                  value={spec.value}
+                  onChange={(e) => updateSpec(idx, "value", e.target.value)}
+                  className="p-2 border rounded flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeSpec(idx)}
+                  className="px-2 bg-red-500 text-white rounded"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
 
-<div className="grid grid-cols-1 gap-2">
-  <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "مواصفات المنتج" : "Product Specifications"}
-  </label>
-
-  {specifications.map((spec, idx) => (
-    <div key={idx} className="flex gap-2">
-      <input
-        type="text"
-        placeholder={language === "ar" ? "اسم" : "Name"}
-        value={spec.name}
-        onChange={(e) => updateSpec(idx, 'name', e.target.value)}
-        className="p-2 border rounded flex-1"
-      />
-      <input
-        type="text"
-        placeholder={language === "ar" ? "القيمة" : "Value"}
-        value={spec.value}
-        onChange={(e) => updateSpec(idx, 'value', e.target.value)}
-        className="p-2 border rounded flex-1"
-      />
-      <button type="button" onClick={() => removeSpec(idx)} className="px-2 bg-red-500 text-white rounded">
-        ×
-      </button>
-    </div>
-  ))}
-
-  <button type="button" onClick={addSpec} className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">
-    {language === "ar" ? "أضف مواصفة" : "Add Specification"}
-  </button>
-</div>
-
+            <button
+              type="button"
+              onClick={addSpec}
+              className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
+            >
+              {language === "ar" ? "أضف مواصفة" : "Add Specification"}
+            </button>
+          </div>
 
           {/* باقي الحقول (description, descriptionAr, price, compare_price, cost_price ...) بنفس أسلوب المدخلات السابقة */}
           {/* الصورة */}
           <div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "الصور" : "Images"}
-  </label>
-  <input type="file" accept="image/*" multiple onChange={handleFiles} />
-  {imageFiles.length > 0 && (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {imageFiles.map((file, index) => (
-        <span
-          key={index}
-          className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-1 rounded"
-        >
-          {file.name}
-        </span>
-      ))}
-    </div>
-  )}
-</div>
-{/* السعر والمخزون */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-  {/* Price */}
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "السعر" : "Price"}
-    </label>
-    <input
-      required
-      type="number"
-      step="0.01"
-      value={price}
-      onChange={(e) => setPrice(Number(e.target.value))}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "الصور" : "Images"}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFiles}
+            />
+            {imageFiles.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {imageFiles.map((file, index) => (
+                  <span
+                    key={index}
+                    className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-1 rounded"
+                  >
+                    {file.name}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* السعر والمخزون */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Price */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "السعر" : "Price"}
+              </label>
+              <input
+                required
+                type="number"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-  {/* Stock */}
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "المخزون" : "Stock"}
-    </label>
-    <input
-      type="number"
-      value={stock}
-      onChange={(e) => setStock(Number(e.target.value))}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+            {/* Stock */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "المخزون" : "Stock"}
+              </label>
+              <input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(Number(e.target.value))}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-  {/* Low stock threshold */}
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "حد التحذير من نقص المخزون" : "Low Stock Threshold"}
-    </label>
-    <input
-      type="number"
-      value={lowStockThreshold}
-      onChange={(e) => setLowStockThreshold(Number(e.target.value))}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
-</div>
-
+            {/* Low stock threshold */}
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar"
+                  ? "حد التحذير من نقص المخزون"
+                  : "Low Stock Threshold"}
+              </label>
+              <input
+                type="number"
+                value={lowStockThreshold}
+                onChange={(e) => setLowStockThreshold(Number(e.target.value))}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "سعر المقارنة" : "Compare Price"}
-    </label>
-    <input
-      type="number"
-      step="0.01"
-      value={comparePrice as any}
-      onChange={(e) =>
-        setComparePrice(e.target.value === "" ? "" : Number(e.target.value))
-      }
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "سعر المقارنة" : "Compare Price"}
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={comparePrice as any}
+                onChange={(e) =>
+                  setComparePrice(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "سعر التكلفة" : "Cost Price"}
-    </label>
-    <input
-      type="number"
-      step="0.01"
-      value={costPrice as any}
-      onChange={(e) =>
-        setCostPrice(e.target.value === "" ? "" : Number(e.target.value))
-      }
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
-</div>
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "سعر التكلفة" : "Cost Price"}
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={costPrice as any}
+                onChange={(e) =>
+                  setCostPrice(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الباركود" : "Barcode"}
+              </label>
+              <input
+                type="text"
+                value={barcode}
+                onChange={(e) => setBarcode(e.target.value)}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "الباركود" : "Barcode"}
-    </label>
-    <input
-      type="text"
-      value={barcode}
-      onChange={(e) => setBarcode(e.target.value)}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوزن" : "Weight"}
+              </label>
+              <input
+                type="text"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "الوزن" : "Weight"}
-    </label>
-    <input
-      type="text"
-      value={weight}
-      onChange={(e) => setWeight(e.target.value)}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
+            <div className="flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الأبعاد" : "Dimensions"}
+              </label>
+              <input
+                type="text"
+                value={dimensions}
+                onChange={(e) => setDimensions(e.target.value)}
+                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isDigital}
+                onChange={(e) => setIsDigital(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label className="text-sm text-gray-700 dark:text-gray-300">
+                {language === "ar" ? "رقمي" : "Digital"}
+              </label>
+            </div>
 
-  <div className="flex flex-col">
-    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-      {language === "ar" ? "الأبعاد" : "Dimensions"}
-    </label>
-    <input
-      type="text"
-      value={dimensions}
-      onChange={(e) => setDimensions(e.target.value)}
-      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-  </div>
-</div>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-  <div className="flex items-center gap-2">
-    <input
-      type="checkbox"
-      checked={isDigital}
-      onChange={(e) => setIsDigital(e.target.checked)}
-      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-    />
-    <label className="text-sm text-gray-700 dark:text-gray-300">
-      {language === "ar" ? "رقمي" : "Digital"}
-    </label>
-  </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={requiresShipping}
+                onChange={(e) => setRequiresShipping(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label className="text-sm text-gray-700 dark:text-gray-300">
+                {language === "ar" ? "يحتاج شحن" : "Requires Shipping"}
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "عنوان الميتا" : "Meta Title"}
+            </label>
+            <input
+              type="text"
+              value={metaTitle}
+              onChange={(e) => setMetaTitle(e.target.value)}
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
-  <div className="flex items-center gap-2">
-    <input
-      type="checkbox"
-      checked={requiresShipping}
-      onChange={(e) => setRequiresShipping(e.target.checked)}
-      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-    />
-    <label className="text-sm text-gray-700 dark:text-gray-300">
-      {language === "ar" ? "يحتاج شحن" : "Requires Shipping"}
-    </label>
-  </div>
-</div>
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "عنوان الميتا" : "Meta Title"}
-  </label>
-  <input
-    type="text"
-    value={metaTitle}
-    onChange={(e) => setMetaTitle(e.target.value)}
-    className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  />
-</div>
-
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "وصف الميتا" : "Meta Description"}
-  </label>
-  <textarea
-    value={metaDescription}
-    onChange={(e) => setMetaDescription(e.target.value)}
-    rows={2}
-    className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  />
-</div>
-
-
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "وصف الميتا" : "Meta Description"}
+            </label>
+            <textarea
+              value={metaDescription}
+              onChange={(e) => setMetaDescription(e.target.value)}
+              rows={2}
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
           {/* أزرار الحفظ والإلغاء */}
           <div className="flex justify-end gap-3 mt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200">{language === "ar" ? "إلغاء" : "Cancel"}</button>
-            <button type="submit" disabled={submitting} className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">{submitting ? (language === "ar" ? "جاري الحفظ..." : "Saving...") : (language === "ar" ? "حفظ" : "Save")}</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+            >
+              {language === "ar" ? "إلغاء" : "Cancel"}
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            >
+              {submitting
+                ? language === "ar"
+                  ? "جاري الحفظ..."
+                  : "Saving..."
+                : language === "ar"
+                ? "حفظ"
+                : "Save"}
+            </button>
           </div>
         </form>
       </motion.div>
     </div>
   );
 }
-
-

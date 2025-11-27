@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { StarIcon } from "@heroicons/react/24/solid";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useApi } from "../hooks/useApi";
 
@@ -14,7 +13,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
   const { data: products, loading } = useApi(
     `/products/${productSlug}/related/`
   );
-  
+  console.log(products);
   if (loading) {
     return (
       <div className="py-12">
@@ -50,7 +49,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
               <div className="aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden">
                 <img
                   src={
-                   product.primary_image ||
+                    product.primary_image ||
                     product.images?.image ||
                     "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                   }
