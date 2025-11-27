@@ -14,6 +14,7 @@ interface AuthContextType {
   // Add product endpoints
   myorders: (page:any) => Promise<any>;
   fetchServices: () => Promise<any[]>;
+  fetchRelatedProducts: (productSlug: string) => Promise<any[]>;
    fetchService: (slug: string | number) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
   fechorder: (order_number: string | number) => Promise<any>;
@@ -595,6 +596,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     }
   };
+  const fetchRelatedProducts=async (productSlug: string): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/${productSlug}/related/`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
+      const data = await handleApiResponse(response);
+      return data;    
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch related products"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);  
+    }
+  };
    const fetchServices=async (): Promise<any> => {
     setIsLoading(true);
     try {
@@ -630,6 +652,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isInitializing,
         createService,
         fetchProducts,
+        fetchRelatedProducts,
         fetchorders,
         updateorders,
         fechorder,

@@ -35,17 +35,52 @@ type Brand = { id: number; name: string };
 type ProductListItem = {
   id: number;
   name: string;
-  name_ar?: string;
-  price: number;
-  compare_price?: number | null;
+  name_ar: string | null;
+  description: string;
+  description_ar: string | null;
+  slug: string;
+  price: string; // لأن القيمة وصلت كنص "1.00"
+  compare_price: string | null;
+  cost_price: string | null;
   stock: number;
-  category_name?: string;
-  brand_name?: string | null;
-  primary_image?: string | null;
-  is_active?: boolean;
-  is_featured?: boolean;
-  slug?: string;
+  low_stock_threshold: number;
+  sku: string;
+  barcode: string | null;
+  weight: string | null;
+  dimensions: string | null;
+  category: Category | null;
+  brand: Brand | null;
+  product_type: string;
+  product_role: string;
+  image: string | null;
+  meta_title: string | null;
+  meta_description: string | null;
+  is_active: boolean;
+  is_featured: boolean;
+  is_digital: boolean;
+  requires_shipping: boolean;
+  average_rating: string;
+  review_count: number;
+  images: {
+    id: number;
+    image: string;
+    alt_text?: string | null;
+  }[];
+  specifications: {
+    id: number;
+    name: string;
+    name_ar: string;
+    value: string;
+    value_ar: string;
+    sort_order: number;
+  }[];
+  discount_percentage: number;
+  is_in_stock: boolean;
+  is_low_stock: boolean;
+  created_at: string;
+  updated_at: string;
 };
+
 
 // const API_BASE = '/api/admin/products/' // list
 // const CREATE_ENDPOINT = '/api/admin/products/create/'
@@ -344,7 +379,8 @@ export default function AdminProductsSection() {
  * ProductForm - handles create & update
  * - expects initial to be ProductListItem or null
  * - posts multipart/form-data to CREATE_ENDPOINT or PUT to update endpoint
- */function ProductForm({
+ */
+function ProductForm({
   onClose,
   onSaved,
   initial,
@@ -383,9 +419,29 @@ export default function AdminProductsSection() {
   const [metaTitle, setMetaTitle] = useState(initial?.meta_title ?? "");
   const [metaDescription, setMetaDescription] = useState(initial?.meta_description ?? "");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [productRole, setProductRole] = useState<string>("tocart");
+  const [productRole, setProductRole] = useState(initial?.product_role ?? "tocart");
+  const { fetchProduct, createProduct, updateProduct } = useAuth()
+  const [specifications, setSpecifications] = useState(initial?.specifications ?? []);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+// إضافة صف جديد
+const addSpec = () => setSpecifications([...specifications, { name: "", value: "" ,id:0, name_ar: "", value_ar: "", sort_order:0}]);
+const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setImageFile(f);
+  };
+// تحديث صف
+const updateSpec = (index: number, key: 'name' | 'value', value: string) => {
+  const newSpecs = [...specifications];
+  newSpecs[index][key] = value;
+  setSpecifications(newSpecs);
+};
 
-  const { fetchProduct, createProduct, updateProduct } = useAuth();
+// حذف صف
+const removeSpec = (index: number) => {
+  const newSpecs = [...specifications];
+  newSpecs.splice(index, 1);
+  setSpecifications(newSpecs);
+};
 
   useEffect(() => {
     if (initial && initial.id) {
@@ -411,6 +467,7 @@ export default function AdminProductsSection() {
           setRequiresShipping(data.requires_shipping ?? true);
           setMetaTitle(data.meta_title ?? "");
           setMetaDescription(data.meta_description ?? "");
+
           if (data.category?.id) setCategoryId(data.category.id);
           if (data.brand?.id) setBrandId(data.brand.id);
         } catch (e) {
@@ -432,7 +489,9 @@ export default function AdminProductsSection() {
     setSubmitting(true);
     try {
       const fd = new FormData();
-      fd.append("name", name);
+      imageFiles.forEach((file) => fd.append('images', file));
+fd.append('specifications', JSON.stringify(specifications));
+fd.append("name", name);
       if (nameAr) fd.append("name_ar", nameAr);
       if (description) fd.append("description", description);
       if (descriptionAr) fd.append("description_ar", descriptionAr);
@@ -451,12 +510,12 @@ export default function AdminProductsSection() {
       fd.append("is_featured", String(Number(isFeatured)));
       fd.append("is_digital", String(Number(isDigital)));
       fd.append("requires_shipping", String(Number(requiresShipping)));
+      fd.append("product_role", productRole);
       if (metaTitle) fd.append("meta_title", metaTitle);
       if (metaDescription) fd.append("meta_description", metaDescription);
-      imageFiles.forEach((file) => {
-  fd.append("images", file); // لاحظ الاسم images ليقبل الباك إند array
-});
-
+       if (imageFile) fd.append("image", imageFile);
+      console.log(fd);
+      
       const res = initial?.id ? await updateProduct(initial.id, fd) : await createProduct(fd);
 
       const saved = res;
@@ -544,6 +603,16 @@ export default function AdminProductsSection() {
     />
   </div>
 </div>
+<div className="flex flex-col">
+  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+    {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
+  </label>
+  <input type="file" accept="image/*" onChange={handleFile} />
+  {imageFile && (
+    <span className="text-sm mt-1 text-gray-600 dark:text-gray-400">{imageFile.name}</span>
+  )}
+</div>
+
 <div className="flex flex-col">
   <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
     {language === "ar" ? "الفئة" : "Category"}
@@ -635,6 +704,41 @@ export default function AdminProductsSection() {
 </div>
 
 
+  
+
+<div className="grid grid-cols-1 gap-2">
+  <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+    {language === "ar" ? "مواصفات المنتج" : "Product Specifications"}
+  </label>
+
+  {specifications.map((spec, idx) => (
+    <div key={idx} className="flex gap-2">
+      <input
+        type="text"
+        placeholder={language === "ar" ? "اسم" : "Name"}
+        value={spec.name}
+        onChange={(e) => updateSpec(idx, 'name', e.target.value)}
+        className="p-2 border rounded flex-1"
+      />
+      <input
+        type="text"
+        placeholder={language === "ar" ? "القيمة" : "Value"}
+        value={spec.value}
+        onChange={(e) => updateSpec(idx, 'value', e.target.value)}
+        className="p-2 border rounded flex-1"
+      />
+      <button type="button" onClick={() => removeSpec(idx)} className="px-2 bg-red-500 text-white rounded">
+        ×
+      </button>
+    </div>
+  ))}
+
+  <button type="button" onClick={addSpec} className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">
+    {language === "ar" ? "أضف مواصفة" : "Add Specification"}
+  </button>
+</div>
+
+
           {/* باقي الحقول (description, descriptionAr, price, compare_price, cost_price ...) بنفس أسلوب المدخلات السابقة */}
           {/* الصورة */}
           <div className="flex flex-col">
@@ -655,6 +759,50 @@ export default function AdminProductsSection() {
     </div>
   )}
 </div>
+{/* السعر والمخزون */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  {/* Price */}
+  <div className="flex flex-col">
+    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      {language === "ar" ? "السعر" : "Price"}
+    </label>
+    <input
+      required
+      type="number"
+      step="0.01"
+      value={price}
+      onChange={(e) => setPrice(Number(e.target.value))}
+      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+
+  {/* Stock */}
+  <div className="flex flex-col">
+    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      {language === "ar" ? "المخزون" : "Stock"}
+    </label>
+    <input
+      type="number"
+      value={stock}
+      onChange={(e) => setStock(Number(e.target.value))}
+      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+
+  {/* Low stock threshold */}
+  <div className="flex flex-col">
+    <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+      {language === "ar" ? "حد التحذير من نقص المخزون" : "Low Stock Threshold"}
+    </label>
+    <input
+      type="number"
+      value={lowStockThreshold}
+      onChange={(e) => setLowStockThreshold(Number(e.target.value))}
+      className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+</div>
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
   <div className="flex flex-col">
@@ -688,17 +836,7 @@ export default function AdminProductsSection() {
   </div>
 </div>
 
-<div className="flex flex-col">
-  <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-    {language === "ar" ? "حد المخزون المنخفض" : "Low Stock Threshold"}
-  </label>
-  <input
-    type="number"
-    value={lowStockThreshold}
-    onChange={(e) => setLowStockThreshold(Number(e.target.value))}
-    className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-  />
-</div>
+
 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <div className="flex flex-col">
     <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">

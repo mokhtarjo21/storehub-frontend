@@ -5,7 +5,7 @@ import AdminOrdersPage from "./Admin_orders_page";
 import AdminServicesSection from "./Services_section";
 import AdminBrandsSection from "./Brands_section";
 import AdminCategoriesSection from "./Categories_section";
-import AdminSidebar from  "./AdminSidebar";
+import AdminSidebar from  "./ AdminSidebar";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const AdminPanel: React.FC = () => {

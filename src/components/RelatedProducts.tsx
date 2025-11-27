@@ -14,7 +14,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
   const { data: products, loading } = useApi(
     `/products/${productSlug}/related/`
   );
-  const url = "http://192.168.1.7:8000";
+  
   if (loading) {
     return (
       <div className="py-12">
@@ -50,7 +50,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
               <div className="aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden">
                 <img
                   src={
-                    url + product.primary_image ||
+                   product.primary_image ||
                     product.images?.image ||
                     "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                   }
