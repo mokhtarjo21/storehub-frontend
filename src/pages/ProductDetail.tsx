@@ -8,6 +8,7 @@ import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
 import RelatedProducts from "../components/RelatedProducts";
 import CustomerFormModal from "../components/FormCart";
+
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -38,11 +39,11 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   const currentImage = carouselImages[selectedImage]?.image;
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col h-full">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full aspect-square bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="w-full flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden"
       >
         <img
           src={currentImage}
@@ -52,12 +53,12 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
       </motion.div>
 
       {carouselImages.length > 1 && (
-        <div className="flex flex-nowrap gap-2 overflow-x-hidden overflow-y-hidden">
+        <div className="flex gap-2 mt-2">
           {carouselImages.map((img, idx) => (
             <button
               key={img.id}
               onClick={() => setSelectedImage(idx)}
-              className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 transition-all overflow-hidden ${
+              className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
                 selectedImage === idx
                   ? "border-blue-600 scale-105"
                   : "border-gray-300 dark:border-gray-700 hover:border-gray-400"
@@ -66,7 +67,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
               <img
                 src={img.image}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </button>
           ))}
@@ -75,8 +76,6 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
     </div>
   );
 };
-
-// ----
 
 // ---------- Main ProductDetail Component ----------
 const ProductDetail: React.FC = () => {
@@ -87,7 +86,6 @@ const ProductDetail: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
 
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
-  console.log(product);
 
   if (loading) {
     return (
@@ -163,7 +161,6 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  // ---------- Handle Cart Click ----------
   const handleCartClick = () => {
     if (product.product_role === "tocart") {
       handleAddToCart();
@@ -210,73 +207,79 @@ const ProductDetail: React.FC = () => {
         </motion.div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
-          <ProductImageCarousel
-            images={product.images}
-            mainImage={product.image}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-10 lg:gap-x-14">
+          {/* العمود الأول: الصور */}
+          <div>
+            <ProductImageCarousel
+              images={product.images}
+              mainImage={product.image}
+            />
+          </div>
 
-          {/* Product Info */}
+          {/* العمود الثاني: كل شيء آخر */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
+            className="space-y-4 flex flex-col"
           >
+            {/* الاسم والوصف */}
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white leading-snug">
               {language === "ar"
                 ? product.name_ar || product.name
                 : product.name}
             </h1>
-
-            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed break-words">
               {language === "ar"
                 ? product.description_ar || product.description
                 : product.description}
             </p>
 
-            {/* Price */}
-            <div className="flex items-end gap-3 mt-4">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                {language === "ar" ? "جنية" : "EGP"}{" "}
-                {parseFloat(product.price).toLocaleString()}
-              </span>
-
-              {product.compare_price && (
-                <span className="text-xl line-through text-gray-400 dark:text-gray-500">
-                  {parseFloat(product.compare_price).toLocaleString()}
+            {/* السعر + الخصم + حالة المخزون */}
+            <div className="flex flex-wrap items-center justify-between mt-4 gap-4">
+              {/* السعر والخصم */}
+              <div className="flex items-end gap-3">
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                  {language === "ar" ? "جنية" : "EGP"}{" "}
+                  {parseFloat(product.price).toLocaleString()}
                 </span>
-              )}
+                {product.compare_price && (
+                  <span className="text-xl line-through text-gray-400 dark:text-gray-500">
+                    {parseFloat(product.compare_price).toLocaleString()}
+                  </span>
+                )}
+                {product.discount_percentage > 0 && (
+                  <span className="text-lg font-semibold px-3 py-1 rounded-lg bg-[#44B3E1]/10 text-[#44B3E1]">
+                    {product.discount_percentage}%{" "}
+                    {language === "ar" ? "خصم" : "Off"}
+                  </span>
+                )}
+              </div>
 
-              {product.discount_percentage > 0 && (
-                <span className="text-xl font-semibold px-2 py-1 rounded bg-[#44B3E1]/10 text-[#44B3E1]">
-                  {product.discount_percentage}%{" "}
-                  {language === "ar" ? "خصم" : "Off"}
-                </span>
-              )}
+              {/* حالة المخزون */}
+              <div className="flex items-center gap-2">
+                {product.stock > 0 ? (
+                  <>
+                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
+                    <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
+                      {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
+                      {product.stock}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span className="text-red-600 dark:text-red-400 font-medium">
+                      {language === "ar"
+                        ? "غير متوفر في المخزون"
+                        : "Out of Stock"}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Stock */}
-            <div className="flex items-center space-x-2 rtl:space-x-reverse pt-2">
-              {product.stock > 0 ? (
-                <>
-                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
-                  <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                    {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
-                    {product.stock}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-red-500 font-medium text-sm">
-                    {language === "ar" ? "غير متوفر" : "Out of Stock"}
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* Quantity + Cart */}
-            <div className="flex items-center gap-3 pt-4">
+            {/* المخزون + الكمية + زر السلة */}
+            <div className="flex items-center gap-3 pt-3">
               <button
                 onClick={() => {
                   if (quantity <= 1)
@@ -291,11 +294,9 @@ const ProductDetail: React.FC = () => {
               >
                 -
               </button>
-
               <span className="px-5 py-2 border rounded-lg bg-white dark:bg-gray-100 text-sm">
                 {quantity}
               </span>
-
               <button
                 onClick={() => {
                   if (quantity >= maxQuantity)
@@ -313,156 +314,126 @@ const ProductDetail: React.FC = () => {
 
               <button
                 onClick={handleCartClick}
-                disabled={product.product_role === "tocart" && maxQuantity <= 0} // تعطيل فقط للـ tocart حسب المخزون
+                disabled={product.product_role === "tocart" && maxQuantity <= 0}
                 className={`flex-1 py-3 rounded-xl text-white font-medium shadow-md transition-all flex items-center justify-center gap-2 ${
                   product.product_role === "tocart"
                     ? maxQuantity > 0
                       ? "bg-[#155F82] hover:bg-[#124b66]"
                       : "bg-gray-400 cursor-not-allowed"
-                    : "bg-[#44B3E1] hover:bg-[#3399cc]" // لون مختلف للخدمة
+                    : "bg-[#44B3E1] hover:bg-[#3399cc]"
                 }`}
               >
                 <ShoppingCartIcon className="w-5 h-5" />
-                {
-                  product.product_role === "tocart"
-                    ? maxQuantity > 0
-                      ? t("products.addToCart")
-                      : t("products.outOfStock")
-                    : t(
-                        "services.requestService"
-                      ) /* أضف هذا المفتاح في ملفات الترجمة */
-                }
+                {product.product_role === "tocart"
+                  ? maxQuantity > 0
+                    ? t("products.addToCart")
+                    : t("products.outOfStock")
+                  : t("services.requestService")}
               </button>
+            </div>
+
+            {/* ---------- Professional Specs Card ---------- */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {/* عنوان الكرت */}
+              <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-center text-gray-900 dark:text-white">
+                  {language === "ar" ? "بيانات المنتج" : "Product Details"}
+                </h2>
+              </div>
+
+              {/* الجدول */}
+              <table className="w-full text-sm text-gray-700 dark:text-gray-300">
+                <tbody>
+                  {/* الفئة */}
+                  {product.category &&
+                    (product.category.name || product.category.name_ar) && (
+                      <tr className="transition-all hover:bg-blue-50 dark:hover:bg-gray-700">
+                        <td className="py-3 px-5 font-medium w-1/3 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                          {language === "ar" ? "الفئة" : "Category"}
+                        </td>
+                        <td className="py-3 px-5 border-b border-gray-200 dark:border-gray-700">
+                          {language === "ar"
+                            ? product.category.name_ar || product.category.name
+                            : product.category.name}
+                        </td>
+                      </tr>
+                    )}
+                  {/* مواصفات المنتج */}
+                  {product.specifications
+                    ?.filter((spec) =>
+                      language === "ar"
+                        ? spec.value_ar || spec.name_ar
+                        : spec.value || spec.name
+                    )
+                    .map((spec: any, i: number) => (
+                      <tr
+                        key={spec.id}
+                        className={`transition-all ${
+                          i % 2 === 0
+                            ? "bg-gray-50 dark:bg-gray-800/50"
+                            : "bg-white dark:bg-gray-800"
+                        } hover:bg-blue-50 dark:hover:bg-gray-700`}
+                      >
+                        <td className="py-3 px-5 font-medium w-1/3 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                          {language === "ar" && spec.name_ar
+                            ? spec.name_ar
+                            : spec.name}
+                        </td>
+                        <td className="py-3 px-5 border-b border-gray-200 dark:border-gray-700">
+                          {language === "ar" && spec.value_ar
+                            ? spec.value_ar
+                            : spec.value}
+                        </td>
+                      </tr>
+                    ))}
+                  {/* معلومات إضافية */}
+                  {[
+                    {
+                      label: language === "ar" ? "باركود" : "Barcode",
+                      value: product.barcode,
+                    },
+                    {
+                      label: language === "ar" ? "النوع" : "Type",
+                      value: product.product_type,
+                    },
+                    {
+                      label: language === "ar" ? "الدور" : "Role",
+                      value: product.product_role,
+                    },
+                    {
+                      label: language === "ar" ? "الوزن" : "Weight",
+                      value: product.weight,
+                    },
+                    {
+                      label: language === "ar" ? "الأبعاد" : "Dimensions",
+                      value: product.dimensions,
+                    },
+                  ]
+                    .filter((item) => item.value) // هنا نتأكد إن القيمة موجودة قبل العرض
+                    .map((item, i) => (
+                      <tr
+                        key={i}
+                        className={`transition-all ${
+                          i % 2 === 0
+                            ? "bg-gray-50 dark:bg-gray-800/50"
+                            : "bg-white dark:bg-gray-800"
+                        } hover:bg-blue-50 dark:hover:bg-gray-700`}
+                      >
+                        <td className="py-3 px-5 font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                          {item.label}
+                        </td>
+                        <td className="py-3 px-5 border-b border-gray-200 dark:border-gray-700">
+                          {item.value}
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
             </div>
           </motion.div>
         </div>
 
-        {/* ---------- Full Product Details ---------- */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-12 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 space-y-6"
-        >
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            {language === "ar" ? "تفاصيل المنتج" : "Product Details"}
-          </h2>
-
-          {/* Specifications */}
-          {product.specifications?.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                {language === "ar" ? "المواصفات" : "Specifications"}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {product.specifications.map((spec: any) => (
-                  <div
-                    key={spec.id}
-                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600"
-                  >
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {language === "ar" && spec.name_ar
-                        ? spec.name_ar
-                        : spec.name}
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
-                      {language === "ar" && spec.value_ar
-                        ? spec.value_ar
-                        : spec.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Category */}
-          {product.category && (
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                {language === "ar" ? "الفئة" : "Category"}
-              </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <p className="text-gray-600 dark:text-gray-300">
-                  <span className="font-medium">
-                    {language === "ar" ? "الاسم:" : "Name:"}
-                  </span>{" "}
-                  {language === "ar"
-                    ? product.category.name_ar || product.category.name
-                    : product.category.name}
-                </p>
-                <p className="text-gray-600 dark:text-gray-300">
-                  <span className="font-medium">
-                    {language === "ar" ? "الوصف:" : "Description:"}
-                  </span>{" "}
-                  {language === "ar"
-                    ? product.category.description_ar ||
-                      product.category.description
-                    : product.category.description}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Additional Info */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              {language === "ar" ? "بيانات إضافية" : "Additional Info"}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <InfoItem label="SKU" value={product.sku} />
-              <InfoItem
-                label={language === "ar" ? "الباركود" : "Barcode"}
-                value={product.barcode}
-              />
-              <InfoItem
-                label={language === "ar" ? "النوع" : "Type"}
-                value={product.product_type}
-              />
-              <InfoItem
-                label={language === "ar" ? "الدور" : "Role"}
-                value={product.product_role}
-              />
-              <InfoItem
-                label={language === "ar" ? "متوفر؟" : "In Stock?"}
-                value={product.is_in_stock ? "Yes" : "No"}
-              />
-              <InfoItem
-                label={language === "ar" ? "مخزون منخفض؟" : "Low Stock?"}
-                value={product.is_low_stock ? "Yes" : "No"}
-              />
-              <InfoItem
-                label={language === "ar" ? "السعر السابق" : "Compare Price"}
-                value={product.compare_price || "-"}
-              />
-              <InfoItem
-                label={language === "ar" ? "الوزن" : "Weight"}
-                value={product.weight || "-"}
-              />
-              <InfoItem
-                label={language === "ar" ? "الأبعاد" : "Dimensions"}
-                value={product.dimensions || "-"}
-              />
-            </div>
-          </div>
-
-          {/* Dates */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
-              {language === "ar" ? "التواريخ" : "Dates"}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <InfoItem
-                label={language === "ar" ? "تاريخ الإنشاء" : "Created At"}
-                value={new Date(product.created_at).toLocaleString()}
-              />
-              <InfoItem
-                label={language === "ar" ? "آخر تحديث" : "Updated At"}
-                value={new Date(product.updated_at).toLocaleString()}
-              />
-            </div>
-          </div>
-        </motion.div>
-
+        {/* Related Products */}
         <div className="pt-12">
           {slug && <RelatedProducts productSlug={slug} />}
         </div>
