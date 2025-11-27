@@ -46,6 +46,8 @@ const Products: React.FC = () => {
       if (selectedBrand) params.brand = selectedBrand;
 
       const productsData = await fetchProducts(params);
+      console.log(productsData);
+      
       setProducts(productsData.results ?? productsData);
     } catch (err) {
       console.error(err);

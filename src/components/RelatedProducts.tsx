@@ -10,6 +10,7 @@ interface RelatedProductsProps {
 
 const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
   const { language } = useLanguage();
+  const url="http://192.168.1.7:8000"
   const { data: products, loading } = useApi(
     `/products/${productSlug}/related/`
   );
@@ -49,7 +50,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
               <div className="aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden">
                 <img
                   src={
-                    product.primary_image ||
+                   url+ product.image ||
                     product.images?.image ||
                     "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                   }
