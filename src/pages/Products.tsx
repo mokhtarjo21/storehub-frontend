@@ -49,7 +49,9 @@ const Products: React.FC = () => {
       setProducts(productsData.results ?? productsData);
     } catch (err) {
       console.error(err);
-      toast.error(language === "ar" ? "فشل في جلب المنتجات" : "Failed to load products");
+      toast.error(
+        language === "ar" ? "فشل في جلب المنتجات" : "Failed to load products"
+      );
     } finally {
       setLoading(false);
     }
@@ -135,7 +137,6 @@ const Products: React.FC = () => {
       addItem(cartProduct, quantityToAdd);
       trackAddToCart(product.id.toString(), product.name, product.product_type);
       setQuantity(1);
-      
     };
 
     const handleCartClick = () => {
@@ -155,42 +156,61 @@ const Products: React.FC = () => {
                 product.primary_image ||
                 "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
               }
-              alt={language === "ar" ? product.name_ar || product.name : product.name}
+              alt={
+                language === "ar"
+                  ? product.name_ar || product.name
+                  : product.name
+              }
               className="h-full w-full object-fill"
             />
           </div>
         </Link>
 
         <div className="p-4">
+          {/* Product Title */}
           <Link to={`/products/${product.slug}`}>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
-              {language === "ar" ? product.name_ar || product.name : product.name}
+              {language === "ar"
+                ? product.name_ar || product.name
+                : product.name}
             </h3>
           </Link>
 
-          <div className="mt-2 flex items-center gap-2 rtl:space-x-reverse">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
-              {language === "ar" ? "جنية" : "EGP"}{" "}
+          {/* Price & Discount */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 rtl:space-x-reverse">
+            {/* Price */}
+            <span className="text-lg font-bold text-gray-900 dark:text-white">
+              {language === "ar" ? "جنيه" : "EGP"}{" "}
               {parseFloat(product.price).toLocaleString()}
             </span>
+
+            {/* Compare Price */}
             {product.compare_price &&
               parseFloat(product.compare_price) > parseFloat(product.price) && (
-                <span className="text-xl text-gray-500 dark:text-gray-400 line-through">
+                <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
                   {parseFloat(product.compare_price).toLocaleString()}
                 </span>
               )}
+
+            {/* Discount */}
             {product.discount_percentage > 0 && (
-              <span className="text-xl font-semibold pl-6 text-[#44B3E1] dark:text-[#44B3E1]">
-                {product.discount_percentage}% {language === "ar" ? "خصم" : "Off"}
+              <span className="text-sm font-semibold px-2 py-1 rounded bg-[#44B3E1]/10 text-[#44B3E1]">
+                {product.discount_percentage}%{" "}
+                {language === "ar" ? "خصم" : "Off"}
               </span>
             )}
           </div>
 
+          {/* Description */}
           <p className="text-gray-600 dark:text-gray-300 text-xs mt-2 line-clamp-2">
-            {language === "ar" ? product.description_ar || product.description : product.description}
+            {language === "ar"
+              ? product.description_ar || product.description
+              : product.description}
           </p>
 
-          <div className="flex items-center justify-between mt-4">
+          {/* Quantity & Add to Cart */}
+          <div className="flex items-center justify-between mt-5">
+            {/* Quantity Selector */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setQuantity((q) => Math.max(q - 1, 1))}
@@ -198,7 +218,11 @@ const Products: React.FC = () => {
               >
                 -
               </button>
-              <span className="px-3 py-1 border dark:bg-gray-100 border-gray-300 rounded text-sm">{quantity}</span>
+
+              <span className="px-3 py-1 text-sm text-gray-900 dark:text-gray-900 bg-white dark:bg-gray-100 border border-gray-300 rounded">
+                {quantity}
+              </span>
+
               <button
                 onClick={() => setQuantity((q) => Math.min(q + 1, maxQuantity))}
                 className="px-2 py-1 bg-gray-200 dark:bg-gray-300 rounded"
@@ -207,34 +231,36 @@ const Products: React.FC = () => {
               </button>
             </div>
 
-           <button
-  onClick={handleCartClick}
-  disabled={product.product_role === "tocart" && maxQuantity <= 0} // لو tocart فقط نطبق تعطيل حسب المخزون
-  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
-    product.product_role === "tocart"
-      ? maxQuantity <= 0
-        ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
-        : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white"
-      : "bg-[#44B3E1]/80 hover:bg-[#44B3E1]/90 text-white" // لون مختلف للخدمة
-  }`}
->
-  <ShoppingCartIcon className="w-5 h-5" />
-  {product.product_role === "tocart"
-    ? product.stock > 0
-      ? t("products.addToCart")
-      : t("products.outOfStock")
-    : t("services.requestService") /* لازم تضيف "requestService" في ملف الترجمة */}
-</button>
-
+            {/* Cart Button */}
+            <button
+              onClick={handleCartClick}
+              disabled={product.product_role === "tocart" && maxQuantity <= 0}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all whitespace-nowrap
+        ${
+          product.product_role === "tocart"
+            ? maxQuantity <= 0
+              ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed"
+              : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white"
+            : "bg-[#44B3E1]/80 hover:bg-[#44B3E1]/90 text-white m-1 text-sm"
+        }
+      `}
+            >
+              <ShoppingCartIcon className="w-5 h-5" />
+              {product.product_role === "tocart"
+                ? product.stock > 0
+                  ? t("products.addToCart")
+                  : t("products.outOfStock")
+                : t("services.requestService")}
+            </button>
           </div>
 
-          {/* Stock */}
-          <div className="flex items-center pt-4 space-x-2 rtl:space-x-reverse">
+          {/* Stock Indicator */}
+          <div className="flex items-center justify-center pt-4 gap-2">
             {product.stock > 0 ? (
               <>
                 <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
                 <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                  {language === "ar" ? "الكمية المتوفرة" : " In Stock"}{" "}
+                  {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
                   {product.stock}
                 </span>
               </>
@@ -335,7 +361,11 @@ const Products: React.FC = () => {
         </motion.div>
 
         {products.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
             <p className="text-lg text-gray-500 dark:text-gray-400">
               {loading
                 ? language === "ar"
@@ -348,21 +378,35 @@ const Products: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center mt-8">
+        <div className="flex justify-center items-center mt-8 gap-2">
+          {/* Previous */}
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 mx-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50"
+            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 
+               dark:text-gray-300 rounded-lg text-sm shadow 
+               disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {language === "ar" ? "السابق" : "Previous"}
           </button>
-          <span className="px-4 py-2 mx-1">
-            {language === "ar" ? `الصفحة ${currentPage}` : `Page ${currentPage}`}
+
+          {/* Page Number */}
+          <span
+            className="px-4 py-1.5 text-gray-800 
+               dark:text-gray-200 rounded-lg text-sm shadow"
+          >
+            {language === "ar"
+              ? `الصفحة ${currentPage}`
+              : `Page ${currentPage}`}
           </span>
+
+          {/* Next */}
           <button
             onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="px-4 py-2 mx-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+            disabled={products.length < pageSize}
+            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 
+     dark:text-gray-300 rounded-lg text-sm shadow 
+     disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {language === "ar" ? "التالي" : "Next"}
           </button>
@@ -382,7 +426,8 @@ const Products: React.FC = () => {
               name: formProduct.name,
               nameAr: formProduct.name_ar || formProduct.name,
               description: formProduct.description,
-              descriptionAr: formProduct.description_ar || formProduct.description,
+              descriptionAr:
+                formProduct.description_ar || formProduct.description,
               category: formProduct.product_type,
               price: parseFloat(formProduct.price),
               image:

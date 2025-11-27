@@ -7,7 +7,7 @@ import { useCart } from "../contexts/CartContext";
 import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
 import RelatedProducts from "../components/RelatedProducts";
-
+import CustomerFormModal from "../components/FormCart";
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -28,9 +28,13 @@ interface ProductImageCarouselProps {
   mainImage?: string | null;
 }
 
-const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mainImage }) => {
+const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
+  images,
+  mainImage,
+}) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const carouselImages = images.length > 0 ? images : [{ id: 0, image: mainImage || "" }];
+  const carouselImages =
+    images.length > 0 ? images : [{ id: 0, image: mainImage || "" }];
   const currentImage = carouselImages[selectedImage]?.image;
 
   return (
@@ -48,12 +52,12 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mai
       </motion.div>
 
       {carouselImages.length > 1 && (
-        <div className="flex space-x-2 rtl:space-x-reverse overflow-x-auto">
+        <div className="flex flex-nowrap gap-2 overflow-x-hidden overflow-y-hidden">
           {carouselImages.map((img, idx) => (
             <button
               key={img.id}
               onClick={() => setSelectedImage(idx)}
-              className={`flex-shrink-0 w-20 h-20 rounded-lg border-2 transition-all overflow-hidden ${
+              className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 transition-all overflow-hidden ${
                 selectedImage === idx
                   ? "border-blue-600 scale-105"
                   : "border-gray-300 dark:border-gray-700 hover:border-gray-400"
@@ -62,7 +66,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mai
               <img
                 src={img.image}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-fill"
+                className="w-full h-full object-cover"
               />
             </button>
           ))}
@@ -72,78 +76,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images, mai
   );
 };
 
-// ---------- Customer Form Modal ----------
-interface CustomerFormModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void;
-}
-
-const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ open, onClose, onSubmit }) => {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-
-  if (!open) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !phone) {
-      return toast.error("Please fill all required fields");
-    }
-    onSubmit({ name, phone, email });
-    setName(""); setPhone(""); setEmail("");
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Customer Info</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email (optional)"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          />
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg bg-gray-300 dark:bg-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white"
-            >
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+// ----
 
 // ---------- Main ProductDetail Component ----------
 const ProductDetail: React.FC = () => {
@@ -154,6 +87,7 @@ const ProductDetail: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
 
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
+  console.log(product);
 
   if (loading) {
     return (
@@ -174,7 +108,7 @@ const ProductDetail: React.FC = () => {
             to="/products"
             className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            ← Back to Products
+            Back to Products
           </Link>
         </div>
       </div>
@@ -222,9 +156,7 @@ const ProductDetail: React.FC = () => {
       await addItem(cartProduct, finalQuantity);
       setQuantity(1);
       toast.success(
-        language === "ar"
-          ? "تم إضافة المنتج للسلة"
-          : "Product added to cart"
+        language === "ar" ? "تم إضافة المنتج للسلة" : "Product added to cart"
       );
     } catch (error) {
       console.error(error);
@@ -249,36 +181,64 @@ const ProductDetail: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
           <nav className="flex items-center space-x-2 rtl:space-x-reverse text-sm">
-            <Link to="/" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Home</Link>
+            <Link
+              to="/"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Home
+            </Link>
             <span className="text-gray-400">/</span>
-            <Link to="/products" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">Products</Link>
+            <Link
+              to="/products"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              Products
+            </Link>
             <span className="text-gray-400">/</span>
             <span className="text-gray-900 dark:text-white font-medium">
-              {language === "ar" ? product.name_ar || product.name : product.name}
+              {language === "ar"
+                ? product.name_ar || product.name
+                : product.name}
             </span>
           </nav>
         </motion.div>
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
-          <ProductImageCarousel images={product.images} mainImage={product.image} />
+          <ProductImageCarousel
+            images={product.images}
+            mainImage={product.image}
+          />
 
           {/* Product Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="space-y-6"
+          >
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white leading-snug">
-              {language === "ar" ? product.name_ar || product.name : product.name}
+              {language === "ar"
+                ? product.name_ar || product.name
+                : product.name}
             </h1>
 
             <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed max-w-lg">
-              {language === "ar" ? product.description_ar || product.description : product.description}
+              {language === "ar"
+                ? product.description_ar || product.description
+                : product.description}
             </p>
 
             {/* Price */}
             <div className="flex items-end gap-3 mt-4">
               <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                {language === "ar" ? "جنية" : "EGP"} {parseFloat(product.price).toLocaleString()}
+                {language === "ar" ? "جنية" : "EGP"}{" "}
+                {parseFloat(product.price).toLocaleString()}
               </span>
 
               {product.compare_price && (
@@ -288,8 +248,9 @@ const ProductDetail: React.FC = () => {
               )}
 
               {product.discount_percentage > 0 && (
-                <span className="text-xl font-bold text-[#44B3E1]">
-                  {product.discount_percentage}% {language === "ar" ? "خصم" : "Off"}
+                <span className="text-xl font-semibold px-2 py-1 rounded bg-[#44B3E1]/10 text-[#44B3E1]">
+                  {product.discount_percentage}%{" "}
+                  {language === "ar" ? "خصم" : "Off"}
                 </span>
               )}
             </div>
@@ -300,13 +261,16 @@ const ProductDetail: React.FC = () => {
                 <>
                   <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
                   <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                    {language === "ar" ? "الكمية المتوفرة" : "In Stock"} {product.stock}
+                    {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
+                    {product.stock}
                   </span>
                 </>
               ) : (
                 <>
                   <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-red-500 font-medium text-sm">{language === "ar" ? "غير متوفر" : "Out of Stock"}</span>
+                  <span className="text-red-500 font-medium text-sm">
+                    {language === "ar" ? "غير متوفر" : "Out of Stock"}
+                  </span>
                 </>
               )}
             </div>
@@ -316,7 +280,11 @@ const ProductDetail: React.FC = () => {
               <button
                 onClick={() => {
                   if (quantity <= 1)
-                    return toast.error(language === "ar" ? "لا يمكن أن تكون الكمية أقل من 1" : "Quantity cannot be less than 1");
+                    return toast.error(
+                      language === "ar"
+                        ? "لا يمكن أن تكون الكمية أقل من 1"
+                        : "Quantity cannot be less than 1"
+                    );
                   setQuantity((q) => q - 1);
                 }}
                 className="w-10 h-10 bg-gray-200 dark:bg-gray-300 rounded-lg flex items-center justify-center text-lg font-bold"
@@ -324,12 +292,18 @@ const ProductDetail: React.FC = () => {
                 -
               </button>
 
-              <span className="px-5 py-2 border rounded-lg bg-white dark:bg-gray-100 text-sm">{quantity}</span>
+              <span className="px-5 py-2 border rounded-lg bg-white dark:bg-gray-100 text-sm">
+                {quantity}
+              </span>
 
               <button
                 onClick={() => {
                   if (quantity >= maxQuantity)
-                    return toast.error(language === "ar" ? `لا يمكن إضافة أكثر من ${maxQuantity}` : `Cannot add more than ${maxQuantity}`);
+                    return toast.error(
+                      language === "ar"
+                        ? `لا يمكن إضافة أكثر من ${maxQuantity}`
+                        : `Cannot add more than ${maxQuantity}`
+                    );
                   setQuantity((q) => q + 1);
                 }}
                 className="w-10 h-10 bg-gray-200 dark:bg-gray-300 rounded-lg flex items-center justify-center text-lg font-bold"
@@ -337,26 +311,28 @@ const ProductDetail: React.FC = () => {
                 +
               </button>
 
-             <button
-  onClick={handleCartClick}
-  disabled={product.product_role === "tocart" && maxQuantity <= 0} // تعطيل فقط للـ tocart حسب المخزون
-  className={`flex-1 py-3 rounded-xl text-white font-medium shadow-md transition-all flex items-center justify-center gap-2 ${
-    product.product_role === "tocart"
-      ? maxQuantity > 0
-        ? "bg-[#155F82] hover:bg-[#124b66]"
-        : "bg-gray-400 cursor-not-allowed"
-      : "bg-[#44B3E1] hover:bg-[#3399cc]" // لون مختلف للخدمة
-  }`}
->
-  <ShoppingCartIcon className="w-5 h-5" />
-  {product.product_role === "tocart"
-    ? maxQuantity > 0
-      ? t("products.addToCart")
-      : t("products.outOfStock")
-    : t("services.requestService") /* أضف هذا المفتاح في ملفات الترجمة */
-  }
-</button>
-
+              <button
+                onClick={handleCartClick}
+                disabled={product.product_role === "tocart" && maxQuantity <= 0} // تعطيل فقط للـ tocart حسب المخزون
+                className={`flex-1 py-3 rounded-xl text-white font-medium shadow-md transition-all flex items-center justify-center gap-2 ${
+                  product.product_role === "tocart"
+                    ? maxQuantity > 0
+                      ? "bg-[#155F82] hover:bg-[#124b66]"
+                      : "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#44B3E1] hover:bg-[#3399cc]" // لون مختلف للخدمة
+                }`}
+              >
+                <ShoppingCartIcon className="w-5 h-5" />
+                {
+                  product.product_role === "tocart"
+                    ? maxQuantity > 0
+                      ? t("products.addToCart")
+                      : t("products.outOfStock")
+                    : t(
+                        "services.requestService"
+                      ) /* أضف هذا المفتاح في ملفات الترجمة */
+                }
+              </button>
             </div>
           </motion.div>
         </div>
@@ -384,10 +360,14 @@ const ProductDetail: React.FC = () => {
                     className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600"
                   >
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {language === "ar" && spec.name_ar ? spec.name_ar : spec.name}
+                      {language === "ar" && spec.name_ar
+                        ? spec.name_ar
+                        : spec.name}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
-                      {language === "ar" && spec.value_ar ? spec.value_ar : spec.value}
+                      {language === "ar" && spec.value_ar
+                        ? spec.value_ar
+                        : spec.value}
                     </p>
                   </div>
                 ))}
@@ -403,15 +383,20 @@ const ProductDetail: React.FC = () => {
               </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <p className="text-gray-600 dark:text-gray-300">
-                  <span className="font-medium">{language === "ar" ? "الاسم:" : "Name:"}</span>{" "}
+                  <span className="font-medium">
+                    {language === "ar" ? "الاسم:" : "Name:"}
+                  </span>{" "}
                   {language === "ar"
                     ? product.category.name_ar || product.category.name
                     : product.category.name}
                 </p>
                 <p className="text-gray-600 dark:text-gray-300">
-                  <span className="font-medium">{language === "ar" ? "الوصف:" : "Description:"}</span>{" "}
+                  <span className="font-medium">
+                    {language === "ar" ? "الوصف:" : "Description:"}
+                  </span>{" "}
                   {language === "ar"
-                    ? product.category.description_ar || product.category.description
+                    ? product.category.description_ar ||
+                      product.category.description
                     : product.category.description}
                 </p>
               </div>
@@ -478,12 +463,16 @@ const ProductDetail: React.FC = () => {
           </div>
         </motion.div>
 
-         <div className="pt-12">
+        <div className="pt-12">
           {slug && <RelatedProducts productSlug={slug} />}
         </div>
 
         {/* Customer Form Modal */}
-        <CustomerFormModal open={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
+        <CustomerFormModal
+          open={formOpen}
+          onClose={() => setFormOpen(false)}
+          onSubmit={handleFormSubmit}
+        />
       </div>
     </div>
   );
