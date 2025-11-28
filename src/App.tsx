@@ -8,7 +8,6 @@ import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
-import Services from "./pages/Services";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
@@ -28,7 +27,7 @@ import AccountSuspended from "./pages/AccountSuspended";
 import AccountUnderReview from "./pages/AccountUnderReview";
 import ScrollToTop from "./components/ScrollToTop";
 import Checkout from "./pages/checkout";
-import ServiceDetails from "./pages/ServiceDetails";
+
 function App() {
   return (
     <LanguageProvider>
@@ -48,11 +47,7 @@ function App() {
                     <Route index element={<Home />} />
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
-                    <Route path="services" element={<Services />} />
-                    <Route
-                      path="/services/:slug"
-                      element={<ServiceDetails />}
-                    />
+                    
                     <Route path="cart" element={<Cart />} />
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />

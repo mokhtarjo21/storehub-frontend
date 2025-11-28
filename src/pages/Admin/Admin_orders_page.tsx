@@ -67,6 +67,7 @@ export default function AdminOrdersPage() {
   );
   const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
 
+
   // Calculate statistics
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -219,6 +220,7 @@ export default function AdminOrdersPage() {
 
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
+        console.log("Selected order data:", orderDatsData);
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
         setEditingOrder({
@@ -283,10 +285,14 @@ export default function AdminOrdersPage() {
       if (editingOrder.order_status !== selectedOrder.order_status) {
         updates.order_status = editingOrder.order_status;
       }
-
+      if (editingOrder.payment_status !== selectedOrder.payment_status){
+        updates.payment_status = editingOrder.payment_status;
+      }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
         // محاولة تحديث الطلب - نستخدم Promise.allSettled حتى لو فشل
+        console.log(updates);
+        
         const [updateResult] = await Promise.allSettled([
           updateorders(selectedOrder.order_number, updates),
         ]);
@@ -644,7 +650,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "إجمالي الإيرادات" : "Total Revenue",
-      value: `${stats.totalRevenue} EGP`,
+      value: `${stats.totalRevenue} `,
       icon: CurrencyDollarIcon,
       color: "purple",
       bgColor: "bg-purple-100 dark:bg-purple-900/30",
@@ -1057,7 +1063,10 @@ export default function AdminOrdersPage() {
                       <span>
                         {selectedOrder.payment_status_display ||
                           selectedOrder.payment_status}
+
                       </span>
+                      
+
                     </div>
                   </div>
                 </div>
@@ -1149,7 +1158,7 @@ export default function AdminOrdersPage() {
                                     : "Subtotal")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.subtotal ?? "0.00"} EGP
+                                {selectedOrder.subtotal ?? "0.00"} {selectedOrder.currency ||"EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1158,7 +1167,7 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الضريبة" : "Tax")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.tax_amount ?? "0.00"} EGP
+                                {selectedOrder.tax_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1167,7 +1176,7 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الشحن" : "Shipping")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.shipping_amount ?? "0.00"} EGP
+                                {selectedOrder.shipping_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1176,7 +1185,7 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الخصم" : "Discount")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.discount_amount ?? "0.00"} EGP
+                                {selectedOrder.discount_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between pt-2 sm:pt-3 border-t border-gray-300 dark:border-gray-600 mt-2 sm:mt-3">
@@ -1185,7 +1194,7 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "المجموع" : "Total")}
                               </dt>
                               <dd className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">
-                                {selectedOrder.total_price} EGP
+                                {selectedOrder.total_price} {selectedOrder.currency ||"EGP"}
                               </dd>
                             </div>
                           </dl>
@@ -1389,6 +1398,18 @@ export default function AdminOrdersPage() {
                     )}
                   </div>
                 </div>
+                        <div className="mt-4">
+  <label className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+    {language === "ar" ? "ملاحظات الطلب" : "Order Notes"}
+  </label>
+  <textarea
+    value={editingOrder?.notes ?? selectedOrder.notes}
+    onChange={(e) => handleEditField("notes", e.target.value)}
+    rows={3}
+    className="w-full mt-2 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white"
+    placeholder={language === "ar" ? "اكتب ملاحظات..." : "Write notes..."}
+  ></textarea>
+</div>
 
                 {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
@@ -1512,6 +1533,57 @@ export default function AdminOrdersPage() {
                           </div>
                         </div>
 
+{/* Payment Status Control */}
+<div className="mt-4">
+  <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
+    {t("updatePaymentStatus") || (language === "ar" ? "تحديث حالة الدفع" : "Update Payment Status")}
+  </label>
+
+  <select
+    value={editingOrder?.payment_status ?? selectedOrder.payment_status}
+    onChange={(e) => handleEditField("payment_status", e.target.value)}
+    disabled={!selectedOrder.can_be_edited}
+    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 
+               text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
+               disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    <option value="pending">
+  { (language === "ar" ? "قيد الانتظار" : "Pending")}
+</option>
+
+<option value="paid">
+  {(language === "ar" ? "مدفوع" : "Paid")}
+</option>
+
+<option value="partial">
+  {(language === "ar" ? "مدفوع جزئياً" : "Partially Paid")}
+</option>
+
+<option value="failed">
+  {(language === "ar" ? "فشل الدفع" : "Failed")}
+</option>
+
+<option value="refunded">
+  {(language === "ar" ? "مُسترد" : "Refunded")}
+</option>
+
+  </select>
+
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      handleSaveOrder();
+    }}
+    disabled={updating || !selectedOrder.can_be_edited}
+    className="mt-2 w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 
+               dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed 
+               transition-colors font-medium"
+  >
+    {updating
+      ? t("saving") || (language === "ar" ? "جاري الحفظ..." : "Saving...")
+      : t("savePaymentStatus") || (language === "ar" ? "حفظ حالة الدفع" : "Save Payment Status")}
+  </button>
+</div>
                         {Array.isArray(selectedOrder.payment_transactions) &&
                           selectedOrder.payment_transactions.length > 0 && (
                             <div className="mt-3 space-y-2">

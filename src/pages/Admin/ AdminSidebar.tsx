@@ -59,11 +59,7 @@ const AdminSidebar: React.FC<Props> = ({
           icon={<MdProductionQuantityLimits />}
           tab="products"
         />
-        <NavItem
-          label="Services"
-          icon={<MdHomeRepairService />}
-          tab="services"
-        />
+      
         <NavItem label="Brands" icon={<FaTags />} tab="brands" />
         <NavItem label="Categories" icon={<MdCategory />} tab="categories" />
         <NavItem label="Orders" icon={<FaShoppingCart />} tab="order" />

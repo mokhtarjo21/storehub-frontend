@@ -34,7 +34,7 @@ const Navbar: React.FC = () => {
   const navigation = [
     { name: t("nav.home"), href: "/", icon: HomeIcon },
     { name: t("nav.products"), href: "/products", icon: CubeIcon },
-    { name: t("nav.services"), href: "/services", icon: WrenchScrewdriverIcon },
+    
   ];
 
   if (user) {

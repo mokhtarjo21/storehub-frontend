@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import AdminDashboard from "./AdminDashboard";
 import AdminProductsSection from "./Products_section";
 import AdminOrdersPage from "./Admin_orders_page";
-import AdminServicesSection from "./Services_section";
 import AdminBrandsSection from "./Brands_section";
 import AdminCategoriesSection from "./Categories_section";
 import AdminSidebar from  "./ AdminSidebar";
@@ -57,7 +56,7 @@ const AdminPanel: React.FC = () => {
         {activeTab === "dashboard" && <AdminDashboard />}
         {activeTab === "products" && <AdminProductsSection />}
         {activeTab === "order" && <AdminOrdersPage />}
-        {activeTab === "services" && <AdminServicesSection />}
+        
         {activeTab === "brands" && <AdminBrandsSection />}
         {activeTab === "categories" && <AdminCategoriesSection />}
       </div>
