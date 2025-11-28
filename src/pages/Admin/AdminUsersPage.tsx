@@ -10,7 +10,7 @@ export default function AdminUsersPage() {
     try {
       setLoading(true);
       const res = await axios.get(`/api/auth/admin/users/?search=${search}`);
-      setUsers(res.data);
+      setUsers(res.data.results);
     } catch (error) {
       console.error(error);
     } finally {

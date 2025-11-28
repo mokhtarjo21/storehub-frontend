@@ -64,16 +64,6 @@ const openCompanyModal = async (id: number) => {
 
 
 
-  const handleDelete = async (companyId: number) => {
-    if (!confirm("Are you sure you want to delete this company?")) return;
-    try {
-      await axiosInstance.delete(`/api/admin/companies/${companyId}/`);
-      fetchCompanies();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const toggleActive = async (company: Company) => {
     try {
         if (company.approval_status === "reject" || company.approval_status === "pending") {

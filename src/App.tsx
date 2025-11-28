@@ -7,6 +7,7 @@ import { UserConfigProvider } from "./contexts/UserConfigContext";
 import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
+import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
@@ -122,6 +123,15 @@ function App() {
                         <AdminCompaniesPage />
                       </ProtectedRoute>
                     } />
+                    <Route
+                      path="admin/users"
+                      element={
+                        <ProtectedRoute requiredRole="super_admin">
+                          <AdminUsersPage />
+                        </ProtectedRoute>
+                      }
+                    />  
+
                     <Route
                       path="admin"
                       element={
