@@ -12,7 +12,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Dashboard from "./pages/Dashboard";
-import CompanyDashboard from "./pages/Company/CompanyDashboard";
+import AdminCompaniesPage from "./pages/Admin/AdminCompany";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import SmartRegister from "./pages/Auth/SmartRegister";
@@ -117,6 +117,11 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                    <Route path="admin/companies" element={
+                      <ProtectedRoute requiredRole="super_admin">
+                        <AdminCompaniesPage />
+                      </ProtectedRoute>
+                    } />
                     <Route
                       path="admin"
                       element={
