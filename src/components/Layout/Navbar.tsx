@@ -34,7 +34,6 @@ const Navbar: React.FC = () => {
   const navigation = [
     { name: t("nav.home"), href: "/", icon: HomeIcon },
     { name: t("nav.products"), href: "/products", icon: CubeIcon },
-    
   ];
 
   if (user) {
@@ -315,9 +314,9 @@ const Navbar: React.FC = () => {
                   </Disclosure.Button>
 
                   {/* Notifications */}
-                  <Disclosure.Button className="flex items-center w-full rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800">
-                    <NotificationBell />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <Disclosure.Button className="flex items-center w-full rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 relative">
+                    <NotificationBell showBadge={true} />
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
                       Notifications
                     </span>
                   </Disclosure.Button>

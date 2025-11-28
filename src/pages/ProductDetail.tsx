@@ -393,14 +393,6 @@ const ProductDetail: React.FC = () => {
                       value: product.barcode,
                     },
                     {
-                      label: language === "ar" ? "النوع" : "Type",
-                      value: product.product_type,
-                    },
-                    {
-                      label: language === "ar" ? "الدور" : "Role",
-                      value: product.product_role,
-                    },
-                    {
                       label: language === "ar" ? "الوزن" : "Weight",
                       value: product.weight,
                     },

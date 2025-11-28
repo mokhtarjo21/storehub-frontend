@@ -12,7 +12,12 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { Notification } from "../types";
 import toast from "react-hot-toast";
 
-const NotificationBell: React.FC = () => {
+interface NotificationBellProps {
+  showBadge?: boolean;
+}
+const NotificationBell: React.FC<NotificationBellProps> = ({
+  showBadge = true,
+}) => {
   const { t, language, isRTL } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -211,9 +216,12 @@ const NotificationBell: React.FC = () => {
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="relative p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="notifications">
+      <Menu.Button
+        className="relative p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        aria-label="notifications"
+      >
         <BellIcon className="h-6 w-6" />
-        {unreadCount > 0 && (
+        {showBadge && unreadCount > 0 && (
           <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full transform translate-x-1/2 -translate-y-1/2">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
@@ -230,7 +238,9 @@ const NotificationBell: React.FC = () => {
         leaveTo="transform opacity-0 scale-95"
       >
         <Menu.Items
-          className={`absolute z-50 mt-2 w-80 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isRTL ? "left-0" : "right-0"}`}
+          className={`absolute z-50 mt-2 w-80 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${
+            isRTL ? "left-0" : "right-0"
+          }`}
         >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
