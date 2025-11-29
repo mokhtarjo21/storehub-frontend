@@ -90,7 +90,7 @@ const CompanyDashboard: React.FC = () => {
 
   const fetchCompanyData = async () => {
     try {
-      const response = await apiRequest('/auth/company/');
+      const response = await apiRequest('/auth/company/detail/');
       const data = await handleApiResponse(response);
       setCompany(data);
     } catch (error) {
@@ -100,8 +100,10 @@ const CompanyDashboard: React.FC = () => {
 
 const fetchEmployees = async () => {
   try {
-    const response = await apiRequest('/auth/employees/');
+    const response = await apiRequest('/auth/company/employees/');
     const data = await handleApiResponse(response);
+    console.log(data);
+    
     // Ensure we always have an array
     setEmployees(Array.isArray(data) ? data : []);
   } catch (error) {
@@ -115,7 +117,7 @@ const fetchEmployees = async () => {
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await apiRequest('/auth/employees/', {
+      const response = await apiRequest('/auth/company/employees/add/', {
         method: 'POST',
         body: JSON.stringify(newEmployee),
       });
@@ -147,7 +149,7 @@ const fetchEmployees = async () => {
     if (!editingEmployee) return;
 
     try {
-      const response = await apiRequest(`/auth/employees/${editingEmployee.id}/`, {
+      const response = await apiRequest(`/auth/company/employees/${editingEmployee.id}/`, {
         method: 'PATCH',
         body: JSON.stringify(editingEmployee),
       });
@@ -166,7 +168,7 @@ const fetchEmployees = async () => {
     if (!confirm('Are you sure you want to delete this employee?')) return;
 
     try {
-      await apiRequest(`/auth/employees/${employeeId}/`, {
+      await apiRequest(`/auth/company/employees/${employeeId}/`, {
         method: 'DELETE',
       });
       
@@ -178,19 +180,7 @@ const fetchEmployees = async () => {
     }
   };
 
-  const handleSendInvitation = async (employeeId: number) => {
-    try {
-      const response = await apiRequest(`/auth/employees/${employeeId}/invite/`, {
-        method: 'POST',
-      });
-      
-      await handleApiResponse(response);
-      toast.success('Invitation sent successfully!');
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to send invitation';
-      toast.error(errorMessage);
-    }
-  };
+
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -434,14 +424,7 @@ const fetchEmployees = async () => {
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
-                        {employee.status === 'pending' && (
-                          <button
-                            onClick={() => handleSendInvitation(employee.id)}
-                            className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-                          >
-                            <EnvelopeIcon className="w-4 h-4" />
-                          </button>
-                        )}
+                       
                         <button
                           onClick={() => handleDeleteEmployee(employee.id)}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"

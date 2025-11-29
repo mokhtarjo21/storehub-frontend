@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
+import CompanyDashboard from "./pages/Company/CompanyDashboard";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Dashboard from "./pages/Dashboard";
@@ -107,6 +108,14 @@ function App() {
                       element={
                         <ProtectedRoute>
                           <Checkout />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="company"
+                      element={
+                        <ProtectedRoute requiredRole="company_admin">
+                          <CompanyDashboard />
                         </ProtectedRoute>
                       }
                     />
