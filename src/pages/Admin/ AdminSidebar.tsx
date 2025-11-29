@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   MdDashboard,
   MdProductionQuantityLimits,
@@ -10,11 +10,16 @@ import { ChevronLeft, ChevronRight } from "react-feather";
 interface Props {
   activeTab: string;
   setActiveTab: (v: any) => void;
+  collapsed: boolean;
+  setCollapsed: (v: boolean) => void;
 }
 
-const AdminSidebar: React.FC<Props> = ({ activeTab, setActiveTab }) => {
-  const [collapsed, setCollapsed] = useState(false);
-
+const AdminSidebar: React.FC<Props> = ({
+  activeTab,
+  setActiveTab,
+  collapsed,
+  setCollapsed,
+}) => {
   const navItems = [
     { label: "Dashboard", icon: <MdDashboard />, tab: "dashboard" },
     {
@@ -51,13 +56,7 @@ const AdminSidebar: React.FC<Props> = ({ activeTab, setActiveTab }) => {
       {/* Collapse Toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="
-          absolute -right-4 top-4 w-7 h-7 
-          rounded-full bg-white dark:bg-[#215C98]
-          flex items-center justify-center 
-          shadow-md border border-gray-200 dark:border-[#215C98]
-          transition hover:scale-110
-        "
+        className="absolute -right-4 top-4 w-7 h-7 rounded-full bg-[#44B3E1] dark:bg-[#44B3E1] flex items-center justify-center shadow-md border border-[#215C98] dark:border-[#215C98] transition hover:scale-110"
       >
         {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </button>
@@ -75,16 +74,21 @@ const AdminSidebar: React.FC<Props> = ({ activeTab, setActiveTab }) => {
           {navItems.map((item) => (
             <div key={item.tab} className="relative group">
               <button
-                onClick={() => setActiveTab(item.tab)}
-                className={`
-                  flex items-center gap-3 p-3 w-full rounded-xl
-                  text-sm transition-all
-                  ${
-                    activeTab === item.tab
-                      ? "bg-[#44B3E1] dark:bg-[#44B3E1] text-[#215C98] dark:text-[#215C98] font-semibold shadow"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                onClick={() => {
+                  setActiveTab(item.tab);
+                  if (window.innerWidth < 1024) {
+                    setCollapsed(true);
                   }
-                `}
+                }}
+                className={`
+        flex items-center gap-3 p-3 w-full rounded-xl
+        text-sm transition-all
+        ${
+          activeTab === item.tab
+            ? "bg-[#44B3E1] dark:bg-[#44B3E1] text-[#215C98] dark:text-[#215C98] font-semibold shadow"
+            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+        }
+      `}
               >
                 <span className="text-xl">{item.icon}</span>
                 {!collapsed && <span>{item.label}</span>}
@@ -94,13 +98,13 @@ const AdminSidebar: React.FC<Props> = ({ activeTab, setActiveTab }) => {
               {collapsed && (
                 <span
                   className="
-                    absolute left-14 top-1/2 -translate-y-1/2
-                    bg-gray-900 text-white text-xs
-                    px-2 py-1 rounded shadow opacity-0
-                    pointer-events-none
-                    group-hover:opacity-100 group-hover:translate-x-1
-                    transition-all
-                  "
+        absolute left-14 top-1/2 -translate-y-1/2
+        bg-gray-900 text-white text-xs
+        px-2 py-1 rounded shadow opacity-0
+        pointer-events-none
+        group-hover:opacity-100 group-hover:translate-x-1
+        transition-all
+      "
                 >
                   {item.label}
                 </span>

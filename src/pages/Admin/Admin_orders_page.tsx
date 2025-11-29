@@ -67,7 +67,6 @@ export default function AdminOrdersPage() {
   );
   const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
 
-
   // Calculate statistics
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
@@ -89,14 +88,18 @@ export default function AdminOrdersPage() {
 
   const stats = useMemo(() => {
     const total = filteredOrders.length;
-    const pending = filteredOrders.filter((o) => o.order_status === "pending").length;
+    const pending = filteredOrders.filter(
+      (o) => o.order_status === "pending"
+    ).length;
     const confirmed = filteredOrders.filter(
       (o) => o.order_status === "confirmed" || o.order_status === "confirmed"
     ).length;
     const processing = filteredOrders.filter(
       (o) => o.order_status === "processing"
     ).length;
-    const shipped = filteredOrders.filter((o) => o.order_status === "shipped").length;
+    const shipped = filteredOrders.filter(
+      (o) => o.order_status === "shipped"
+    ).length;
     const delivered = filteredOrders.filter(
       (o) => o.order_status === "delivered"
     ).length;
@@ -164,7 +167,12 @@ export default function AdminOrdersPage() {
   ) => {
     setLoading(true);
     try {
-      console.log("Fetching orders with:", { searchTerm, statusFilter, page, size });
+      console.log("Fetching orders with:", {
+        searchTerm,
+        statusFilter,
+        page,
+        size,
+      });
       const [cRes] = await Promise.allSettled([
         fetchorders(searchTerm || "", statusFilter || "", page, size),
       ]);
@@ -285,14 +293,14 @@ export default function AdminOrdersPage() {
       if (editingOrder.order_status !== selectedOrder.order_status) {
         updates.order_status = editingOrder.order_status;
       }
-      if (editingOrder.payment_status !== selectedOrder.payment_status){
+      if (editingOrder.payment_status !== selectedOrder.payment_status) {
         updates.payment_status = editingOrder.payment_status;
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
         // محاولة تحديث الطلب - نستخدم Promise.allSettled حتى لو فشل
         console.log(updates);
-        
+
         const [updateResult] = await Promise.allSettled([
           updateorders(selectedOrder.order_number, updates),
         ]);
@@ -677,20 +685,6 @@ export default function AdminOrdersPage() {
               : "Manage and track all orders"}
           </p>
         </div>
-        {/* <button
-          onClick={fetchOrders}
-          disabled={loading}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-        >
-          <ArrowPathIcon
-            className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-          />
-          <span>
-            {loading
-              ? t("loading") || "Loading..."
-              : t("refreshBtn") || "Refresh"}
-          </span>
-        </button> */}
       </div>
 
       {/* Stats Cards */}
@@ -811,32 +805,56 @@ export default function AdminOrdersPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
       >
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("orderNumber") ||
                       (language === "ar" ? "رقم الطلب" : "Order #")}
                   </th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("customer") ||
                       (language === "ar" ? "العميل" : "Customer")}
                   </th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("total") || (language === "ar" ? "المجموع" : "Total")}
                   </th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("status") || (language === "ar" ? "الحالة" : "Status")}
                   </th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("createdAt") ||
                       (language === "ar" ? "تاريخ الإنشاء" : "Created At")}
                   </th>
-                  <th className="px-2 sm:px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("actions") ||
                       (language === "ar" ? "الإجراءات" : "Actions")}
                   </th>
@@ -888,61 +906,117 @@ export default function AdminOrdersPage() {
                         className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-150"
                         onClick={() => handleSelectOrder(order.order_number)}
                       >
-                        <td className="px-2 sm:px-4 py-4">
-                          <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
-                            <span className="hidden sm:inline">#</span>
-                            {order.order_number}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 sm:hidden mt-1">
-                            {order.user_name || "N/A"}
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            #{order.order_number}
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-4 hidden sm:table-cell">
-                          <div className="flex items-center">
-                            <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 mr-2 rtl:mr-0 rtl:ml-2 flex-shrink-0" />
-                            <div className="text-xs sm:text-sm text-gray-900 dark:text-white truncate">
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <div
+                            className={`flex items-center ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
+                          >
+                            <UserIcon
+                              className={`w-4 h-4 text-gray-400 flex-shrink-0 ${
+                                language === "ar" ? "ml-2" : "mr-2"
+                              }`}
+                            />
+                            <div className="text-sm text-gray-900 dark:text-white">
                               {order.user_name || "N/A"}
                             </div>
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-4">
-                          <div className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white">
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white">
                             {order.total_price} EGP
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-4">
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSelectOrder(order.order_number);
                             }}
-                            className={`inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-semibold ${statusBadge.bg} ${statusBadge.text} hover:opacity-80 transition-opacity cursor-pointer`}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              statusBadge.bg
+                            } ${
+                              statusBadge.text
+                            } hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
                             title={
                               language === "ar"
                                 ? "انقر لتغيير الحالة"
                                 : "Click to change status"
                             }
                           >
-                            <StatusIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            <span className="hidden sm:inline">
-                              {order.order_status}
-                            </span>
+                            <StatusIcon className="w-3.5 h-3.5" />
+                            <span>{order.order_status}</span>
                           </button>
                         </td>
-                        <td className="px-2 sm:px-4 py-4">
-                          <div className="flex items-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                            <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 rtl:mr-0 rtl:ml-1 flex-shrink-0" />
-                            <span className="whitespace-nowrap">
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <div
+                            className={`flex items-center text-sm text-gray-500 dark:text-gray-400 ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
+                          >
+                            <CalendarIcon
+                              className={`w-4 h-4 flex-shrink-0 ${
+                                language === "ar" ? "ml-1" : "mr-1"
+                              }`}
+                            />
+                            <span>
                               {new Date(order.created_at).toLocaleDateString(
                                 language === "ar" ? "ar-EG" : "en-GB"
                               )}
                             </span>
                           </div>
                         </td>
-                        <td className="px-2 sm:px-4 py-4 text-sm">
-                          <div className="flex items-center gap-1 sm:gap-2">
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <div
+                            className={`flex items-center gap-2 ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
+                          >
                             <button
-                              className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-md transition-colors duration-200"
+                              className={`inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-md transition-colors duration-200 whitespace-nowrap ${
+                                language === "ar"
+                                  ? "flex-row-reverse"
+                                  : "flex-row"
+                              }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSelectOrder(order.order_number);
@@ -953,14 +1027,18 @@ export default function AdminOrdersPage() {
                                   : "View details"
                               }
                             >
-                              <EyeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              <span className="hidden md:inline text-xs sm:text-sm">
+                              <EyeIcon className="w-4 h-4" />
+                              <span className="text-sm">
                                 {t("view") ||
                                   (language === "ar" ? "عرض" : "View")}
                               </span>
                             </button>
                             <button
-                              className="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded-md transition-colors duration-200"
+                              className={`inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded-md transition-colors duration-200 whitespace-nowrap ${
+                                language === "ar"
+                                  ? "flex-row-reverse"
+                                  : "flex-row"
+                              }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSelectOrder(order.order_number);
@@ -969,8 +1047,8 @@ export default function AdminOrdersPage() {
                                 language === "ar" ? "تعديل الطلب" : "Edit order"
                               }
                             >
-                              <PencilIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              <span className="hidden md:inline text-xs sm:text-sm">
+                              <PencilIcon className="w-4 h-4" />
+                              <span className="text-sm">
                                 {t("edit") ||
                                   (language === "ar" ? "تعديل" : "Edit")}
                               </span>
@@ -986,39 +1064,43 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       </motion.div>
-             <button
-                  onClick={() => {
-                    if (currentPage > 1) {
-                      setCurrentPage(currentPage - 1);
-                      fetchOrders(search, status, currentPage - 1, pageSize);
-                    }
-                  }}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
-                >
-                  {language === "ar" ? "السابق" : "Previous"}
-                </button>
 
-                {/* Page Info */}
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {language === "ar"
-                    ? `الصفحة ${currentPage} من ${Math.ceil(totalOrders / pageSize)}`
-                    : `Page ${currentPage} of ${Math.ceil(totalOrders / pageSize)}`}
-                </span>
+      {/* pagination */}
+      <div className="flex items-center justify-center">
+        <button
+          onClick={() => {
+            if (currentPage > 1) {
+              setCurrentPage(currentPage - 1);
+              fetchOrders(search, status, currentPage - 1, pageSize);
+            }
+          }}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
+        >
+          {language === "ar" ? "السابق" : "Previous"}
+        </button>
 
-                {/* Next Button */}
-                <button
-                  onClick={() => {
-                    if (currentPage < Math.ceil(totalOrders / pageSize)) {
-                      setCurrentPage(currentPage + 1);
-                      fetchOrders(search, status, currentPage + 1, pageSize);
-                    }
-                  }}
-                  disabled={currentPage === Math.ceil(totalOrders / pageSize)}
-                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
-                >
-                  {language === "ar" ? "التالي" : "Next"}
-                </button>
+        {/* Page Info */}
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {language === "ar"
+            ? `الصفحة ${currentPage} من ${Math.ceil(totalOrders / pageSize)}`
+            : `Page ${currentPage} of ${Math.ceil(totalOrders / pageSize)}`}
+        </span>
+
+        {/* Next Button */}
+        <button
+          onClick={() => {
+            if (currentPage < Math.ceil(totalOrders / pageSize)) {
+              setCurrentPage(currentPage + 1);
+              fetchOrders(search, status, currentPage + 1, pageSize);
+            }
+          }}
+          disabled={currentPage === Math.ceil(totalOrders / pageSize)}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md disabled:opacity-50"
+        >
+          {language === "ar" ? "التالي" : "Next"}
+        </button>
+      </div>
 
       {/* Order Details Modal */}
       <AnimatePresence>
@@ -1041,51 +1123,43 @@ export default function AdminOrdersPage() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between sm:gap-4 sm:px-6 sm:py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
-                <div className="flex items-start sm:items-center sm:gap-4 flex-1 min-w-0">
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
+              <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white truncate">
                       {t("orderDetails") ||
-                        (language === "ar"
-                          ? "تفاصيل الطلب"
-                          : "Order Details")}{" "}
-                      —{" "}
-                      <span className="text-indigo-600 dark:text-indigo-400">
+                        (language === "ar" ? "تفاصيل الطلب" : "Order Details")}
+                      <span className="text-indigo-600 dark:text-indigo-400 ml-1 sm:ml-2">
                         #{selectedOrder.order_number}
                       </span>
                     </h3>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex flex-wrap gap-2">
-                      <span>
+                    <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {selectedOrder.status_display ||
                           selectedOrder.order_status}
                       </span>
-                      <span>•</span>
-                      <span>
+                      <span className="text-xs text-gray-400">•</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {selectedOrder.payment_status_display ||
                           selectedOrder.payment_status}
-
                       </span>
-                      
-
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                  {/* small meta */}
-                  <div className="hidden md:flex md:items-center md:gap-4">
-                    <div className="text-right">
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {t("createdAt") ||
-                          (language === "ar" ? "تاريخ الإنشاء" : "Created At")}
-                      </div>
-                      <div className="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-200">
-                        {selectedOrder.created_at
-                          ? new Date(selectedOrder.created_at).toLocaleString(
-                              locale
-                            )
-                          : "—"}
-                      </div>
+                  {/* Created At - Hidden on mobile */}
+                  <div className="hidden sm:block text-right">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {t("createdAt") ||
+                        (language === "ar" ? "تاريخ الإنشاء" : "Created At")}
+                    </div>
+                    <div className="text-xs font-medium text-gray-800 dark:text-gray-200">
+                      {selectedOrder.created_at
+                        ? new Date(selectedOrder.created_at).toLocaleString(
+                            locale
+                          )
+                        : "—"}
                     </div>
                   </div>
 
@@ -1094,9 +1168,9 @@ export default function AdminOrdersPage() {
                     aria-label={
                       t("close") || (language === "ar" ? "إغلاق" : "Close")
                     }
-                    className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+                    className="p-1 sm:p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
                   >
-                    <XMarkIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    <XMarkIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-300" />
                   </button>
                 </div>
               </div>
@@ -1158,7 +1232,8 @@ export default function AdminOrdersPage() {
                                     : "Subtotal")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.subtotal ?? "0.00"} {selectedOrder.currency ||"EGP"}
+                                {selectedOrder.subtotal ?? "0.00"}{" "}
+                                {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1167,7 +1242,8 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الضريبة" : "Tax")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.tax_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
+                                {selectedOrder.tax_amount ?? "0.00"}{" "}
+                                {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1176,7 +1252,8 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الشحن" : "Shipping")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.shipping_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
+                                {selectedOrder.shipping_amount ?? "0.00"}{" "}
+                                {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1185,7 +1262,8 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "الخصم" : "Discount")}
                               </dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
-                                {selectedOrder.discount_amount ?? "0.00"} {selectedOrder.currency ||"EGP"}
+                                {selectedOrder.discount_amount ?? "0.00"}{" "}
+                                {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between pt-2 sm:pt-3 border-t border-gray-300 dark:border-gray-600 mt-2 sm:mt-3">
@@ -1194,7 +1272,8 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "المجموع" : "Total")}
                               </dt>
                               <dd className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">
-                                {selectedOrder.total_price} {selectedOrder.currency ||"EGP"}
+                                {selectedOrder.total_price}{" "}
+                                {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                           </dl>
@@ -1398,18 +1477,20 @@ export default function AdminOrdersPage() {
                     )}
                   </div>
                 </div>
-                        <div className="mt-4">
-  <label className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-    {language === "ar" ? "ملاحظات الطلب" : "Order Notes"}
-  </label>
-  <textarea
-    value={editingOrder?.notes ?? selectedOrder.notes}
-    onChange={(e) => handleEditField("notes", e.target.value)}
-    rows={3}
-    className="w-full mt-2 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white"
-    placeholder={language === "ar" ? "اكتب ملاحظات..." : "Write notes..."}
-  ></textarea>
-</div>
+                <div className="mt-4">
+                  <label className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+                    {language === "ar" ? "ملاحظات الطلب" : "Order Notes"}
+                  </label>
+                  <textarea
+                    value={editingOrder?.notes ?? selectedOrder.notes}
+                    onChange={(e) => handleEditField("notes", e.target.value)}
+                    rows={3}
+                    className="w-full mt-2 px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white"
+                    placeholder={
+                      language === "ar" ? "اكتب ملاحظات..." : "Write notes..."
+                    }
+                  ></textarea>
+                </div>
 
                 {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
@@ -1533,57 +1614,72 @@ export default function AdminOrdersPage() {
                           </div>
                         </div>
 
-{/* Payment Status Control */}
-<div className="mt-4">
-  <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
-    {t("updatePaymentStatus") || (language === "ar" ? "تحديث حالة الدفع" : "Update Payment Status")}
-  </label>
+                        {/* Payment Status Control */}
+                        <div className="mt-4">
+                          <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
+                            {t("updatePaymentStatus") ||
+                              (language === "ar"
+                                ? "تحديث حالة الدفع"
+                                : "Update Payment Status")}
+                          </label>
 
-  <select
-    value={editingOrder?.payment_status ?? selectedOrder.payment_status}
-    onChange={(e) => handleEditField("payment_status", e.target.value)}
-    disabled={!selectedOrder.can_be_edited}
-    className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 
+                          <select
+                            value={
+                              editingOrder?.payment_status ??
+                              selectedOrder.payment_status
+                            }
+                            onChange={(e) =>
+                              handleEditField("payment_status", e.target.value)
+                            }
+                            disabled={!selectedOrder.can_be_edited}
+                            className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 
                text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent 
                disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    <option value="pending">
-  { (language === "ar" ? "قيد الانتظار" : "Pending")}
-</option>
+                          >
+                            <option value="pending">
+                              {language === "ar" ? "قيد الانتظار" : "Pending"}
+                            </option>
 
-<option value="paid">
-  {(language === "ar" ? "مدفوع" : "Paid")}
-</option>
+                            <option value="paid">
+                              {language === "ar" ? "مدفوع" : "Paid"}
+                            </option>
 
-<option value="partial">
-  {(language === "ar" ? "مدفوع جزئياً" : "Partially Paid")}
-</option>
+                            <option value="partial">
+                              {language === "ar"
+                                ? "مدفوع جزئياً"
+                                : "Partially Paid"}
+                            </option>
 
-<option value="failed">
-  {(language === "ar" ? "فشل الدفع" : "Failed")}
-</option>
+                            <option value="failed">
+                              {language === "ar" ? "فشل الدفع" : "Failed"}
+                            </option>
 
-<option value="refunded">
-  {(language === "ar" ? "مُسترد" : "Refunded")}
-</option>
+                            <option value="refunded">
+                              {language === "ar" ? "مُسترد" : "Refunded"}
+                            </option>
+                          </select>
 
-  </select>
-
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      handleSaveOrder();
-    }}
-    disabled={updating || !selectedOrder.can_be_edited}
-    className="mt-2 w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveOrder();
+                            }}
+                            disabled={updating || !selectedOrder.can_be_edited}
+                            className="mt-2 w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 
                dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed 
                transition-colors font-medium"
-  >
-    {updating
-      ? t("saving") || (language === "ar" ? "جاري الحفظ..." : "Saving...")
-      : t("savePaymentStatus") || (language === "ar" ? "حفظ حالة الدفع" : "Save Payment Status")}
-  </button>
-</div>
+                          >
+                            {updating
+                              ? t("saving") ||
+                                (language === "ar"
+                                  ? "جاري الحفظ..."
+                                  : "Saving...")
+                              : t("savePaymentStatus") ||
+                                (language === "ar"
+                                  ? "حفظ حالة الدفع"
+                                  : "Save Payment Status")}
+                          </button>
+                        </div>
                         {Array.isArray(selectedOrder.payment_transactions) &&
                           selectedOrder.payment_transactions.length > 0 && (
                             <div className="mt-3 space-y-2">
@@ -1623,12 +1719,6 @@ export default function AdminOrdersPage() {
                   </div>
                 </aside>
               </div>
-
-              {/* Pagination Controls */}
-              <motion.div className="flex flex-col sm:flex-row items-center justify-between mt-4">
-                {/* Previous Button */}
-               
-              </motion.div>
             </motion.div>
           </motion.div>
         )}
