@@ -155,19 +155,19 @@ const AdminDashboard: React.FC = () => {
           ))}
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Sales Over Time */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {language === "ar" ? "نظرة عامة على المبيعات" : "Sales Overview"}
             </h3>
-            {salesData?.sales_over_time &&
-            salesData.sales_over_time.length > 0 ? (
+
+            {salesData?.sales_over_time?.length ? (
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={salesData.sales_over_time}>
                   <defs>
@@ -190,6 +190,7 @@ const AdminDashboard: React.FC = () => {
                       />
                     </linearGradient>
                   </defs>
+
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                   <XAxis dataKey="period" className="text-xs" />
                   <YAxis className="text-xs" />
@@ -201,6 +202,7 @@ const AdminDashboard: React.FC = () => {
                       color: "white",
                     }}
                   />
+
                   <Area
                     type="monotone"
                     dataKey="revenue"
@@ -222,34 +224,32 @@ const AdminDashboard: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2 border border-gray-200 dark:border-gray-700"
           >
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {language === "ar" ? "توزيع المستخدمين" : "Users by Role"}
             </h3>
-            {usersData?.users_by_role && usersData.users_by_role.length > 0 ? (
+
+            {usersData?.users_by_role?.length ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={usersData.users_by_role}
-                    cx="50%"
+                    cx="54%"
                     cy="50%"
+                    outerRadius={70}
                     labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
                     dataKey="count"
                     label={({ role, percent }) =>
                       `${role} ${(percent * 100).toFixed(0)}%`
                     }
                   >
-                    {usersData.users_by_role.map(
-                      (entry: any, index: number) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={Object.values(COLORS)[index % 5]}
-                        />
-                      )
-                    )}
+                    {usersData.users_by_role.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={Object.values(COLORS)[index % 5]}
+                      />
+                    ))}
                   </Pie>
                   <Tooltip />
                 </PieChart>

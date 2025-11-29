@@ -5,6 +5,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
   PhotoIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -314,8 +315,9 @@ export default function AdminProductsSection() {
                     )}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
-                    {p.name}
+                    {language === "ar" ? p.name_ar || p.name : p.name}
                   </td>
+
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {p.category_name ?? "—"}
                   </td>
@@ -578,278 +580,397 @@ function ProductForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
+        className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto"
       >
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        {/* Header */}
+        <div
+          className={`flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 ${
+            language === "ar" ? "flex-row" : "flex-row"
+          }`}
+        >
+          <h3
+            className={`text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex-1 ${
+              language === "ar" ? "text-right pr-3" : "text-left pl-3"
+            }`}
+          >
             {initial
               ? language === "ar"
                 ? "تعديل المنتج"
-                : "Edit product"
+                : "Edit Product"
               : language === "ar"
-              ? "إضافة منتج"
-              : "Add product"}
+              ? "إضافة منتج جديد"
+              : "Add New Product"}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex-shrink-0 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
+              language === "ar" ? "ml-2" : "mr-2"
+            }`}
+            title={language === "ar" ? "إغلاق" : "Close"}
+            aria-label={language === "ar" ? "إغلاق النافذة" : "Close window"}
           >
-            ✕
+            <XMarkIcon className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200" />
           </button>
         </div>
 
-        <form onSubmit={submit} className="grid grid-cols-1 gap-4">
-          {/* الحقول الأساسية والجديدة تباعا مثل name, name_ar, description, price ... */}
-          {/* مثال: */}
+        {/* Form */}
+        <form onSubmit={submit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "اسم المنتج (إنجليزي)" : "Name"}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar"
+                  ? "اسم المنتج (إنجليزي) *"
+                  : "Product Name (EN) *"}
               </label>
               <input
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "أدخل اسم المنتج بالإنجليزية"
+                    : "Enter product name in English"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "اسم المنتج (عربي)" : "Name (AR)"}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "اسم المنتج (عربي)" : "Product Name (AR)"}
               </label>
               <input
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "أدخل اسم المنتج بالعربية"
+                    : "Enter product name in Arabic"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
           </div>
-          {/* الوصف بالإنجليزي والعربي */}
+
+          {/* Description Fields */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "الوصف (إنجليزي)" : "Description"}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الوصف (إنجليزي)" : "Description (EN)"}
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "أدخل وصف المنتج بالإنجليزية"
+                    : "Enter product description in English"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
-
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "الوصف (عربي)" : "Description (AR)"}
               </label>
               <textarea
                 value={descriptionAr}
                 onChange={(e) => setDescriptionAr(e.target.value)}
                 rows={3}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "أدخل وصف المنتج بالعربية"
+                    : "Enter product description in Arabic"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
           </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
-            </label>
-            <input type="file" accept="image/*" onChange={handleFile} />
-            {imageFile && (
-              <span className="text-sm mt-1 text-gray-600 dark:text-gray-400">
-                {imageFile.name}
-              </span>
-            )}
+
+          {/* Category and Brand */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Category */}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الفئة *" : "Category *"}
+              </label>
+              {categories ? (
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(Number(e.target.value))}
+                  required
+                  className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                  dir={language === "ar" ? "rtl" : "ltr"}
+                >
+                  <option value="">
+                    {language === "ar" ? "اختر فئة" : "Select category"}
+                  </option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={categoryId as any}
+                  onChange={(e) =>
+                    setCategoryId(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  placeholder={language === "ar" ? "رقم الفئة" : "Category ID"}
+                  className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                  dir="ltr"
+                />
+              )}
+            </div>
+
+            {/* Brand */}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "العلامة التجارية" : "Brand"}
+              </label>
+              {brands ? (
+                <select
+                  value={brandId}
+                  onChange={(e) =>
+                    setBrandId(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                  dir={language === "ar" ? "rtl" : "ltr"}
+                >
+                  <option value="">
+                    {language === "ar"
+                      ? "اختر علامة تجارية (اختياري)"
+                      : "Select brand (optional)"}
+                  </option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={brandId as any}
+                  onChange={(e) =>
+                    setBrandId(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  placeholder={
+                    language === "ar"
+                      ? "رقم العلامة التجارية (اختياري)"
+                      : "Brand ID (optional)"
+                  }
+                  className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                  dir="ltr"
+                />
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "الفئة" : "Category"}
-            </label>
-            {categories ? (
+          {/* Product Type and Role */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "نوع المنتج" : "Product Type"}
+              </label>
               <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(Number(e.target.value))}
-                required
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={productType}
+                onChange={(e) => setProductType(e.target.value)}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir={language === "ar" ? "rtl" : "ltr"}
               >
-                <option value="">
-                  {language === "ar" ? "اختر فئة" : "Select category"}
+                <option value="network-device">
+                  {language === "ar" ? "جهاز شبكات" : "Network Device"}
                 </option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
+                <option value="software-license">
+                  {language === "ar" ? "ترخيص برمجي" : "Software License"}
+                </option>
+                <option value="installation-service">
+                  {language === "ar" ? "خدمة تركيب" : "Installation Service"}
+                </option>
               </select>
-            ) : (
-              <input
-                value={categoryId as any}
-                onChange={(e) =>
-                  setCategoryId(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                placeholder={language === "ar" ? "رقم الفئة" : "Category ID"}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "البراند" : "Brand"}
-            </label>
-            {brands ? (
+            </div>
+
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "دور المنتج" : "Product Role"}
+              </label>
               <select
-                value={brandId}
-                onChange={(e) =>
-                  setBrandId(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={productRole}
+                onChange={(e) => setProductRole(e.target.value)}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir={language === "ar" ? "rtl" : "ltr"}
               >
-                <option value="">
-                  {language === "ar"
-                    ? "اختر براند (اختياري)"
-                    : "Select brand (optional)"}
+                <option value="tocart">
+                  {language === "ar" ? "إلى السلة" : "To Cart"}
                 </option>
-                {brands.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name}
-                  </option>
-                ))}
+                <option value="toform">
+                  {language === "ar" ? "إلى النموذج" : "To Form"}
+                </option>
               </select>
-            ) : (
-              <input
-                value={brandId as any}
-                onChange={(e) =>
-                  setBrandId(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                placeholder={
-                  language === "ar"
-                    ? "رقم البراند (اختياري)"
-                    : "Brand ID (optional)"
-                }
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "نوع المنتج" : "Product Type"}
-            </label>
-            <select
-              value={productType}
-              onChange={(e) => setProductType(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="network-device">
-                {language === "ar" ? "جهاز شبكات" : "Network Device"}
-              </option>
-              <option value="software-license">
-                {language === "ar" ? "ترخيص برمجي" : "Software License"}
-              </option>
-              <option value="installation-service">
-                {language === "ar" ? "خدمة تركيب" : "Installation Service"}
-              </option>
-            </select>
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "دور المنتج" : "Product Role"}
-            </label>
-            <select
-              value={productRole}
-              onChange={(e) => setProductRole(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="tocart">
-                {language === "ar" ? "الي السله" : "To Cart"}
-              </option>
-              <option value="toform">
-                {language === "ar" ? "املا قائمة" : "To Form"}
-              </option>
-            </select>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-200">
+          {/* Specifications */}
+          <div className={language === "ar" ? "text-right" : "text-left"}>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
               {language === "ar" ? "مواصفات المنتج" : "Product Specifications"}
             </label>
 
-            {specifications.map((spec, idx) => (
-              <div key={idx} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={language === "ar" ? "اسم" : "Name"}
-                  value={spec.name}
-                  onChange={(e) => updateSpec(idx, "name", e.target.value)}
-                  className="p-2 border rounded flex-1"
-                />
-                <input
-                  type="text"
-                  placeholder={language === "ar" ? "القيمة" : "Value"}
-                  value={spec.value}
-                  onChange={(e) => updateSpec(idx, "value", e.target.value)}
-                  className="p-2 border rounded flex-1"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeSpec(idx)}
-                  className="px-2 bg-red-500 text-white rounded"
+            <div className="space-y-2">
+              {specifications.map((spec, idx) => (
+                <div
+                  key={idx}
+                  className={`flex gap-2 ${
+                    language === "ar" ? "flex-row-reverse" : "flex-row"
+                  }`}
                 >
-                  ×
-                </button>
-              </div>
-            ))}
+                  <input
+                    type="text"
+                    placeholder={
+                      language === "ar" ? "اسم المواصفة" : "Specification Name"
+                    }
+                    value={spec.name}
+                    onChange={(e) => updateSpec(idx, "name", e.target.value)}
+                    className={`flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir={language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <input
+                    type="text"
+                    placeholder={
+                      language === "ar"
+                        ? "قيمة المواصفة"
+                        : "Specification Value"
+                    }
+                    value={spec.value}
+                    onChange={(e) => updateSpec(idx, "value", e.target.value)}
+                    className={`flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir={language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSpec(idx)}
+                    className="px-3 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
 
             <button
               type="button"
               onClick={addSpec}
-              className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
             >
-              {language === "ar" ? "أضف مواصفة" : "Add Specification"}
+              {language === "ar"
+                ? "+ أضف مواصفة جديدة"
+                : "+ Add New Specification"}
             </button>
           </div>
 
-          {/* باقي الحقول (description, descriptionAr, price, compare_price, cost_price ...) بنفس أسلوب المدخلات السابقة */}
-          {/* الصورة */}
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "الصور" : "Images"}
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFiles}
-            />
-            {imageFiles.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {imageFiles.map((file, index) => (
-                  <span
-                    key={index}
-                    className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 p-1 rounded"
-                  >
-                    {file.name}
-                  </span>
-                ))}
-              </div>
-            )}
+          {/* Images */}
+          <div className="grid grid-cols-1 gap-4">
+            {/* Primary Image */}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFile}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
+                  language === "ar"
+                    ? "file:ml-4 file:mr-0 text-right"
+                    : "file:mr-4 text-left"
+                }`}
+                dir={language === "ar" ? "rtl" : "ltr"}
+              />
+              {imageFile && (
+                <span className="block mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {language === "ar" ? "تم اختيار الملف:" : "Selected file:"}{" "}
+                  {imageFile.name}
+                </span>
+              )}
+            </div>
+
+            {/* Additional Images */}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الصور الإضافية" : "Additional Images"}
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFiles}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
+                  language === "ar"
+                    ? "file:ml-4 file:mr-0 text-right"
+                    : "file:mr-4 text-left"
+                }`}
+                dir={language === "ar" ? "rtl" : "ltr"}
+              />
+              {imageFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {imageFiles.map((file, index) => (
+                    <span
+                      key={index}
+                      className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
+                    >
+                      {file.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-          {/* السعر والمخزون */}
+
+          {/* Pricing and Stock */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Price */}
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "السعر" : "Price"}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "السعر *" : "Price *"}
               </label>
               <input
                 required
@@ -857,42 +978,48 @@ function ProductForm({
                 step="0.01"
                 value={price}
                 onChange={(e) => setPrice(Number(e.target.value))}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
 
-            {/* Stock */}
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "المخزون" : "Stock"}
               </label>
               <input
                 type="number"
                 value={stock}
                 onChange={(e) => setStock(Number(e.target.value))}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
 
-            {/* Low stock threshold */}
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar"
-                  ? "حد التحذير من نقص المخزون"
-                  : "Low Stock Threshold"}
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "حد إنذار المخزون" : "Low Stock Alert"}
               </label>
               <input
                 type="number"
                 value={lowStockThreshold}
                 onChange={(e) => setLowStockThreshold(Number(e.target.value))}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
           </div>
 
+          {/* Additional Pricing */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "سعر المقارنة" : "Compare Price"}
               </label>
               <input
@@ -904,12 +1031,15 @@ function ProductForm({
                     e.target.value === "" ? "" : Number(e.target.value)
                   )
                 }
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "سعر التكلفة" : "Cost Price"}
               </label>
               <input
@@ -921,118 +1051,171 @@ function ProductForm({
                     e.target.value === "" ? "" : Number(e.target.value)
                   )
                 }
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
           </div>
 
+          {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "الباركود" : "Barcode"}
               </label>
               <input
                 type="text"
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                dir="ltr"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "الوزن" : "Weight"}
               </label>
               <input
                 type="text"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={language === "ar" ? "كجم" : "kg"}
+                dir="ltr"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "الأبعاد" : "Dimensions"}
               </label>
               <input
                 type="text"
                 value={dimensions}
                 onChange={(e) => setDimensions(e.target.value)}
-                className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar" ? "الطول × العرض × الارتفاع" : "L × W × H"
+                }
+                dir="ltr"
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            <div className="flex items-center gap-2">
+
+          {/* Checkboxes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label
+              className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 ${
+                language === "ar" ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={isDigital}
                 onChange={(e) => setIsDigital(e.target.checked)}
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label className="text-sm text-gray-700 dark:text-gray-300">
-                {language === "ar" ? "رقمي" : "Digital"}
-              </label>
-            </div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {language === "ar" ? "منتج رقمي" : "Digital Product"}
+              </span>
+            </label>
 
-            <div className="flex items-center gap-2">
+            <label
+              className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 ${
+                language === "ar" ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
               <input
                 type="checkbox"
                 checked={requiresShipping}
                 onChange={(e) => setRequiresShipping(e.target.checked)}
                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label className="text-sm text-gray-700 dark:text-gray-300">
-                {language === "ar" ? "يحتاج شحن" : "Requires Shipping"}
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {language === "ar" ? "يتطلب شحن" : "Requires Shipping"}
+              </span>
+            </label>
+          </div>
+
+          {/* SEO Fields */}
+          <div className="grid grid-cols-1 gap-4">
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "عنوان SEO" : "SEO Title"}
               </label>
+              <input
+                type="text"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "عنوان محسن لمحركات البحث"
+                    : "SEO optimized title"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
+              />
+            </div>
+
+            <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "وصف SEO" : "SEO Description"}
+              </label>
+              <textarea
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                rows={2}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "وصف محسن لمحركات البحث"
+                    : "SEO optimized description"
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
+              />
             </div>
           </div>
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "عنوان الميتا" : "Meta Title"}
-            </label>
-            <input
-              type="text"
-              value={metaTitle}
-              onChange={(e) => setMetaTitle(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
 
-          <div className="flex flex-col">
-            <label className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "وصف الميتا" : "Meta Description"}
-            </label>
-            <textarea
-              value={metaDescription}
-              onChange={(e) => setMetaDescription(e.target.value)}
-              rows={2}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* أزرار الحفظ والإلغاء */}
-          <div className="flex justify-end gap-3 mt-4">
+          {/* Actions */}
+          <div
+            className={`flex flex-col-reverse gap-3 pt-4 border-t border-gray-200 dark:border-gray-700 ${
+              language === "ar"
+                ? "sm:flex-row-reverse justify-end"
+                : "sm:flex-row justify-end"
+            }`}
+          >
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+              className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium flex-1 sm:flex-none"
             >
               {language === "ar" ? "إلغاء" : "Cancel"}
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm font-medium flex-1 sm:flex-none"
             >
               {submitting
                 ? language === "ar"
                   ? "جاري الحفظ..."
                   : "Saving..."
                 : language === "ar"
-                ? "حفظ"
-                : "Save"}
+                ? "حفظ المنتج"
+                : "Save Product"}
             </button>
           </div>
         </form>

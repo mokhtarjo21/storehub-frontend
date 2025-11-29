@@ -5,6 +5,7 @@ import {
   TrashIcon,
   LinkIcon,
   PhotoIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from "@headlessui/react";
 import toast from "react-hot-toast";
@@ -45,7 +46,9 @@ export default function AdminBrandsSection() {
     } catch (error) {
       console.error(error);
       toast.error(
-        language === "ar" ? "فشل في جلب العلامات" : "Failed to load brands"
+        language === "ar"
+          ? "فشل في جلب العلامات التجارية"
+          : "Failed to load brands"
       );
     } finally {
       setLoading(false);
@@ -61,11 +64,7 @@ export default function AdminBrandsSection() {
     if (!query.trim()) return brands;
     const q = query.toLowerCase();
     return brands.filter((brand) => {
-      const fields = [
-        brand.name,
-        brand.description || "",
-        brand.website || "",
-      ]
+      const fields = [brand.name, brand.description || "", brand.website || ""]
         .join(" ")
         .toLowerCase();
       return fields.includes(q);
@@ -86,31 +85,34 @@ export default function AdminBrandsSection() {
     if (
       !confirm(
         language === "ar"
-          ? "هل تريد حذف هذه العلامة؟"
-          : "Delete this brand permanently?"
+          ? "هل أنت متأكد من حذف هذه العلامة التجارية؟"
+          : "Are you sure you want to delete this brand?"
       )
     )
       return;
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${API_BASE_URL}/products/brands/${id}/`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/products/brands/${id}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         throw new Error(error.detail || "Delete failed");
       }
-      toast.success(language === "ar" ? "تم حذف العلامة" : "Brand deleted");
+      toast.success(
+        language === "ar"
+          ? "تم حذف العلامة التجارية"
+          : "Brand deleted successfully"
+      );
       setBrands((prev) => prev.filter((brand) => brand.id !== id));
     } catch (error) {
       console.error(error);
-      toast.error(language === "ar" ? "فشل الحذف" : "Failed to delete brand");
+      toast.error(
+        language === "ar" ? "فشل في الحذف" : "Failed to delete brand"
+      );
     }
   };
 
@@ -127,160 +129,274 @@ export default function AdminBrandsSection() {
   };
 
   return (
-    <div className="min-h-[70vh] p-6 bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div className="flex gap-3 w-full md:w-1/2">
+    <div className="min-h-[70vh] p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
+      {/* Header Section */}
+      <div
+        className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 ${
+          language === "ar" ? "text-right" : "text-left"
+        }`}
+      >
+        <div className="flex gap-3 w-full lg:w-1/2">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={
-              language === "ar" ? "ابحث عن علامة..." : "Search brands..."
+              language === "ar" ? "ابحث عن علامة تجارية..." : "Search brands..."
             }
-            className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`flex-1 p-2 sm:p-3 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              language === "ar" ? "text-right" : "text-left"
+            }`}
+            dir={language === "ar" ? "rtl" : "ltr"}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div
+          className={`flex items-center gap-2 ${
+            language === "ar" ? "flex-row-reverse" : "flex-row"
+          }`}
+        >
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm text-sm sm:text-base"
           >
-            <PlusCircleIcon className="w-5 h-5" />
-            <span>{language === "ar" ? "إضافة علامة" : "Add brand"}</span>
+            <PlusCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span>
+              {language === "ar" ? "إضافة علامة تجارية" : "Add Brand"}
+            </span>
           </button>
           <button
             onClick={loadBrands}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm sm:text-base"
           >
             {language === "ar" ? "تحديث" : "Refresh"}
           </button>
         </div>
       </div>
 
+      {/* Table Container */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الشعار" : "Logo"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الاسم" : "Name"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الموقع" : "Website"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الوصف" : "Description"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الحالة" : "Status"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "التحكم" : "Actions"}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {loading ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
-                <td
-                  colSpan={6}
-                  className="p-6 text-center text-gray-500 dark:text-gray-400"
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
                 >
-                  {language === "ar" ? "جارٍ التحميل..." : "Loading brands..."}
-                </td>
+                  {language === "ar" ? "الشعار" : "Logo"}
+                </th>
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "الاسم" : "Name"}
+                </th>
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap hidden md:table-cell ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "الموقع الإلكتروني" : "Website"}
+                </th>
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap hidden lg:table-cell ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "الوصف" : "Description"}
+                </th>
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "الحالة" : "Status"}
+                </th>
+                <th
+                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "الإجراءات" : "Actions"}
+                </th>
               </tr>
-            ) : filteredBrands.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="p-6 text-center text-gray-500 dark:text-gray-400"
-                >
-                  {language === "ar" ? "لا توجد علامات" : "No brands found"}
-                </td>
-              </tr>
-            ) : (
-              filteredBrands.map((brand) => (
-                <tr
-                  key={brand.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150"
-                >
-                  <td className="px-4 py-3">
-                    {brand.logo ? (
-                      <img
-                        src={brand.logo}
-                        alt={brand.name}
-                        className="w-16 h-16 rounded object-cover border border-gray-200 dark:border-gray-600"
-                      />
-                    ) : (
-                      <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                    {brand.name}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-blue-600 dark:text-blue-400">
-                    {brand.website ? (
-                      <a
-                        href={brand.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 hover:underline"
-                      >
-                        <LinkIcon className="w-4 h-4" />
-                        <span className="truncate max-w-[150px]">
-                          {brand.website}
-                        </span>
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs">
-                    <p className="line-clamp-2">
-                      {brand.description || (language === "ar" ? "—" : "—")}
-                    </p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        brand.is_active
-                          ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200"
-                          : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
-                      }`}
-                    >
-                      {brand.is_active
-                        ? language === "ar"
-                          ? "نشط"
-                          : "Active"
-                        : language === "ar"
-                        ? "غير نشط"
-                        : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openEdit(brand)}
-                        className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition"
-                        title={language === "ar" ? "تعديل" : "Edit"}
-                      >
-                        <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(brand.id)}
-                        className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition"
-                        title={language === "ar" ? "حذف" : "Delete"}
-                      >
-                        <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="p-6 text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base"
+                  >
+                    {language === "ar"
+                      ? "جارٍ التحميل..."
+                      : "Loading brands..."}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : filteredBrands.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="p-6 text-center text-gray-500 dark:text-gray-400 text-sm sm:text-base"
+                  >
+                    {language === "ar"
+                      ? "لا توجد علامات تجارية"
+                      : "No brands found"}
+                  </td>
+                </tr>
+              ) : (
+                filteredBrands.map((brand) => (
+                  <tr
+                    key={brand.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150"
+                  >
+                    {/* Logo */}
+                    <td className="px-3 py-3">
+                      {brand.logo ? (
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-600"
+                        />
+                      ) : (
+                        <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </td>
+
+                    {/* Name */}
+                    <td
+                      className={`px-3 py-3 ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {brand.name}
+                        </div>
+                        {/* Website on mobile */}
+                        <div className="md:hidden mt-1">
+                          {brand.website ? (
+                            <a
+                              href={brand.website}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={`inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline ${
+                                language === "ar"
+                                  ? "flex-row-reverse"
+                                  : "flex-row"
+                              }`}
+                            >
+                              <LinkIcon className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate max-w-[120px]">
+                                {brand.website}
+                              </span>
+                            </a>
+                          ) : (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              —
+                            </span>
+                          )}
+                        </div>
+                        {/* Description on mobile */}
+                        <div className="lg:hidden mt-1">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                            {brand.description || "—"}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Website - Hidden on mobile */}
+                    <td
+                      className={`px-3 py-3 hidden md:table-cell ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {brand.website ? (
+                        <a
+                          href={brand.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline ${
+                            language === "ar" ? "flex-row-reverse" : "flex-row"
+                          }`}
+                        >
+                          <LinkIcon className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate max-w-[150px]">
+                            {brand.website}
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          —
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Description - Hidden on mobile and medium screens */}
+                    <td
+                      className={`px-3 py-3 hidden lg:table-cell ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 max-w-xs">
+                        {brand.description || "—"}
+                      </p>
+                    </td>
+
+                    {/* Status */}
+                    <td
+                      className={`px-3 py-3 ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${
+                          brand.is_active
+                            ? "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200"
+                            : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
+                        }`}
+                      >
+                        {brand.is_active
+                          ? language === "ar"
+                            ? "نشط"
+                            : "Active"
+                          : language === "ar"
+                          ? "غير نشط"
+                          : "Inactive"}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td
+                      className={`px-3 py-3 ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <div className="flex gap-1 sm:gap-2">
+                        <button
+                          onClick={() => openEdit(brand)}
+                          className="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition"
+                          title={language === "ar" ? "تعديل" : "Edit"}
+                        >
+                          <PencilSquareIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 dark:text-yellow-400" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(brand.id)}
+                          className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition"
+                          title={language === "ar" ? "حذف" : "Delete"}
+                        >
+                          <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-700 dark:text-red-400" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showForm && (
@@ -352,14 +468,18 @@ function BrandForm({
       }
 
       toast.success(
-        language === "ar" ? "تم حفظ العلامة" : "Brand saved successfully"
+        language === "ar"
+          ? "تم حفظ العلامة التجارية بنجاح"
+          : "Brand saved successfully"
       );
       onSaved(data);
     } catch (error: any) {
       console.error(error);
       toast.error(
         error?.message ||
-          (language === "ar" ? "فشل الحفظ" : "Failed to save brand")
+          (language === "ar"
+            ? "فشل في حفظ العلامة التجارية"
+            : "Failed to save brand")
       );
     } finally {
       setSubmitting(false);
@@ -381,7 +501,7 @@ function BrandForm({
           <div className="fixed inset-0 bg-black/40" />
         </Transition.Child>
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="flex min-h-full items-center justify-center p-2 sm:p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -391,91 +511,168 @@ function BrandForm({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left shadow-xl transition-all">
-                <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  {initial
-                    ? language === "ar"
-                      ? "تعديل العلامة"
-                      : "Edit brand"
-                    : language === "ar"
-                    ? "إضافة علامة"
-                    : "Add brand"}
-                </Dialog.Title>
-                <form onSubmit={submit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === "ar" ? "الاسم" : "Name"}
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-xl sm:rounded-2xl bg-white dark:bg-gray-800 p-4 sm:p-6 text-left shadow-xl transition-all mx-2">
+                {/* Header */}
+                <div
+                  className={`flex items-center justify-between mb-4 sm:mb-6 ${
+                    language === "ar" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                >
+                  <Dialog.Title
+                    className={`text-lg sm:text-xl font-semibold text-gray-900 dark:text-white flex-1 ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {initial
+                      ? language === "ar"
+                        ? "تعديل العلامة التجارية"
+                        : "Edit Brand"
+                      : language === "ar"
+                      ? "إضافة علامة تجارية جديدة"
+                      : "Add New Brand"}
+                  </Dialog.Title>
+                  <button
+                    onClick={onClose}
+                    className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+                  >
+                    <XMarkIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  </button>
+                </div>
+
+                {/* Form */}
+                <form onSubmit={submit} className="space-y-4 sm:space-y-6">
+                  {/* Name */}
+                  <div
+                    className={language === "ar" ? "text-right" : "text-left"}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {language === "ar"
+                        ? "اسم العلامة التجارية"
+                        : "Brand Name"}{" "}
+                      *
                     </label>
                     <input
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                      placeholder={
+                        language === "ar"
+                          ? "أدخل اسم العلامة التجارية"
+                          : "Enter brand name"
+                      }
+                      dir={language === "ar" ? "rtl" : "ltr"}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === "ar" ? "الموقع" : "Website"}
+
+                  {/* Website */}
+                  <div
+                    className={language === "ar" ? "text-right" : "text-left"}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {language === "ar" ? "الموقع الإلكتروني" : "Website"}
                     </label>
                     <input
                       type="url"
                       value={website}
                       onChange={(e) => setWebsite(e.target.value)}
                       placeholder="https://example.com"
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                      dir="ltr"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+
+                  {/* Description */}
+                  <div
+                    className={language === "ar" ? "text-right" : "text-left"}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {language === "ar" ? "الوصف" : "Description"}
                     </label>
                     <textarea
                       rows={4}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                      placeholder={
+                        language === "ar"
+                          ? "أدخل وصف العلامة التجارية"
+                          : "Enter brand description"
+                      }
+                      dir={language === "ar" ? "rtl" : "ltr"}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {language === "ar" ? "الشعار" : "Logo"}
+
+                  {/* Logo Upload */}
+                  <div
+                    className={language === "ar" ? "text-right" : "text-left"}
+                  >
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {language === "ar"
+                        ? "شعار العلامة التجارية"
+                        : "Brand Logo"}
                     </label>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleFile}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
+                        language === "ar"
+                          ? "file:ml-4 file:mr-0 text-right"
+                          : "file:mr-4 text-left"
+                      }`}
+                      dir={language === "ar" ? "rtl" : "ltr"}
                     />
                   </div>
-                  <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+
+                  {/* Active Checkbox */}
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50`}
+                  >
                     <input
                       type="checkbox"
                       checked={isActive}
                       onChange={(e) => setIsActive(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
                     />
-                    {language === "ar" ? "نشط" : "Active"}
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {language === "ar" ? "علامة تجارية نشطة" : "Active Brand"}
+                    </span>
                   </label>
-                  <div className="flex justify-end gap-2 pt-4">
+
+                  {/* Actions */}
+                  <div
+                    className={`flex flex-col-reverse gap-3 ${
+                      language === "ar"
+                        ? "sm:flex-row-reverse justify-end"
+                        : "sm:flex-row justify-end"
+                    }`}
+                  >
                     <button
                       type="button"
                       onClick={onClose}
-                      className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+                      className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium flex-1 sm:flex-none"
                     >
                       {language === "ar" ? "إلغاء" : "Cancel"}
                     </button>
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-sm font-medium flex-1 sm:flex-none"
                     >
                       {submitting
                         ? language === "ar"
                           ? "جاري الحفظ..."
                           : "Saving..."
                         : language === "ar"
-                        ? "حفظ"
-                        : "Save"}
+                        ? "حفظ العلامة التجارية"
+                        : "Save Brand"}
                     </button>
                   </div>
                 </form>
@@ -487,4 +684,3 @@ function BrandForm({
     </Transition>
   );
 }
-
