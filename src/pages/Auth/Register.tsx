@@ -55,7 +55,31 @@ export const useRegisterSchema = () => {
     email: yup
       .string()
       .email(messages[language].emailInvalid)
-      .required(messages[language].emailRequired),
+      .required(messages[language].emailRequired)
+      .when("role", {
+        is: "company_admin",
+        then: (schema) =>
+          schema.test(
+            "company-email-only",
+            messages[language].companyEmailOnly ||
+              "Please use a company email address",
+            (value) => {
+              if (!value) return false;
+
+              const blockedDomains = [
+                "gmail.com",
+                "yahoo.com",
+                "hotmail.com",
+                "outlook.com",
+              ];
+
+              const domain = value.split("@")[1]?.toLowerCase();
+              return !blockedDomains.includes(domain);
+            }
+          ),
+        otherwise: (schema) => schema, // لو مش شركة → مفيش test إضافي
+      }),
+
     phone: yup
       .string()
       .required(messages[language].phoneRequired)

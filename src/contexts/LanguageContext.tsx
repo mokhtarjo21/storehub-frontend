@@ -387,6 +387,8 @@ const translations = {
     "auth.register.email.placeholder": "Enter your email",
     "auth.register.password.placeholder": "Create a password",
     "auth.register.haveAccount": "Already have an account?",
+    companyEmailOnly:
+      "Personal emails like Gmail are not allowed. Please use your company email.",
 
     "auth.register.phoneRequired": "Phone number is required",
     "auth.register.phoneInvalid": "Invalid  phone number",
@@ -807,7 +809,8 @@ const translations = {
     "auth.register.phoneRequired": "رقم الهاتف مطلوب",
     "auth.register.phoneInvalid": "رقم الهاتف غير صالح",
     "auth.register.phone.placeholder": "ادخل رقم هاتفك",
-
+    companyEmailOnly:
+      "لا يُسمح باستخدام بريد شخصي مثل Gmail — استخدم بريد الشركة.",
     "auth.forgotPassword.title": "هل نسيت كلمة المرور؟",
     "auth.forgotPassword.subtitle":
       "أدخل بريدك الإلكتروني  وسنرسل لك رمزًا لإعادة تعيين كلمة المرور.",
