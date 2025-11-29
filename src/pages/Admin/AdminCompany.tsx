@@ -1,4 +1,3 @@
-// AdminCompaniesPage.tsx
 import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 
@@ -10,7 +9,17 @@ interface Company {
   phone: string;
   approval_status: string;
   full_address: string;
-  is_active: boolean;
+  registration_number?: string;
+  website?: string;
+  description?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  tax_card_image?: string;
+  commercial_registration_image?: string;
 }
 
 export default function AdminCompaniesPage() {
@@ -25,26 +34,7 @@ export default function AdminCompaniesPage() {
   const [perPage] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
 
-    // داخل AdminCompaniesPage.tsx
-const url = "http://192.168.1.7:8000"; // تأكد من أن هذا هو نفس عنوان الـ baseURL في axiosInstance.ts
-// AdminCompaniesPage.tsx
-const openCompanyModal = async (id: number) => {
-  try {
-    // جلب التفاصيل من الباك إند
-    const res = await axiosInstance.get(`/api/auth/admin/company/${id}/`);
-    setSelectedCompany(res.data); // البيانات الكاملة من السيرفر
-    console.log(res.data);
-    
-    setIsModalOpen(true);
-  } catch (error) {
-    console.error("Failed to fetch company details:", error);
-    alert("Failed to load company details");
-  }
-};
-
-  useEffect(() => {
-    fetchCompanies();
-  }, [currentPage, search, filterStatus, sortField, sortOrder]);
+  const url = "http://192.168.1.7:8000"; // baseURL for images
 
   const fetchCompanies = async () => {
     try {
@@ -62,20 +52,25 @@ const openCompanyModal = async (id: number) => {
     }
   };
 
+  useEffect(() => {
+    fetchCompanies();
+  }, [currentPage, search, filterStatus, sortField, sortOrder]);
 
+  const openCompanyModal = async (id: number) => {
+    try {
+      const res = await axiosInstance.get(`/api/auth/admin/company/${id}/`);
+      setSelectedCompany(res.data);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch company details:", error);
+      alert("Failed to load company details");
+    }
+  };
 
   const toggleActive = async (company: Company) => {
     try {
-        if (company.approval_status === "reject" || company.approval_status === "pending") {
-      await axiosInstance.post(`/api/auth/admin/companies/${company.id}/approve/`, {
-     action:"approve"
-      });}
-        else {
-        await axiosInstance.post(`/api/auth/admin/companies/${company.id}/approve/`, {   
-
-        action:"reject"
-        });
-        }
+      const action = company.approval_status === "approved" ? "reject" : "approve";
+      await axiosInstance.post(`/api/auth/admin/companies/${company.id}/approve/`, { action });
       fetchCompanies();
     } catch (error) {
       console.error(error);
@@ -87,22 +82,22 @@ const openCompanyModal = async (id: number) => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Companies</h1>
+    <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <h1 className="text-3xl font-bold">Companies</h1>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-4 flex-wrap">
+      <div className="flex flex-wrap gap-3 items-center">
         <input
           type="text"
           placeholder="Search by name or email"
-          className="border p-2 rounded"
+          className="border p-2 rounded flex-1 min-w-[200px] dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
         >
           <option value="">All</option>
           <option value="approved">Approved</option>
@@ -112,9 +107,9 @@ const openCompanyModal = async (id: number) => {
         <select
           value={sortField}
           onChange={(e) => setSortField(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
         >
-          <option value="">Sort by field</option>
+          <option value="">Sort by</option>
           <option value="name">Name</option>
           <option value="industry">Industry</option>
           <option value="approval_status">Status</option>
@@ -122,7 +117,7 @@ const openCompanyModal = async (id: number) => {
         <select
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-          className="border p-2 rounded"
+          className="border p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
         >
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
@@ -130,100 +125,110 @@ const openCompanyModal = async (id: number) => {
       </div>
 
       {/* Companies Table */}
-      <table className="min-w-full bg-white shadow rounded-lg">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="py-2 px-4 text-left">Name</th>
-            <th className="py-2 px-4 text-left">Industry</th>
-            <th className="py-2 px-4 text-left">Status</th>
-            <th className="py-2 px-4 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {companies.map((company) => (
-            <tr key={company.id} className="border-b">
-              <td className="py-2 px-4">{company.name}</td>
-              <td className="py-2 px-4">{company.industry}</td>
-              <td className="py-2 px-4">{company.approval_status}</td>
-              <td className="py-2 px-4 flex gap-2 flex-wrap">
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded"
-                  onClick={() => openCompanyModal(company.id)}
-                >
-                  View
-                </button>
-                <button
-                  className={`px-2 py-1 rounded ${company.approval_status ==="approved" ? "bg-yellow-500" : "bg-green-500"} text-white`}
-                  onClick={() => toggleActive(company)}
-                >
-                  {company.approval_status === "approved" ? "Reject" : "Approve"}
-                </button>
-               
-              </td>
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded shadow">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
+              <th className="px-4 py-2 text-left text-sm font-semibold">Industry</th>
+              <th className="px-4 py-2 text-left text-sm font-semibold">Status</th>
+              <th className="px-4 py-2 text-left text-sm font-semibold">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {companies.map((company) => (
+              <tr key={company.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td className="px-4 py-2">{company.name}</td>
+                <td className="px-4 py-2">{company.industry}</td>
+                <td className="px-4 py-2 capitalize">{company.approval_status}</td>
+                <td className="px-4 py-2 flex gap-2 flex-wrap">
+                  <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                    onClick={() => openCompanyModal(company.id)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded text-white ${
+                      company.approval_status === "approved" ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                    }`}
+                    onClick={() => toggleActive(company)}
+                  >
+                    {company.approval_status === "approved" ? "Reject" : "Approve"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
-      <div className="flex justify-center mt-4 gap-2">
+      <div className="flex justify-center items-center gap-3 mt-4">
         <button
-          className="px-3 py-1 border rounded disabled:opacity-50"
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-700"
         >
           Prev
         </button>
-        <span className="px-3 py-1">{currentPage} / {totalPages}</span>
+        <span>
+          Page <strong>{currentPage}</strong> of {totalPages}
+        </span>
         <button
-          className="px-3 py-1 border rounded disabled:opacity-50"
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-700"
         >
           Next
         </button>
       </div>
 
       {/* Modal */}
-   {/* Modal */}
-{isModalOpen && selectedCompany && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded shadow-lg w-96 max-h-[80vh] overflow-y-auto">
-      <h2 className="text-xl font-bold mb-4">Company Details</h2>
-      <p><strong>Name:</strong> {selectedCompany.name}</p>
-      <p><strong>Registration Number:</strong> {selectedCompany.registration_number}</p>
-      <p><strong>Industry:</strong> {selectedCompany.industry}</p>
-      <p><strong>Website:</strong> {selectedCompany.website}</p>
-      <p><strong>Description:</strong> {selectedCompany.description}</p>
-      <p>
-        <strong>Address:</strong> {selectedCompany.address_line1}{" "}
-        {selectedCompany.address_line2 ? selectedCompany.address_line2 : ""},{" "}
-        {selectedCompany.city}, {selectedCompany.state}, {selectedCompany.postal_code}, {selectedCompany.country}
-      </p>
-      <p><strong>Phone:</strong> {selectedCompany.phone}</p>
-      <p><strong>Email:</strong> {selectedCompany.email}</p>
-      {selectedCompany.tax_card_image && (
-        
-          <img src={url +selectedCompany.tax_card_image}  alt="" />
-        
-      )}
-      {selectedCompany.commercial_registration_image && (
-        
-          <img src={url +selectedCompany.commercial_registration_image} alt=""/>
-        
-      )}
-      <div className="mt-4 flex justify-end">
-        <button
-          className="bg-gray-500 text-white px-3 py-1 rounded"
-          onClick={() => setIsModalOpen(false)}
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {isModalOpen && selectedCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-gray-800 w-full max-w-xl p-6 rounded-lg shadow-lg max-h-[90vh] overflow-y-auto space-y-4">
+            <h2 className="text-2xl font-bold">{selectedCompany.name}</h2>
+            <p><strong>Registration Number:</strong> {selectedCompany.registration_number || "-"}</p>
+            <p><strong>Industry:</strong> {selectedCompany.industry}</p>
+            <p><strong>Website:</strong> {selectedCompany.website || "-"}</p>
+            <p><strong>Description:</strong> {selectedCompany.description || "-"}</p>
+            <p>
+              <strong>Address:</strong>{" "}
+              {selectedCompany.address_line1 || ""} {selectedCompany.address_line2 || ""},{" "}
+              {selectedCompany.city || ""}, {selectedCompany.state || ""}, {selectedCompany.postal_code || ""}, {selectedCompany.country || ""}
+            </p>
+            <p><strong>Phone:</strong> {selectedCompany.phone}</p>
+            <p><strong>Email:</strong> {selectedCompany.email}</p>
 
+            <div className="flex flex-wrap gap-2 mt-2 justify-center">
+              {selectedCompany.tax_card_image && (
+                <img
+                  src={url + selectedCompany.tax_card_image}
+                  alt="Tax Card"
+                  className="max-h-52 rounded shadow"
+                />
+              )}
+              {selectedCompany.commercial_registration_image && (
+                <img
+                  src={url + selectedCompany.commercial_registration_image}
+                  alt="Commercial Registration"
+                  className="max-h-52 rounded shadow"
+                />
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
