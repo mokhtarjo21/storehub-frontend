@@ -55,7 +55,8 @@ const AdminPanel: React.FC = () => {
       <div className="lg:ml-60 lg:pt-6">
         {activeTab === "dashboard" && <AdminDashboard />}
         {activeTab === "products" && <AdminProductsSection />}
-        {activeTab === "order" && <AdminOrdersPage />}        
+        {activeTab === "order" && <AdminOrdersPage />}
+        
         {activeTab === "brands" && <AdminBrandsSection />}
         {activeTab === "categories" && <AdminCategoriesSection />}
       </div>

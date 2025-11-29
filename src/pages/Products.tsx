@@ -10,7 +10,7 @@ import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import CustomerFormModal from "../components/FormCart";
-
+import SearchBar from "../components/SearchBar";
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
 
