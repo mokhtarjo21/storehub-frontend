@@ -12,6 +12,7 @@ interface AuthContextType {
   fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
+  checkApiConnection: () => Promise<boolean>;
   getNotifications: (num:number) => Promise<any[]>;
   myorders: (page:any) => Promise<any>;
   fetchServices: () => Promise<any[]>;
@@ -173,7 +174,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       toast.success("Logged out successfully");
     }
   };
+  const checkApiConnection = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me/`, {
+        method: "GET",
+       headers: getAuthHeaders(),
+      });
 
+      // Even if we get 401 (unauthorized), it means the API is running
+      if (response.status === 401 || response.ok) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  };
   const register = async (userData: any, password: string): Promise<void> => {
     setIsLoading(true);
 
@@ -686,6 +703,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         getNotifications,
         updateservice,
         deleteProduct,
+        checkApiConnection,
         deleteService,
       }}
     >

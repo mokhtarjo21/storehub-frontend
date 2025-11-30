@@ -88,7 +88,7 @@ const Profile: React.FC = () => {
   const tabs = [...baseTabs, ...additionalTabs];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="content bg-gray-50 dark:bg-gray-900 py-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -174,9 +174,9 @@ const Profile: React.FC = () => {
 
               {/* My Orders Tab */}
               {activeTab === 'orders' && (
-                <div className="p-6">
+                <div className="p-10">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                    My Orders
+                    {language === "ar" ? "طلباتي" : "My Orders"}
                   </h2>
                   <MyOrders />
                 </div>
@@ -186,7 +186,7 @@ const Profile: React.FC = () => {
               {activeTab === 'notifications' && (
                 <div className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                    Notifications
+                    {language === "ar" ? "إشعاراتي" : "My Notifications"}
                   </h2>
                   <MyNotifications />
                 </div>
@@ -194,9 +194,9 @@ const Profile: React.FC = () => {
 
               {/* My Activity Tab */}
               {activeTab === 'activity' && (
-                <div className="p-6">
+                <div className="content p-1">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-                    My Activity
+                    {language === "ar" ? "نشاطي" : "My Activity"}
                   </h2>
                   <MyActivity />
                 </div>

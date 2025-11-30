@@ -14,7 +14,7 @@ import {
 const MyActivity: React.FC = () => {
   const { language } = useLanguage();
   const { data: activities, loading, error } = useApi('/auth/activity/');
-
+  
   const getActivityIcon = (action: string) => {
     switch (action) {
       case 'page_view':
@@ -57,6 +57,7 @@ const MyActivity: React.FC = () => {
     }
   };
 
+  console.log(activities);
   const getActivityLabel = (action: string) => {
     const labels: Record<string, { en: string; ar: string }> = {
       page_view: { en: 'Page View', ar: 'عرض الصفحة' },
@@ -106,73 +107,96 @@ const MyActivity: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          {language === 'ar' ? 'نشاطك الأخير' : 'Your Recent Activity'}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          {language === 'ar'
-            ? 'تتبع تفاعلاتك وسجل التصفح'
-            : 'Track your interactions and browsing history'}
-        </p>
-      </div>
+  <div className="space-y-8">
 
-      <div className="relative">
-        <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+    {/* --- HEADER --- */}
+    <div className="mb-6">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+        {language === "ar" ? "نشاطك الأخير" : "Your Activity Timeline"}
+      </h3>
+      <p className="text-sm text-gray-600 dark:text-gray-400">
+        {language === "ar"
+          ? "سجل شامل لكل تفاعلاتك داخل المنصة"
+          : "A detailed and modern timeline for all your interactions"}
+      </p>
+    </div>
 
-        <div className="space-y-6">
-          {activities.map((activity: any, index: number) => {
-            const Icon = getActivityIcon(activity.action);
-            const colorClass = getActivityColor(activity.action);
+    {/* --- TIMELINE LINE --- */}
+    <div className="relative pl-10">
+      <div className="absolute top-0 bottom-0 left-4 w-[2px] bg-gray-200 dark:bg-gray-700"></div>
 
-            return (
-              <motion.div
-                key={activity.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="relative flex gap-4 pl-12"
+      <div className="space-y-6">
+        {activities.map((activity: any, index: number) => {
+          const Icon = getActivityIcon(activity.action);
+          const colorClass = getActivityColor(activity.action);
+
+          return (
+            <motion.div
+              key={activity.id}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className=" flex gap-6 items-start"
+            >
+              {/* ICON */}
+              <div
+                className={`absolute left-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md border ${colorClass}`}
               >
-                <div
-                  className={`absolute left-0 w-10 h-10 rounded-full flex items-center justify-center ${colorClass}`}
-                >
-                  <Icon className="w-5 h-5" />
-                </div>
+                <Icon className="w-5 h-5" />
+              </div>
 
-                <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
-                        {getActivityLabel(activity.action)}
-                      </h4>
-                      {activity.target && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                          {activity.target}
-                        </p>
-                      )}
-                      {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                          {Object.entries(activity.metadata).map(([key, value]) => (
-                            <span key={key} className="mr-3 rtl:mr-0 rtl:ml-3">
-                              {key}: {String(value)}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <time className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </time>
+              {/* CARD */}
+              <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start justify-between gap-4">
+
+                  {/* TITLE + TARGET */}
+                  <div className="flex-1">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      {getActivityLabel(activity.action)}
+                    </h4>
+
+                    {/* TARGET */}
+                    {activity.target && (
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        {language === "ar" ? "الهدف:" : "Target:"}{" "}
+                        <span className="font-medium">{activity.target}</span>
+                      </p>
+                    )}
+
+                    {/* METADATA */}
+                    {activity.metadata && Object.keys(activity.metadata).length > 0 && (
+                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Object.entries(activity.metadata).map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="bg-gray-50 dark:bg-gray-900/30 p-2 rounded-lg border border-gray-200 dark:border-gray-700"
+                          >
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {key}
+                            </p>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                              {String(value)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
+
+                  {/* TIMESTAMP */}
+                  <time className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                    {new Date(activity.timestamp).toLocaleString()}
+                  </time>
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default MyActivity;

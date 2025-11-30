@@ -5,28 +5,26 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon 
 } from '@heroicons/react/24/outline';
-
+import { useAuth } from '../contexts/AuthContext';
 const ApiStatus: React.FC = () => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [showStatus, setShowStatus] = useState(true);
-
+  const { checkApiConnection } = useAuth();
   useEffect(() => {
-    checkApiConnection();
-    const interval = setInterval(checkApiConnection, 30000); // Check every 30 seconds
+    checkConnection();
+    const interval = setInterval(checkConnection, 30000); // Check every 30 seconds
     return () => clearInterval(interval);
   }, []);
 
-  const checkApiConnection = async () => {
+  const checkConnection = async () => {
     try {
-      const response = await fetch('http://198.168.1.7:8000/api/auth/me/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await checkApiConnection();
+        
+      console.log(response);
+      
       
       // Even if we get 401 (unauthorized), it means the API is running
-      if (response.status === 401 || response.ok) {
+      if (response) {
         setStatus('connected');
       } else {
         setStatus('disconnected');
@@ -72,7 +70,7 @@ const ApiStatus: React.FC = () => {
 
   return (
     <AnimatePresence>
-      {/* <motion.div
+      <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
@@ -99,7 +97,7 @@ const ApiStatus: React.FC = () => {
             ×
           </button>
         </div>
-      </motion.div> */}
+      </motion.div>
     </AnimatePresence>
   );
 };
