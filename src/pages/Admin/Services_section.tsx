@@ -446,14 +446,7 @@ function ServiceForm({
       fd.append("is_featured", String(Number(isFeatured)));
       if (imageFile) fd.append("image", imageFile);
 
-      // Log FormData for debugging
-      console.log("Submitting service:", {
-        title,
-        categoryId,
-        price,
-        duration,
-        hasImage: !!imageFile,
-      });
+      
 
       let url = `${API_BASE_URL}/api/products/admin/services/`;
       let method = "POST";
@@ -462,7 +455,6 @@ function ServiceForm({
         method = "PUT";
       }
 
-      console.log("API Request:", { url, method });
 
       const res = await fetch(url, {
         method,

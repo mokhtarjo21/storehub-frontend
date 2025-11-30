@@ -442,7 +442,7 @@ const OrderDetail: React.FC = () => {
 
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {order.items?.map((item: any) => (
-              console.log(item),            
+                          
               <div
                 key={item.id}
                 className="px-4 sm:px-6 py-3 sm:py-4 flex items-start sm:items-center gap-3 sm:gap-4"

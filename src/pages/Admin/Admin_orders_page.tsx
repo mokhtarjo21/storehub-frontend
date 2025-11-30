@@ -167,19 +167,14 @@ export default function AdminOrdersPage() {
   ) => {
     setLoading(true);
     try {
-      console.log("Fetching orders with:", {
-        searchTerm,
-        statusFilter,
-        page,
-        size,
-      });
+     
       const [cRes] = await Promise.allSettled([
         fetchorders(searchTerm || "", statusFilter || "", page, size),
       ]);
 
       if (cRes.status === "fulfilled") {
         const cdata = cRes.value;
-        console.log("Orders data received:", cdata);
+      
 
         if (Array.isArray(cdata.results)) {
           setOrders(cdata.results);
@@ -228,7 +223,7 @@ export default function AdminOrdersPage() {
 
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
-        console.log("Selected order data:", orderDatsData);
+       
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
         setEditingOrder({
@@ -298,8 +293,7 @@ export default function AdminOrdersPage() {
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
-        // محاولة تحديث الطلب - نستخدم Promise.allSettled حتى لو فشل
-        console.log(updates);
+        /
 
         const [updateResult] = await Promise.allSettled([
           updateorders(selectedOrder.order_number, updates),
