@@ -601,8 +601,16 @@ const translations = {
     "services.duration.2_weeks": "أسبوعان",
     "services.duration.1_month": "شهر واحد",
     "services.duration.custom": "مدة مخصصة",
-
+    "paid":"مدفوع",
     // Orders
+    "pending": "قيد المراجعة",
+    "shipped": "تم الشحن",
+    "delivered": "تم التسليم",
+    "cancelled": "تم الغاء",
+    "confirmed": "تم التاكيد",
+    "processing": "جاري المعالجة",
+    "preparing": "جاري التحضير",
+    "refunded": "تم التراجع",
     "orders.title": "تفاصيل الطلب",
     "orders.notFound": "الطلب غير موجود",
     "orders.cancel": "إلغاء الطلب",
