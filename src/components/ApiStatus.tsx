@@ -70,7 +70,7 @@ const ApiStatus: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
@@ -97,7 +97,7 @@ const ApiStatus: React.FC = () => {
             ×
           </button>
         </div>
-      </motion.div>
+      </motion.div> */}
     </AnimatePresence>
   );
 };
