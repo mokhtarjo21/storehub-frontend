@@ -308,7 +308,7 @@ export default function AdminProductsSection() {
                       <img
                         src={p.primary_image}
                         alt={p.name}
-                        className="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-600"
+                        className="w-16 h-16 object-fill rounded border border-gray-200 dark:border-gray-600"
                       />
                     ) : (
                       <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />

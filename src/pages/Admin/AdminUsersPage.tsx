@@ -863,7 +863,7 @@ export default function AdminUsersPage() {
                                 ? "البطاقة الضريبية"
                                 : "Tax Card"
                             }
-                            className="w-24 h-24 object-cover border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
+                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
                           />
                           <p className="text-xs text-gray-600 dark:text-gray-400">
                             {language === "ar"
@@ -883,7 +883,7 @@ export default function AdminUsersPage() {
                                 ? "السجل التجاري"
                                 : "Commercial Registration"
                             }
-                            className="w-24 h-24 object-cover border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
+                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
                           />
                           <p className="text-xs text-gray-600 dark:text-gray-400">
                             {language === "ar"

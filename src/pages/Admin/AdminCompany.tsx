@@ -556,7 +556,7 @@ export default function AdminCompaniesPage() {
                           alt={
                             language === "ar" ? "البطاقة الضريبية" : "Tax Card"
                           }
-                          className="w-full h-48 object-contain border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
                         />
                       </div>
                     )}
@@ -574,7 +574,7 @@ export default function AdminCompaniesPage() {
                               ? "السجل التجاري"
                               : "Commercial Registration"
                           }
-                          className="w-full h-48 object-contain border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
                         />
                       </div>
                     )}
