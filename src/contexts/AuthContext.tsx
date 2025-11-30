@@ -12,6 +12,7 @@ interface AuthContextType {
   fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
   updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
   // Add product endpoints
+  getNotifications: (num:number) => Promise<any[]>;
   myorders: (page:any) => Promise<any>;
   fetchServices: () => Promise<any[]>;
   fetchRelatedProducts: (productSlug: string) => Promise<any[]>;
@@ -228,7 +229,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-
+ const getNotifications = async (num:number): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      console.log(num);
+      
+      
+      const response = await fetch(`${API_BASE_URL}/auth/notifications/?page=${num}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      return await handleApiResponse(response);
+     
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch notifications"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // داخل AuthProvider
   // ==================
 
@@ -662,6 +683,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         createProduct,
         updateProduct,
         myorders,
+        getNotifications,
         updateservice,
         deleteProduct,
         deleteService,

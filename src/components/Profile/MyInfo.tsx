@@ -32,8 +32,8 @@ const MyInfo: React.FC = () => {
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
-      phone: '',
-      address: '',
+      phone: user?.phone || '',
+      address: user?.address || '',
       companyName: user?.companyName || '',
     },
   });

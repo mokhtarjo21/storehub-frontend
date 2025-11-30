@@ -150,7 +150,7 @@ const fetchEmployees = async () => {
 
     try {
       const response = await apiRequest(`/auth/company/employees/${editingEmployee.id}/`, {
-        method: 'PATCH',
+        method: 'put',
         body: JSON.stringify(editingEmployee),
       });
       
@@ -627,6 +627,7 @@ const fetchEmployees = async () => {
                       Full Name
                     </label>
                     <input
+                    disabled
                       type="text"
                       required
                       value={editingEmployee.full_name}
@@ -639,6 +640,7 @@ const fetchEmployees = async () => {
                       Email
                     </label>
                     <input
+                      disabled
                       type="email"
                       required
                       value={editingEmployee.email}

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useApi } from '../../hooks/useApi';
+import { useAuth } from '../../contexts/AuthContext';
 import { apiRequest, handleApiResponse } from '../../utils/api';
 import toast from 'react-hot-toast';
 import {
@@ -16,9 +16,40 @@ import { Notification } from '../../types';
 
 const MyNotifications: React.FC = () => {
   const { language } = useLanguage();
-  // const { data: notifications, loading, error, refetch } = useApi('/auth/notifications/');
-  const { data: apiData, loading, error, refetch  } = useApi('/auth/notifications/');
-const notifications = apiData?.notifications || [];
+  const { getNotifications, isLoading } = useAuth();
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchNotifications = async () => {
+    try {
+      const [cRes] = await Promise.allSettled([getNotifications(page)]);
+
+      if (cRes.status === 'fulfilled') {
+        const response = cRes.value;
+
+        const cdata =
+          response?.results ??
+          response?.data ??
+          [];
+
+        if (response?.count) {
+          setTotalPages(Math.ceil(response.count / 10));
+        }
+
+        if (Array.isArray(cdata)) {
+          setNotifications(cdata);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [page]);
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -50,28 +81,30 @@ const notifications = apiData?.notifications || [];
     }
   };
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = async (id: string) => {
     try {
-      const response = await apiRequest(`/auth/notifications/${notificationId}/mark-read/`, {
+      const response = await apiRequest(`/auth/notifications/${id}/mark-read/`, {
         method: 'POST',
       });
+
       await handleApiResponse(response);
-      refetch();
-    } catch (error) {
+      fetchNotifications();
+    } catch {
       toast.error('Failed to mark notification as read');
     }
   };
 
-  const deleteNotification = async (notificationId: string) => {
+  const deleteNotification = async (id: string) => {
     try {
-      const response = await apiRequest(`/auth/notifications/${notificationId}/`, {
+      const response = await apiRequest(`/auth/notifications/${id}/delete/`, {
         method: 'DELETE',
       });
+
       if (response.ok) {
+        setNotifications(notifications.filter((n) => n.id !== id));
         toast.success('Notification deleted');
-        refetch();
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete notification');
     }
   };
@@ -81,15 +114,16 @@ const notifications = apiData?.notifications || [];
       const response = await apiRequest('/auth/notifications/mark-all-read/', {
         method: 'POST',
       });
+
       await handleApiResponse(response);
       toast.success('All notifications marked as read');
-      refetch();
-    } catch (error) {
+      fetchNotifications();
+    } catch {
       toast.error('Failed to mark all as read');
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -97,15 +131,7 @@ const notifications = apiData?.notifications || [];
     );
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400">Failed to load notifications</p>
-      </div>
-    );
-  }
-
-  if (!notifications || notifications.length === 0) {
+  if (!notifications.length) {
     return (
       <div className="text-center py-12">
         <BellIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
@@ -116,10 +142,11 @@ const notifications = apiData?.notifications || [];
     );
   }
 
-  const unreadCount = notifications.filter((n: Notification) => !n.is_read).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
     <div className="space-y-4">
+
       {unreadCount > 0 && (
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -134,7 +161,7 @@ const notifications = apiData?.notifications || [];
         </div>
       )}
 
-      {notifications.map((notification: Notification, index: number) => {
+      {notifications.map((notification, index) => {
         const Icon = getNotificationIcon(notification.notification_type);
         const colorClass = getNotificationColor(notification.notification_type);
 
@@ -149,19 +176,21 @@ const notifications = apiData?.notifications || [];
             }`}
           >
             <div className="flex gap-4">
-              <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${colorClass}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${colorClass}`}>
                 <Icon className="w-5 h-5" />
               </div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
+              <div className="flex-1">
+                <div className="flex justify-between">
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
                       {language === 'ar' ? notification.title_ar : notification.title}
                     </h4>
+
                     <p className="text-sm text-gray-600 dark:text-gray-300">
                       {language === 'ar' ? notification.message_ar : notification.message}
                     </p>
+
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                       {new Date(notification.created_at).toLocaleString()}
                     </p>
@@ -171,16 +200,15 @@ const notifications = apiData?.notifications || [];
                     {!notification.is_read && (
                       <button
                         onClick={() => markAsRead(notification.id)}
-                        className="p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                        title={language === 'ar' ? 'تحديد كمقروء' : 'Mark as read'}
+                        className="p-1 text-blue-600 hover:text-blue-700"
                       >
                         <CheckCircleIcon className="w-5 h-5" />
                       </button>
                     )}
+
                     <button
                       onClick={() => deleteNotification(notification.id)}
-                      className="p-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                      title={language === 'ar' ? 'حذف' : 'Delete'}
+                      className="p-1 text-red-600 hover:text-red-700"
                     >
                       <TrashIcon className="w-5 h-5" />
                     </button>
@@ -191,6 +219,36 @@ const notifications = apiData?.notifications || [];
           </motion.div>
         );
       })}
+
+      <div className="flex justify-between items-center mt-6">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className={`px-4 py-2 rounded-lg border ${
+            page === 1
+              ? 'text-gray-400 border-gray-300 cursor-not-allowed'
+              : 'text-gray-700 dark:text-gray-200 border-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          {language === 'ar' ? 'السابق' : 'Previous'}
+        </button>
+
+        <span className="text-sm text-gray-600 dark:text-gray-300">
+          {language === 'ar' ? `صفحة ${page} من ${totalPages}` : `Page ${page} of ${totalPages}`}
+        </span>
+
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
+          className={`px-4 py-2 rounded-lg border ${
+            page === totalPages
+              ? 'text-gray-400 border-gray-300 cursor-not-allowed'
+              : 'text-gray-700 dark:text-gray-200 border-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+        >
+          {language === 'ar' ? 'التالي' : 'Next'}
+        </button>
+      </div>
     </div>
   );
 };
