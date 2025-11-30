@@ -257,7 +257,7 @@ export default function AdminBrandsSection() {
                         <img
                           src={brand.logo}
                           alt={brand.name}
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-600"
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-fill border border-gray-200 dark:border-gray-600"
                         />
                       ) : (
                         <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
