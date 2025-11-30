@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useApi } from '../../hooks/useApi';
@@ -13,8 +13,15 @@ import {
 
 const MyActivity: React.FC = () => {
   const { language } = useLanguage();
-  const { data: activities, loading, error } = useApi('/auth/activity/');
-  
+  const [page, setPage] = useState(1);
+
+  const { data, loading, error } = useApi(`/auth/activity/?page=${page}`);
+
+  const activities = data?.results || [];
+  const totalCount = data?.count || 0;
+  const pageSize = 15; // نفس اللي في الباك
+  const totalPages = Math.ceil(totalCount / pageSize);
+
   const getActivityIcon = (action: string) => {
     switch (action) {
       case 'page_view':
@@ -31,9 +38,6 @@ const MyActivity: React.FC = () => {
         return ArrowRightOnRectangleIcon;
       case 'register':
         return UserPlusIcon;
-      case 'product_click':
-      case 'filter_applied':
-        return CursorArrowRaysIcon;
       default:
         return CursorArrowRaysIcon;
     }
@@ -43,21 +47,20 @@ const MyActivity: React.FC = () => {
     switch (action) {
       case 'order_placed':
       case 'checkout':
-        return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20';
+        return 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20';
       case 'add_to_cart':
-        return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20';
+        return 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20';
       case 'search':
       case 'filter_applied':
-        return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20';
+        return 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/20';
       case 'login':
       case 'register':
-        return 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20';
+        return 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20';
       default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/20';
+        return 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-900/20';
     }
   };
 
-  console.log(activities);
   const getActivityLabel = (action: string) => {
     const labels: Record<string, { en: string; ar: string }> = {
       page_view: { en: 'Page View', ar: 'عرض الصفحة' },
@@ -73,12 +76,11 @@ const MyActivity: React.FC = () => {
       logout: { en: 'Logout', ar: 'تسجيل الخروج' },
       register: { en: 'Register', ar: 'التسجيل' },
       filter_applied: { en: 'Filter Applied', ar: 'تطبيق الفلتر' },
-      other: { en: 'Other', ar: 'أخرى' },
     };
-
-    return language === 'ar' ? labels[action]?.ar || action : labels[action]?.en || action;
+    return language === 'ar' ? labels[action]?.ar : labels[action]?.en;
   };
 
+  // --- LOADING ---
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -87,6 +89,7 @@ const MyActivity: React.FC = () => {
     );
   }
 
+  // --- ERROR ---
   if (error) {
     return (
       <div className="text-center py-12">
@@ -95,108 +98,122 @@ const MyActivity: React.FC = () => {
     );
   }
 
-  if (!activities || activities.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <CursorArrowRaysIcon className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-600 dark:text-gray-300">
-          {language === 'ar' ? 'لا يوجد نشاط' : 'No activity yet'}
+  return (
+    <div className="space-y-8">
+
+      {/* --- HEADER --- */}
+      <div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+          {language === 'ar' ? 'نشاطك الأخير' : 'Your Activity Timeline'}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {language === 'ar'
+            ? 'سجل تفاعلاتك داخل المنصة'
+            : 'Track all your activity inside the platform'}
         </p>
       </div>
-    );
-  }
 
-  return (
-  <div className="space-y-8">
+      {/* --- TIMELINE --- */}
+      <div className="relative pl-10">
+        <div className="absolute top-0 bottom-0 left-4 w-[2px] bg-gray-300 dark:bg-gray-700"></div>
 
-    {/* --- HEADER --- */}
-    <div className="mb-6">
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-        {language === "ar" ? "نشاطك الأخير" : "Your Activity Timeline"}
-      </h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        {language === "ar"
-          ? "سجل شامل لكل تفاعلاتك داخل المنصة"
-          : "A detailed and modern timeline for all your interactions"}
-      </p>
-    </div>
+        <div className="space-y-6">
+          {activities.map((activity: any, index: number) => {
+            const Icon = getActivityIcon(activity.action);
+            const colorClass = getActivityColor(activity.action);
 
-    {/* --- TIMELINE LINE --- */}
-    <div className="relative pl-10">
-      <div className="absolute top-0 bottom-0 left-4 w-[2px] bg-gray-200 dark:bg-gray-700"></div>
-
-      <div className="space-y-6">
-        {activities.map((activity: any, index: number) => {
-          const Icon = getActivityIcon(activity.action);
-          const colorClass = getActivityColor(activity.action);
-
-          return (
-            <motion.div
-              key={activity.id}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className=" flex gap-6 items-start"
-            >
-              {/* ICON */}
-              <div
-                className={`absolute left-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md border ${colorClass}`}
+            return (
+              <motion.div
+                key={activity.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="flex gap-6 items-start"
               >
-                <Icon className="w-5 h-5" />
-              </div>
-
-              {/* CARD */}
-              <div className="flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between gap-4">
-
-                  {/* TITLE + TARGET */}
-                  <div className="flex-1">
-                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      {getActivityLabel(activity.action)}
-                    </h4>
-
-                    {/* TARGET */}
-                    {activity.target && (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                        {language === "ar" ? "الهدف:" : "Target:"}{" "}
-                        <span className="font-medium">{activity.target}</span>
-                      </p>
-                    )}
-
-                    {/* METADATA */}
-                    {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {Object.entries(activity.metadata).map(([key, value]) => (
-                          <div
-                            key={key}
-                            className="bg-gray-50 dark:bg-gray-900/30 p-2 rounded-lg border border-gray-200 dark:border-gray-700"
-                          >
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {key}
-                            </p>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                              {String(value)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* TIMESTAMP */}
-                  <time className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                    {new Date(activity.timestamp).toLocaleString()}
-                  </time>
+                {/* ICON */}
+                <div
+                  className={`absolute left-0 w-10 h-10 rounded-full flex items-center justify-center shadow ${colorClass}`}
+                >
+                  <Icon className="w-5 h-5" />
                 </div>
-              </div>
-            </motion.div>
-          );
-        })}
+
+                {/* CARD */}
+                <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition">
+                  <div className="flex justify-between items-start">
+
+                    {/* LEFT SIDE INFO */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {getActivityLabel(activity.action)}
+                      </h4>
+
+                      {/* TARGET */}
+                      {activity.target && (
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                          {language === 'ar' ? 'الهدف:' : 'Target:'}{' '}
+                          <span className="font-medium">{activity.target}</span>
+                        </p>
+                      )}
+
+                      {/* METADATA */}
+                      {activity.metadata && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
+                          {Object.entries(activity.metadata).map(([key, value]) => (
+                            <div
+                              key={key}
+                              className="bg-gray-50 dark:bg-gray-900/30 p-2 rounded-lg border border-gray-200 dark:border-gray-700"
+                            >
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {key}
+                              </p>
+                              <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+                                {String(value)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* TIMESTAMP */}
+                    <time className="text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </time>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* --- PAGINATION CONTROLS --- */}
+      <div className="flex items-center justify-center gap-4 py-4">
+
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className="px-4 py-2 rounded-lg border bg-white dark:bg-gray-800 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          {language === 'ar' ? 'السابق' : 'Previous'}
+        </button>
+
+        <span className="text-gray-700 dark:text-gray-300 font-medium">
+          {language === 'ar'
+            ? `صفحة ${page} من ${totalPages}`
+            : `Page ${page} of ${totalPages}`}
+        </span>
+
+        <button
+          disabled={!data?.next}
+          onClick={() => setPage(page + 1)}
+          className="px-4 py-2 rounded-lg border bg-white dark:bg-gray-800 disabled:opacity-40 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          {language === 'ar' ? 'التالي' : 'Next'}
+        </button>
       </div>
     </div>
-  </div>
-);
-
+  );
 };
 
 export default MyActivity;
