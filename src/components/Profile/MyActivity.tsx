@@ -264,7 +264,7 @@ const MyActivity: React.FC = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage(page - 1)}
-            className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {language === "ar" ? "السابق" : "Previous"}
           </button>
@@ -276,7 +276,7 @@ const MyActivity: React.FC = () => {
           <button
             disabled={page === totalPages}
             onClick={() => setPage(page + 1)}
-            className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {language === "ar" ? "التالي" : "Next"}
           </button>

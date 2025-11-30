@@ -162,8 +162,8 @@ export default function AdminUsersPage() {
           type="text"
           placeholder={
             language === "ar"
-              ? "ابحث بالاسم، البريد، الهاتف..."
-              : "Search name, email, phone..."
+              ? "ابحث هنا"
+              : "Search"
           }
           className={`flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             language === "ar" ? "text-right" : "text-left"
