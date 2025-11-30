@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-
+import { Order } from "../../types";
 import toast from "react-hot-toast";
 import {
   MagnifyingGlassIcon,
@@ -47,12 +47,13 @@ function TabButton({
   );
 }
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState([]);
+
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [editingOrder, setEditingOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [orderStatus, setOrderStatus] = useState("");
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -293,7 +294,7 @@ export default function AdminOrdersPage() {
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
-        /
+        
 
         const [updateResult] = await Promise.allSettled([
           updateorders(selectedOrder.order_number, updates),
@@ -1537,24 +1538,7 @@ export default function AdminOrdersPage() {
                             <option value="delivered">Delivered</option>
                           </select>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSaveOrder();
-                            }}
-                            disabled={updating || !selectedOrder.can_be_edited}
-                            className="w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                          >
-                            {updating
-                              ? t("saving") ||
-                                (language === "ar"
-                                  ? "جاري الحفظ..."
-                                  : "Saving...")
-                              : t("saveChanges") ||
-                                (language === "ar"
-                                  ? "حفظ التغييرات"
-                                  : "Save Changes")}
-                          </button>
+                        
 
                           {selectedOrder.can_be_cancelled ? (
                             <button
@@ -1653,26 +1637,7 @@ export default function AdminOrdersPage() {
                             </option>
                           </select>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSaveOrder();
-                            }}
-                            disabled={updating || !selectedOrder.can_be_edited}
-                            className="mt-2 w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 
-               dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed 
-               transition-colors font-medium"
-                          >
-                            {updating
-                              ? t("saving") ||
-                                (language === "ar"
-                                  ? "جاري الحفظ..."
-                                  : "Saving...")
-                              : t("savePaymentStatus") ||
-                                (language === "ar"
-                                  ? "حفظ حالة الدفع"
-                                  : "Save Payment Status")}
-                          </button>
+                         
                         </div>
                         {Array.isArray(selectedOrder.payment_transactions) &&
                           selectedOrder.payment_transactions.length > 0 && (
@@ -1706,10 +1671,31 @@ export default function AdminOrdersPage() {
                                   </div>
                                 </div>
                               ))}
+                              
                             </div>
+                            
                           )}
+                          
                       </div>
                     </div>
+                        <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSaveOrder();
+                            }}
+                            disabled={updating || !selectedOrder.can_be_edited}
+                            className="w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                          >
+                            {updating
+                              ? t("saving") ||
+                                (language === "ar"
+                                  ? "جاري الحفظ..."
+                                  : "Saving...")
+                              : t("saveChanges") ||
+                                (language === "ar"
+                                  ? "حفظ التغييرات"
+                                  : "Save Changes")}
+                          </button>
                   </div>
                 </aside>
               </div>
