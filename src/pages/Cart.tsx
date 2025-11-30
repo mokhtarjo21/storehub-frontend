@@ -24,7 +24,7 @@ const Cart: React.FC = () => {
   const navigate = useNavigate();
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
-  console.log(items);
+  
 
   const pointsDiscount = usePoints
     ? Math.min(user?.points || 0, total * 0.1)
@@ -69,9 +69,7 @@ const Cart: React.FC = () => {
 
   const handleCheckout = () => {
     navigate("/checkout");
-    console.log("Processing checkout with payment method:", paymentMethod);
-    console.log("Has services:", hasServices);
-    console.log("Has products:", hasProducts);
+    
   };
 
   if (items.length === 0) {

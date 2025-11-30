@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const data = await handleApiResponse(response);
-      console.log("Login response data:", data.user);
+      
       // Store tokens
       localStorage.setItem("access_token", data.tokens.access);
       localStorage.setItem("refresh_token", data.tokens.refresh);
@@ -223,11 +223,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         formData.append("affiliate_job_title", userData.affiliateJobTitle);
         formData.append("affiliate_reason", userData.affiliateReason);
       }
-      console.log(formData);
+      
 
-      for (const [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
+     
 
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: "POST",
@@ -249,7 +247,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
  const getNotifications = async (num:number): Promise<any[]> => {
     setIsLoading(true);
     try {
-      console.log(num);
+      
       
       
       const response = await fetch(`${API_BASE_URL}/auth/notifications/?page=${num}`, {
@@ -389,7 +387,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const response = await fetch(
         `${API_BASE_URL}/products/admin/products/${id}/update/`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             ...(token && { Authorization: `Bearer ${token}` }),
           },

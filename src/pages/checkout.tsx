@@ -35,7 +35,7 @@ export default function Checkout(): JSX.Element {
   const [shippingPostalCode, setShippingPostalCode] = useState("");
   const [shippingCountry, setShippingCountry] = useState("");
   const [notes, setNotes] = useState("");
-  console.log(user);
+  
 
   useEffect(() => {
     // If the user has a default shipping address in profile, you can populate here.
@@ -190,9 +190,7 @@ export default function Checkout(): JSX.Element {
                   }
                 );
 
-                if (updateResponse.ok) {
-                  console.log(`Stock updated for product ${actualItemId}: ${currentStock} -> ${newStock}`);
-                }
+                
               }
             } catch (stockError) {
               console.error(`Failed to update stock for product ${actualItemId}:`, stockError);

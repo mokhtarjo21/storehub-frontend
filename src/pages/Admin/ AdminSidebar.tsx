@@ -4,7 +4,7 @@ import {
   MdProductionQuantityLimits,
   MdCategory,
 } from "react-icons/md";
-import { FaTags, FaShoppingCart } from "react-icons/fa";
+import { FaTags, FaShoppingCart ,FaUsers,FaBuilding} from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "react-feather";
 
 interface Props {
@@ -32,12 +32,12 @@ const AdminSidebar: React.FC<Props> = ({
     { label: "Orders", icon: <FaShoppingCart />, tab: "order" },
     {
       label: "Manage User",
-      icon: <FaTags />,
+      icon: <FaUsers />,
       tab: "user management",
     },
     {
       label: "Manage Company",
-      icon: <FaTags />,
+      icon: <FaBuilding />,
       tab: "Companies management",
     },
   ];
