@@ -10,6 +10,7 @@ import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import CustomerFormModal from "../components/FormCart";
+import { useActivityTracker } from '../hooks/useActivityTracker';
 import SearchBar from "../components/SearchBar";
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
@@ -28,7 +29,7 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
-
+  const { trackProductClick,trackAddToCart } = useActivityTracker();
   const [formProduct, setFormProduct] = useState<any | null>(null); // product with toform
 
   // Fetch products
@@ -122,7 +123,9 @@ const Products: React.FC = () => {
         specifications: {},
         tags: [],
       };
+      trackAddToCart(product.slug,product.name,product.product_role);
       addItem(cartProduct, quantityToAdd);
+
       setQuantity(1);
     };
 
@@ -133,7 +136,10 @@ const Products: React.FC = () => {
 
     return (
       <motion.div className="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg overflow-hidden border border-gray-300 dark:border-gray-700 transition-all duration-300 h-full flex flex-col">
-        <Link to={`/products/${product.slug}`}>
+     <Link 
+  to={`/products/${product.slug}`} 
+  onClick={() => trackProductClick(product.id, product.name)}
+>
           <div className="relative bg-gray-100 dark:bg-gray-700 h-52 flex items-center justify-center overflow-hidden">
             <img
               src={

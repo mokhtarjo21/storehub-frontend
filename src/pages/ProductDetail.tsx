@@ -8,7 +8,7 @@ import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
 import RelatedProducts from "../components/RelatedProducts";
 import CustomerFormModal from "../components/FormCart";
-
+import { useActivityTracker } from '../hooks/useActivityTracker';
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -84,9 +84,9 @@ const ProductDetail: React.FC = () => {
   const { addItem, items } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
-
+  const { trackProductView } = useActivityTracker();
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
-
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -118,7 +118,7 @@ const ProductDetail: React.FC = () => {
   );
   const alreadyInCart = existingItem ? existingItem.quantity : 0;
   const maxQuantity = product.stock - alreadyInCart;
-
+trackProductView(slug,product.name);
   const handleAddToCart = async () => {
     if (!product) return;
     if (maxQuantity <= 0) {
