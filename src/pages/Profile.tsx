@@ -25,7 +25,7 @@ import { changePassword } from "../utils/api";
 import MyInfo from "../components/Profile/MyInfo";
 import MyOrders from "../components/Profile/MyOrders";
 import MyNotifications from "../components/Profile/MyNotifications";
-import MyActivity from "../components/Profile/MyActivity";
+
 
 const passwordSchema = yup.object({
   currentPassword: yup.string().required("Current password is required"),
@@ -95,7 +95,7 @@ const Profile: React.FC = () => {
     { id: "info", icon: UserIcon },
     { id: "orders", icon: ShoppingBagIcon },
     { id: "notifications", icon: BellIcon },
-    { id: "activity", icon: ClockIcon },
+    
     { id: "security", icon: KeyIcon },
     { id: "preferences", icon: GlobeAltIcon },
   ];
@@ -245,17 +245,7 @@ const Profile: React.FC = () => {
                 </div>
               )}
 
-              {/* My Activity Tab */}
-              {activeTab === "activity" && (
-                <div className="p-4 lg:p-6">
-                  <h2
-                    className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 `}
-                  >
-                    {getTabName("activity")}
-                  </h2>
-                  <MyActivity />
-                </div>
-              )}
+              
 
               {/* Security Tab */}
               {activeTab === "security" && (

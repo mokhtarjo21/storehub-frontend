@@ -8,7 +8,7 @@ import {
   XCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-
+import { useNavigate } from "react-router-dom";
 interface Company {
   id: number;
   name: string;
@@ -55,14 +55,14 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-
+  
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const perPage = 10;
   const [totalPages, setTotalPages] = useState(1);
-
+  const nanvigate = useNavigate();
   useEffect(() => {
     fetchUsers();
   }, [currentPage, search, roleFilter]);
@@ -141,6 +141,7 @@ export default function AdminUsersPage() {
 
     return roleMap[role]?.[language === "ar" ? "ar" : "en"] || role;
   };
+
 
   return (
     <div className="min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
@@ -365,6 +366,17 @@ export default function AdminUsersPage() {
                         >
                           <EyeIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 dark:text-blue-400" />
                         </button>
+                        <button
+                          className={`p-1.5 sm:p-2 rounded-lg transition-colors 
+                             bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50`
+                          }
+                          onClick={() => nanvigate(`/activity/${user.id}`)}
+                          
+                          
+                        >
+                          {language === "ar"  ? "نشاط" : "Activey"}
+                        </button>
+
                         <button
                           className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                             user.is_verified

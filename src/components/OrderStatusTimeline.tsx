@@ -77,12 +77,19 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
         ) : (
           <ShoppingBagIcon className={iconClass} />
         );
+        case "payment_paid":
+        return completed ? (
+          <CheckCircleSolidIcon className={iconClass} />
+        ) : (
+          <CheckCircleIcon className={iconClass} />
+        );
       case "confirmed":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />
         ) : (
           <CheckCircleIcon className={iconClass} />
         );
+
       case "preparing":
         return completed ? (
           <CheckCircleSolidIcon className={iconClass} />

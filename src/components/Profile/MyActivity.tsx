@@ -10,12 +10,12 @@ import {
   UserPlusIcon,
   CursorArrowRaysIcon,
 } from "@heroicons/react/24/outline";
-
+import { useParams } from "react-router-dom";
 const MyActivity: React.FC = () => {
   const { language } = useLanguage();
   const [page, setPage] = useState(1);
-
-  const { data, loading, error } = useApi(`/auth/activity/?page=${page}`);
+   const { id } = useParams<{ id: string }>();
+  const { data, loading, error } = useApi(`/auth/activity/${id}/?page=${page}`);
 
   const activities = data?.results || [];
   const totalCount = data?.count || 0;
@@ -88,6 +88,7 @@ const MyActivity: React.FC = () => {
       </div>
     );
   }
+console.log(data);
 
   // --- ERROR ---
   if (error) {
