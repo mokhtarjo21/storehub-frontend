@@ -112,23 +112,23 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (
-      !confirm(
-        language === "ar"
-          ? "هل أنت متأكد من حذف هذا المستخدم؟"
-          : "Are you sure you want to delete this user?"
-      )
-    )
-      return;
+  // const handleDelete = async (id: number) => {
+  //   if (
+  //     !confirm(
+  //       language === "ar"
+  //         ? "هل أنت متأكد من حذف هذا المستخدم؟"
+  //         : "Are you sure you want to delete this user?"
+  //     )
+  //   )
+  //     return;
 
-    try {
-      await axiosInstance.delete(`/api/auth/admin/users/${id}/`);
-      fetchUsers();
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //   try {
+  //     await axiosInstance.delete(`/api/auth/admin/users/${id}/`);
+  //     fetchUsers();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const getRoleDisplayName = (role: string) => {
     const roleMap: { [key: string]: { en: string; ar: string } } = {
@@ -410,13 +410,13 @@ export default function AdminUsersPage() {
                             <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
                           )}
                         </button>
-                        <button
+                        {/* <button
                           className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                           onClick={() => handleDelete(user.id)}
                           title={language === "ar" ? "حذف" : "Delete"}
                         >
                           <TrashIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
@@ -649,13 +649,13 @@ export default function AdminUsersPage() {
                             )}
                           </button>
 
-                          {/* DELETE */}
+                          {/* DELETE
                           <button
                             className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                             onClick={() => handleDelete(user.id)}
                           >
                             <TrashIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>
