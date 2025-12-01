@@ -367,7 +367,8 @@ const translations = {
     "auth.role.company_staff": "Company Staff",
     "auth.role.affiliate": "Sales By Commission",
     "auth.companyName": "Company Name",
-    cannotCancel: "This order cannot be cancelled",
+    "orders.timeline.payment_paid": "Payment Paid",
+    "cannotCancel": "This order cannot be cancelled",
     "auth.register.companyName": "Company Name",
     "auth.register.companyName.placeholder": "Enter company name",
     "auth.register.companyEmail": "Company Email",
@@ -387,7 +388,7 @@ const translations = {
     "auth.register.email.placeholder": "Enter your email",
     "auth.register.password.placeholder": "Create a password",
     "auth.register.haveAccount": "Already have an account?",
-    companyEmailOnly:
+    "companyEmailOnly":
       "Personal emails like Gmail are not allowed. Please use your company email.",
 
     "auth.register.phoneRequired": "Phone number is required",
@@ -653,6 +654,7 @@ const translations = {
     "orders.timeline.delivered": "تم تسليم الطلب",
     "orders.timeline.default": "تحديث الحالة",
     "payments.title.full": "معلومات الدفع",
+    "orders.timeline.payment_paid": "تم دفع المبلغ",
     "payments.title.split": "تفاصيل الدفع المقسّم",
     "payments.progress": "تقدم الدفع",
     "payments.step": "الخطوة",
