@@ -10,8 +10,9 @@ interface AuthContextType {
   isLoading: boolean;
   isInitializing: boolean;
   fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
-  updateorders: (order_number: any, orderStatus: any) => Promise<any[]>;
+  updateorders: (order_number: any, updates: any) => Promise<any[]>;
   // Add product endpoints
+  cancelorders: (order_number: any) => Promise<any[]>;
   checkApiConnection: () => Promise<boolean>;
   getNotifications: (num:number) => Promise<any[]>;
   myorders: (page:any) => Promise<any>;
@@ -588,6 +589,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
+   const cancelorders = async (
+    order_number: any
+  ): Promise<any[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/orders/${order_number}/cancel/`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          
+        }
+      );
+      const data = await handleApiResponse(response);
+      return data;
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update order"
+      );
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const fechorder=async (order_number: string | number): Promise<any> => {
     setIsLoading(true);
     try {
@@ -701,6 +727,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         getNotifications,
         updateservice,
         deleteProduct,
+        cancelorders,
         checkApiConnection,
         deleteService,
       }}

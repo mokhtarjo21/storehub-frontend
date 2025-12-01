@@ -21,7 +21,7 @@ import toast from "react-hot-toast";
 const OrderDetail: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const { t, language } = useLanguage();
-  const { updateorders, fechorder } = useAuth();
+  const {  fechorder ,cancelorders} = useAuth();
   const [cancelling, setCancelling] = useState(false);
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
@@ -50,7 +50,7 @@ const OrderDetail: React.FC = () => {
     try {
       // استخدام updateorders لتغيير الحالة إلى cancelled
       const [cancelResult] = await Promise.allSettled([
-        updateorders(order.order_number, { order_status: "cancelled" }),
+        cancelorders(order.order_number),
       ]);
 
       // إعادة جلب بيانات الطلب للتأكد من الإلغاء
