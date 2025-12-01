@@ -29,7 +29,7 @@ export interface Product {
 export interface PaymentTransaction {
   id: string;
   transaction_type: 'full' | 'deposit' | 'final' | 'refund';
-  transaction_status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  transaction_status: 'pending' | 'refunded'| 'processing' | 'completed' | 'failed' | 'cancelled';
   amount: number;
   payment_method: 'cod' | 'split' | 'card' | 'bank_transfer';
   transaction_id?: string;

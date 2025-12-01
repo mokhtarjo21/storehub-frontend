@@ -1530,12 +1530,12 @@ export default function AdminOrdersPage() {
                             disabled={!selectedOrder.can_be_edited}
                             className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <option value="pending">Pending</option>
-                            <option value="processing">Processing</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="preparing">Preparing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
+                            <option value="pending">{t(`pending`)}</option>
+                            <option value="processing">{t('processing')}</option>
+                            <option value="confirmed">{t('confirmed')}</option>
+                            <option value="preparing">{t('preparing')}</option>
+                            <option value="shipped">{t('shipped')}</option>
+                            <option value="delivered">{t('delivered')}</option>
                           </select>
 
                         
@@ -1622,15 +1622,6 @@ export default function AdminOrdersPage() {
                               {language === "ar" ? "مدفوع" : "Paid"}
                             </option>
 
-                            <option value="partial">
-                              {language === "ar"
-                                ? "مدفوع جزئياً"
-                                : "Partially Paid"}
-                            </option>
-
-                            <option value="failed">
-                              {language === "ar" ? "فشل الدفع" : "Failed"}
-                            </option>
 
                             <option value="refunded">
                               {language === "ar" ? "مُسترد" : "Refunded"}
