@@ -110,11 +110,10 @@ export default function AdminProductsSection() {
       if (brandFilter) params.brand = brandFilter;
 
       const res = await fetchProducts(params);
-     
+
       // backend might return {results: [...]} or plain array
       const data = res.results ?? res;
       setProducts(Array.isArray(data) ? data : []);
-    
     } catch (err: any) {
       console.error("fetchProducts error", err);
       toast.error(
@@ -132,7 +131,6 @@ export default function AdminProductsSection() {
         fetchcategories(),
         fetchbrands(),
       ]);
-      
 
       if (cRes.status === "fulfilled") {
         const cdata = (cRes.value.results ?? cRes.value.data) as Category[];
@@ -169,7 +167,6 @@ export default function AdminProductsSection() {
     )
       return;
     try {
-     
       await deleteProduct(id);
       setProducts((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
@@ -520,7 +517,9 @@ function ProductForm({
     setSubmitting(true);
     try {
       const fd = new FormData();
-      if(imageFiles.length > 0){imageFiles.forEach((file) => fd.append("images", file));}
+      if (imageFiles.length > 0) {
+        imageFiles.forEach((file) => fd.append("images", file));
+      }
       fd.append("specifications", JSON.stringify(specifications));
       fd.append("name", name);
       if (nameAr) fd.append("name_ar", nameAr);
@@ -545,7 +544,6 @@ function ProductForm({
       if (metaTitle) fd.append("meta_title", metaTitle);
       if (metaDescription) fd.append("meta_description", metaDescription);
       if (imageFile) fd.append("image", imageFile);
-     
 
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
@@ -766,9 +764,7 @@ function ProductForm({
                   dir={language === "ar" ? "rtl" : "ltr"}
                 >
                   <option value="">
-                    {language === "ar"
-                      ? "اختر علامة تجارية (اختياري)"
-                      : "Select brand (optional)"}
+                    {language === "ar" ? "اختر علامة تجارية " : "Select brand"}
                   </option>
                   {brands.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -837,10 +833,10 @@ function ProductForm({
                 dir={language === "ar" ? "rtl" : "ltr"}
               >
                 <option value="tocart">
-                  {language === "ar" ? "إلى السلة" : "To Cart"}
+                  {language === "ar" ? "إلى السلة" : "Direct"}
                 </option>
                 <option value="toform">
-                  {language === "ar" ? "إلى النموذج" : "To Form"}
+                  {language === "ar" ? "إلى النموذج" : "In Direct"}
                 </option>
               </select>
             </div>
