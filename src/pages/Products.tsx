@@ -10,8 +10,7 @@ import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import CustomerFormModal from "../components/FormCart";
-import { useActivityTracker } from '../hooks/useActivityTracker';
-import SearchBar from "../components/SearchBar";
+import { useActivityTracker } from "../hooks/useActivityTracker";
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
 
@@ -29,7 +28,7 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
-  const { trackProductClick,trackAddToCart } = useActivityTracker();
+  const { trackProductClick, trackAddToCart } = useActivityTracker();
   const [formProduct, setFormProduct] = useState<any | null>(null); // product with toform
 
   // Fetch products
@@ -123,7 +122,7 @@ const Products: React.FC = () => {
         specifications: {},
         tags: [],
       };
-      trackAddToCart(product.slug,product.name,product.product_role);
+      trackAddToCart(product.slug, product.name, product.product_role);
       addItem(cartProduct, quantityToAdd);
 
       setQuantity(1);
@@ -136,10 +135,10 @@ const Products: React.FC = () => {
 
     return (
       <motion.div className="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg overflow-hidden border border-gray-300 dark:border-gray-700 transition-all duration-300 h-full flex flex-col">
-     <Link 
-  to={`/products/${product.slug}`} 
-  onClick={() => trackProductClick(product.id, product.name)}
->
+        <Link
+          to={`/products/${product.slug}`}
+          onClick={() => trackProductClick(product.id, product.name)}
+        >
           <div className="relative bg-gray-100 dark:bg-gray-700 h-52 flex items-center justify-center overflow-hidden">
             <img
               src={
@@ -172,34 +171,44 @@ const Products: React.FC = () => {
           </p>
 
           {/* Description */}
-          <p className="text-gray-600 dark:text-gray-300 text-xs mt-2 line-clamp-2 flex-1">
+          <p
+            className={`text-gray-600 dark:text-gray-300 text-xs mt-2 flex-1 ${
+              product.product_role === "tocart"
+                ? "line-clamp-2"
+                : "line-clamp-4"
+            }`}
+          >
             {language === "ar"
               ? product.description_ar || product.description
               : product.description}
           </p>
 
           {/* Price & Discount */}
-          <div className="mt-2 flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-gray-900 dark:text-white">
-                {language === "ar" ? "جنيه" : "EGP"}{" "}
-                {parseFloat(product.price).toLocaleString()}
-              </span>
-              {product.compare_price &&
-                parseFloat(product.compare_price) >
-                  parseFloat(product.price) && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
-                    {parseFloat(product.compare_price).toLocaleString()}
-                  </span>
-                )}
+          {product.product_role === "tocart" && (
+            <div className="flex flex-wrap items-center gap-6 mt-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  {language === "ar" ? "جنيه" : "EGP"}{" "}
+                  {parseFloat(product.price).toLocaleString()}
+                </span>
+
+                {product.compare_price &&
+                  parseFloat(product.compare_price) >
+                    parseFloat(product.price) && (
+                    <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                      {parseFloat(product.compare_price).toLocaleString()}
+                    </span>
+                  )}
+              </div>
+
+              {product.discount_percentage > 0 && (
+                <span className="text-sm font-semibold px-2 py-1 rounded-lg bg-[#44B3E1]/10 text-[#44B3E1]">
+                  {product.discount_percentage}%{" "}
+                  {language === "ar" ? "خصم" : "Off"}
+                </span>
+              )}
             </div>
-            {product.discount_percentage > 0 && (
-              <span className="text-sm font-semibold px-2 py-1 rounded-lg bg-[#44B3E1]/10 text-[#44B3E1]">
-                {product.discount_percentage}%{" "}
-                {language === "ar" ? "خصم" : "Off"}
-              </span>
-            )}
-          </div>
+          )}
 
           {/* Add to Cart & Stock */}
           <div className="mt-auto pt-4 flex flex-col gap-2">
@@ -248,24 +257,49 @@ const Products: React.FC = () => {
               </button>
             </div>
 
-            {/* Stock */}
+            {/* Stock / Availability */}
             <div className="flex items-center gap-2 justify-center pt-4">
-              {product.stock > 0 ? (
-                <>
-                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
-                  <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                    {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
-                    {product.stock}
-                  </span>
-                </>
+              {product.product_role === "tocart" ? (
+                // ------- PRODUCT: Show Stock -------
+                product.stock > 0 ? (
+                  <>
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-green-600 dark:text-green-400 font-medium">
+                      {" "}
+                      {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
+                      {product.stock}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span className="text-red-600 dark:text-red-400 font-medium">
+                      {language === "ar"
+                        ? "غير متوفر في المخزون"
+                        : "Out of Stock"}
+                    </span>
+                  </>
+                )
               ) : (
+                // ------- SERVICE: Show Availability -------
                 <>
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-red-600 dark:text-red-400 font-medium">
-                    {language === "ar"
-                      ? "غير متوفر في المخزون"
-                      : "Out of Stock"}
-                  </span>
+                  {product.stock ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-green-600 dark:text-green-400 font-medium">
+                        {language === "ar"
+                          ? "الخدمة متاحة"
+                          : "Service Available"}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="text-red-600 dark:text-red-400 font-medium">
+                        {language === "ar" ? "غير متاحة" : "Not Available"}
+                      </span>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -336,7 +370,7 @@ const Products: React.FC = () => {
         {/* Products Grid */}
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6"
         >
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -386,11 +420,6 @@ const Products: React.FC = () => {
               tags: [],
             };
             addItem(cartProduct, 1);
-            toast.success(
-              language === "ar"
-                ? "تم إضافة المنتج للسلة"
-                : "Product added to cart"
-            );
             setFormProduct(null);
           }}
         />

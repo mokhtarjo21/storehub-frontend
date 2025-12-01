@@ -8,7 +8,7 @@ import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
 import RelatedProducts from "../components/RelatedProducts";
 import CustomerFormModal from "../components/FormCart";
-import { useActivityTracker } from '../hooks/useActivityTracker';
+import { useActivityTracker } from "../hooks/useActivityTracker";
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -86,7 +86,7 @@ const ProductDetail: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const { trackProductView } = useActivityTracker();
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
-  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -118,7 +118,7 @@ const ProductDetail: React.FC = () => {
   );
   const alreadyInCart = existingItem ? existingItem.quantity : 0;
   const maxQuantity = product.stock - alreadyInCart;
-trackProductView(slug,product.name);
+  trackProductView(slug, product.name);
   const handleAddToCart = async () => {
     if (!product) return;
     if (maxQuantity <= 0) {
@@ -236,43 +236,78 @@ trackProductView(slug,product.name);
 
             {/* السعر + الخصم + حالة المخزون */}
             <div className="flex flex-wrap items-center justify-between mt-4 gap-4">
-              {/* السعر والخصم */}
-              <div className="flex items-end gap-3">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {language === "ar" ? "جنية" : "EGP"}{" "}
-                  {parseFloat(product.price).toLocaleString()}
-                </span>
-                {product.compare_price && (
-                  <span className="text-xl line-through text-gray-400 dark:text-gray-500">
-                    {parseFloat(product.compare_price).toLocaleString()}
-                  </span>
-                )}
-                {product.discount_percentage > 0 && (
-                  <span className="text-lg font-semibold px-3 py-1 rounded-lg bg-[#44B3E1]/10 text-[#44B3E1]">
-                    {product.discount_percentage}%{" "}
-                    {language === "ar" ? "خصم" : "Off"}
-                  </span>
-                )}
-              </div>
+              {/* Price & Discount */}
+              {product.product_role === "tocart" && (
+                <div className="flex flex-wrap items-center gap-6 mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                      {language === "ar" ? "جنيه" : "EGP"}{" "}
+                      {parseFloat(product.price).toLocaleString()}
+                    </span>
 
-              {/* حالة المخزون */}
-              <div className="flex items-center gap-2">
-                {product.stock > 0 ? (
-                  <>
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#E97132] to-[#DF1783]"></div>
-                    <span className="text-sm font-medium bg-gradient-to-r from-[#E97132] to-[#DF1783] bg-clip-text text-transparent">
-                      {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
-                      {product.stock}
+                    {product.compare_price &&
+                      parseFloat(product.compare_price) >
+                        parseFloat(product.price) && (
+                        <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                          {parseFloat(product.compare_price).toLocaleString()}
+                        </span>
+                      )}
+                  </div>
+
+                  {product.discount_percentage > 0 && (
+                    <span className="text-sm font-semibold px-2 py-1 rounded-lg bg-[#44B3E1]/10 text-[#44B3E1]">
+                      {product.discount_percentage}%{" "}
+                      {language === "ar" ? "خصم" : "Off"}
                     </span>
-                  </>
+                  )}
+                </div>
+              )}
+
+              {/* Stock / Availability */}
+              <div className="flex items-center gap-2 justify-center pt-4">
+                {product.product_role === "tocart" ? (
+                  // ------- PRODUCT: Show Stock -------
+                  product.stock > 0 ? (
+                    <>
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-green-600 dark:text-green-400 font-medium">
+                        {" "}
+                        {language === "ar"
+                          ? "الكمية المتوفرة"
+                          : "In Stock"}{" "}
+                        {product.stock}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="text-red-600 dark:text-red-400 font-medium">
+                        {language === "ar"
+                          ? "غير متوفر في المخزون"
+                          : "Out of Stock"}
+                      </span>
+                    </>
+                  )
                 ) : (
+                  // ------- SERVICE: Show Availability -------
                   <>
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-red-600 dark:text-red-400 font-medium">
-                      {language === "ar"
-                        ? "غير متوفر في المخزون"
-                        : "Out of Stock"}
-                    </span>
+                    {product.stock ? (
+                      <>
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span className="text-green-600 dark:text-green-400 font-medium">
+                          {language === "ar"
+                            ? "الخدمة متاحة"
+                            : "Service Available"}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <span className="text-red-600 dark:text-red-400 font-medium">
+                          {language === "ar" ? "غير متاحة" : "Not Available"}
+                        </span>
+                      </>
+                    )}
                   </>
                 )}
               </div>

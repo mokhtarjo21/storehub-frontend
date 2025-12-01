@@ -6,30 +6,36 @@ import toast from "react-hot-toast";
 type CustomerFormModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { name: string; email: string; phone: string }) => void;
+  onSubmit: (data: { phone: string; details: string }) => void;
 };
 
-const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ open, onClose, onSubmit }) => {
+const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
+  open,
+  onClose,
+  onSubmit,
+}) => {
   const { language } = useLanguage();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [details, setDetails] = useState("");
 
   const handleSubmit = () => {
-    if (!name || !email || !phone) {
+    if (!phone || !details) {
       toast.error(
         language === "ar" ? "يرجى ملء جميع الحقول" : "Please fill all fields"
       );
       return;
     }
 
-    onSubmit({ name, email, phone });
+    onSubmit({ phone, details });
+
     toast.success(
-      language === "ar" ? "تم إرسال البيانات بنجاح" : "Data submitted successfully"
+      language === "ar"
+        ? "سوف يتم التواصل معك من أحد ممثلي خدمة العملاء"
+        : "A customer service agent will contact you shortly"
     );
-    setName("");
-    setEmail("");
+
     setPhone("");
+    setDetails("");
   };
 
   if (!open) return null;
@@ -45,27 +51,24 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ open, onClose, on
         </button>
 
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-          {language === "ar" ? "معلومات العميل" : "Customer Information"}
+          {language === "ar" ? "تفاصيل الخدمة" : "Service Details"}
         </h2>
 
         <div className="space-y-4">
-          <input
-            type="text"
-            placeholder={language === "ar" ? "الاسم الكامل" : "Full Name"}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <input
-            type="email"
-            placeholder={language === "ar" ? "البريد الإلكتروني" : "Email"}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          {/* ⭐ حقل تفاصيل الخدمة */}
+          <textarea
+            placeholder={
+              language === "ar"
+                ? "ما هي الخدمة المطلوبة؟ يرجى كتابة التفاصيل"
+                : "What do you need? Write service details"
+            }
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            className="w-full px-4 py-2 h-28 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <input
             type="tel"
-            placeholder={language === "ar" ? "رقم الهاتف" : "Phone Number"}
+            placeholder={language === "ar" ? "رقم الهاتف للتواصل" : "Phone Number for Contact"}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
