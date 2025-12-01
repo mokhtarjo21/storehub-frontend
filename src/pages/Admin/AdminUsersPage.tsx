@@ -55,7 +55,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  
+
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,7 +142,6 @@ export default function AdminUsersPage() {
     return roleMap[role]?.[language === "ar" ? "ar" : "en"] || role;
   };
 
-
   return (
     <div className="min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
       <h1
@@ -161,11 +160,7 @@ export default function AdminUsersPage() {
       >
         <input
           type="text"
-          placeholder={
-            language === "ar"
-              ? "ابحث هنا"
-              : "Search"
-          }
+          placeholder={language === "ar" ? "ابحث هنا" : "Search"}
           className={`flex-1 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
             language === "ar" ? "text-right" : "text-left"
           }`}
@@ -200,55 +195,62 @@ export default function AdminUsersPage() {
 
       {/* Users Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Desktop Table - No horizontal scroll */}
-        <div className="hidden lg:block">
+        {/* Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto scrollbar-hide">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الاسم" : "Name"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
-                  {language === "ar" ? "البريد الإلكتروني" : "Email"}
+                  {language === "ar" ? "البريد" : "Email"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الهاتف" : "Phone"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الصلاحية" : "Role"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "مفعل" : "Verified"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الشركة" : "Company"}
                 </th>
                 <th
-                  className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}
+                >
+                  {language === "ar" ? "النشاط" : "Activity"}
+                </th>
+                <th
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
@@ -256,10 +258,11 @@ export default function AdminUsersPage() {
                 </th>
               </tr>
             </thead>
+
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-8 px-4 text-center">
+                  <td colSpan={8} className="py-8 px-4 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
                       <p className="text-gray-500 dark:text-gray-400 text-sm">
@@ -271,7 +274,7 @@ export default function AdminUsersPage() {
               ) : users.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="py-8 px-4 text-center text-gray-500 dark:text-gray-400 text-sm"
                   >
                     {language === "ar" ? "لا توجد مستخدمين" : "No users found"}
@@ -283,22 +286,27 @@ export default function AdminUsersPage() {
                     key={user.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
                   >
+                    {/* Name */}
                     <td
                       className={`py-3 px-4 ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">
                         {user.full_name}
                       </div>
                     </td>
+
+                    {/* Email */}
                     <td
-                      className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
+                      className={`p-2 text-sm text-gray-900 dark:text-white max-w-[140px] truncate ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
                       {user.email}
                     </td>
+
+                    {/* Phone */}
                     <td
                       className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                         language === "ar" ? "text-right" : "text-left"
@@ -306,15 +314,19 @@ export default function AdminUsersPage() {
                     >
                       {user.phone}
                     </td>
+
+                    {/* Role */}
                     <td
                       className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full whitespace-nowrap">
+                      <span className="p-1.5 text-xs font-serif bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full whitespace-nowrap">
                         {getRoleDisplayName(user.role)}
                       </span>
                     </td>
+
+                    {/* Verified */}
                     <td
                       className={`py-3 px-4 ${
                         language === "ar" ? "text-right" : "text-left"
@@ -340,6 +352,8 @@ export default function AdminUsersPage() {
                         )}
                       </span>
                     </td>
+
+                    {/* Company */}
                     <td
                       className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                         language === "ar" ? "text-right" : "text-left"
@@ -347,65 +361,61 @@ export default function AdminUsersPage() {
                     >
                       {user.company_name || "-"}
                     </td>
+
+                    {/* Activity */}
                     <td
-                      className={`py-3 px-4 ${
+                      className={`py-2 px-3 ${
+                        language === "ar" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      <button
+                        className="p-1 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 "
+                        onClick={() => nanvigate(`/activity/${user.id}`)}
+                      >
+                        {language === "ar" ? "نشاط" : "Activity"}
+                      </button>
+                    </td>
+
+                    <td
+                      className={`py-2 px-3 ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
                       <div
-                        className={`flex gap-1 sm:gap-2 ${
+                        className={`flex gap-1 ${
                           language === "ar" ? "flex-row-reverse" : "flex-row"
                         }`}
                       >
                         <button
-                          className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                          className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
                           onClick={() => openViewModal(user)}
-                          title={
-                            language === "ar" ? "عرض التفاصيل" : "View details"
-                          }
+                          title={language === "ar" ? "عرض" : "View"}
                         >
-                          <EyeIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 dark:text-blue-400" />
+                          <EyeIcon className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                         </button>
                         <button
-                          className={`p-1.5 sm:p-2 rounded-lg transition-colors 
-                             bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50`
-                          }
-                          onClick={() => nanvigate(`/activity/${user.id}`)}
-                          
-                          
-                        >
-                          {language === "ar"  ? "نشاط" : "Activey"}
-                        </button>
-
-                        <button
-                          className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                          className={`p-1.5 rounded transition-colors ${
                             user.is_verified
                               ? "bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50"
                               : "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50"
                           }`}
                           onClick={() => toggleActive(user)}
                           title={
-                            language === "ar"
-                              ? user.is_verified
-                                ? "تعطيل"
-                                : "تفعيل"
-                              : user.is_verified
-                              ? "Disable"
-                              : "Enable"
+                            language === "ar" ? "تفعيل/تعطيل" : "Enable/Disable"
                           }
                         >
                           {user.is_verified ? (
-                            <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-700 dark:text-red-400" />
+                            <XCircleIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
                           ) : (
-                            <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-700 dark:text-green-400" />
+                            <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
                           )}
                         </button>
                         <button
-                          className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                          className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                           onClick={() => handleDelete(user.id)}
                           title={language === "ar" ? "حذف" : "Delete"}
                         >
-                          <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-700 dark:text-red-400" />
+                          <TrashIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
                         </button>
                       </div>
                     </td>
@@ -469,14 +479,22 @@ export default function AdminUsersPage() {
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
+                    {language === "ar" ? "نشاط" : "Activity"}
+                  </th>
+                  <th
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {language === "ar" ? "الإجراءات" : "Actions"}
                   </th>
                 </tr>
               </thead>
+
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-8 px-4 text-center">
+                    <td colSpan={8} className="py-8 px-4 text-center">
                       <div className="flex flex-col items-center justify-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
                         <p className="text-gray-500 dark:text-gray-400 text-sm">
@@ -488,7 +506,7 @@ export default function AdminUsersPage() {
                 ) : users.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="py-8 px-4 text-center text-gray-500 dark:text-gray-400 text-sm"
                     >
                       {language === "ar"
@@ -502,6 +520,7 @@ export default function AdminUsersPage() {
                       key={user.id}
                       className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
                     >
+                      {/* NAME */}
                       <td
                         className={`py-3 px-4 ${
                           language === "ar" ? "text-right" : "text-left"
@@ -511,6 +530,8 @@ export default function AdminUsersPage() {
                           {user.full_name}
                         </div>
                       </td>
+
+                      {/* EMAIL */}
                       <td
                         className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                           language === "ar" ? "text-right" : "text-left"
@@ -520,6 +541,8 @@ export default function AdminUsersPage() {
                           {user.email}
                         </div>
                       </td>
+
+                      {/* PHONE */}
                       <td
                         className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                           language === "ar" ? "text-right" : "text-left"
@@ -527,44 +550,46 @@ export default function AdminUsersPage() {
                       >
                         <div className="min-w-[100px]">{user.phone}</div>
                       </td>
+
+                      {/* ROLE */}
                       <td
                         className={`py-3 px-4 ${
                           language === "ar" ? "text-right" : "text-left"
                         }`}
                       >
-                        <div className="min-w-[90px]">
-                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
-                            {getRoleDisplayName(user.role)}
-                          </span>
-                        </div>
+                        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
+                          {getRoleDisplayName(user.role)}
+                        </span>
                       </td>
+
+                      {/* VERIFIED */}
                       <td
                         className={`py-3 px-4 ${
                           language === "ar" ? "text-right" : "text-left"
                         }`}
                       >
-                        <div className="min-w-[70px]">
-                          <span
-                            className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                              user.is_verified
-                                ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                                : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                            }`}
-                          >
-                            {user.is_verified ? (
-                              <>
-                                <CheckCircleIcon className="w-3 h-3 mr-1" />
-                                {language === "ar" ? "نعم" : "Yes"}
-                              </>
-                            ) : (
-                              <>
-                                <XCircleIcon className="w-3 h-3 mr-1" />
-                                {language === "ar" ? "لا" : "No"}
-                              </>
-                            )}
-                          </span>
-                        </div>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                            user.is_verified
+                              ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                              : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                          }`}
+                        >
+                          {user.is_verified ? (
+                            <>
+                              <CheckCircleIcon className="w-3 h-3 mr-1" />
+                              {language === "ar" ? "نعم" : "Yes"}
+                            </>
+                          ) : (
+                            <>
+                              <XCircleIcon className="w-3 h-3 mr-1" />
+                              {language === "ar" ? "لا" : "No"}
+                            </>
+                          )}
+                        </span>
                       </td>
+
+                      {/* COMPANY */}
                       <td
                         className={`py-3 px-4 text-sm text-gray-900 dark:text-white ${
                           language === "ar" ? "text-right" : "text-left"
@@ -574,39 +599,48 @@ export default function AdminUsersPage() {
                           {user.company_name || "-"}
                         </div>
                       </td>
+
+                      {/* ACTIVITY */}
+                      <td
+                        className={`py-3 px-4 ${
+                          language === "ar" ? "text-right" : "text-left"
+                        }`}
+                      >
+                        <button
+                          className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex-shrink-0"
+                          onClick={() => nanvigate(`/activity/${user.id}`)}
+                        >
+                          {language === "ar" ? "نشاط" : "Activity"}
+                        </button>
+                      </td>
+
+                      {/* ACTIONS */}
                       <td
                         className={`py-3 px-4 ${
                           language === "ar" ? "text-right" : "text-left"
                         }`}
                       >
                         <div
-                          className={`flex gap-1 min-w-[110px] ${
+                          className={`flex gap-1 min-w-[120px] ${
                             language === "ar" ? "flex-row-reverse" : "flex-row"
                           }`}
                         >
+                          {/* VIEW */}
                           <button
-                            className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors flex-shrink-0"
+                            className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
                             onClick={() => openViewModal(user)}
-                            title={language === "ar" ? "عرض" : "View"}
                           >
                             <EyeIcon className="w-4 h-4 text-blue-700 dark:text-blue-400" />
                           </button>
+
+                          {/* ENABLE / DISABLE */}
                           <button
-                            className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                            className={`p-1.5 rounded-lg transition-colors ${
                               user.is_verified
                                 ? "bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50"
                                 : "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50"
                             }`}
                             onClick={() => toggleActive(user)}
-                            title={
-                              language === "ar"
-                                ? user.is_verified
-                                  ? "تعطيل"
-                                  : "تفعيل"
-                                : user.is_verified
-                                ? "Disable"
-                                : "Enable"
-                            }
                           >
                             {user.is_verified ? (
                               <XCircleIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
@@ -614,10 +648,11 @@ export default function AdminUsersPage() {
                               <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
                             )}
                           </button>
+
+                          {/* DELETE */}
                           <button
-                            className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex-shrink-0"
+                            className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                             onClick={() => handleDelete(user.id)}
-                            title={language === "ar" ? "حذف" : "Delete"}
                           >
                             <TrashIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
                           </button>
