@@ -46,12 +46,20 @@ export interface PaymentTransaction {
 
 export interface Order {
   user_name: string;
+  tax_amount: number;
   order_number: string;
   shipping_name: string;
+  shipping_phone: string;
   shipping_address: string;
   userId: string;
+  notes?: string;
   items: OrderItem[];
-  
+  status_display: string;
+  estimated_delivery: string;
+  shipping_amount: number;
+  discount_amount: number;
+  full_shipping_address: string;
+  can_be_cancelled: boolean;
   total_price: number;
   order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: string;

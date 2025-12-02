@@ -405,7 +405,7 @@ const translations = {
     "auth.forgotPassword.sentTo": "We have sent a password reset code to",
     "auth.forgotPassword.enterCode": "Enter Reset Code",
     "auth.forgotPassword.codeSent": "Code has been sent ",
-
+    "pricing":"Price not yet",
     "auth.resetPassword.title": "Reset Password",
     "auth.resetPassword.subtitle": "Enter the reset code",
     "auth.resetPassword.newPassword": "New Password",
@@ -486,7 +486,7 @@ const translations = {
     "nav.logout": "تسجيل خروج",
     "nav.login": "تسجيل دخول",
     "nav.register": "إنشاء حساب",
-
+    "pricing" :"لم يسعر بعد",
     // Common
     "common.loading": "جارٍ التحميل...",
     "common.save": "حفظ",
@@ -636,6 +636,7 @@ const translations = {
     "orders.orderSummary": "ملخص الطلب",
     "orders.subtotal": "المجموع الفرعي",
     "orders.tax": "الضريبة",
+    "Cancelled": "ملغي",
     "orders.shipping": "الشحن",
     "orders.free": "مجاني",
     "orders.discount": "الخصم",

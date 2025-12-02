@@ -8,6 +8,7 @@ import { useApi } from "../hooks/useApi";
 import toast from "react-hot-toast";
 import RelatedProducts from "../components/RelatedProducts";
 import CustomerFormModal from "../components/FormCart";
+import { apiRequest } from "../utils/api";
 import { useActivityTracker } from "../hooks/useActivityTracker";
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
@@ -169,10 +170,6 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const handleFormSubmit = (customerData: any) => {
-    console.log("Customer Data:", customerData);
-    handleAddToCart();
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
@@ -291,7 +288,7 @@ const ProductDetail: React.FC = () => {
                 ) : (
                   // ------- SERVICE: Show Availability -------
                   <>
-                    {product.stock ? (
+                    {product.product_role ? (
                       <>
                         <div className="w-2 h-2 rounded-full bg-green-500"></div>
                         <span className="text-green-600 dark:text-green-400 font-medium">
@@ -466,10 +463,20 @@ const ProductDetail: React.FC = () => {
         </div>
 
         {/* Customer Form Modal */}
+       
         <CustomerFormModal
           open={formOpen}
-          onClose={() => setFormOpen(false)}
-          onSubmit={handleFormSubmit}
+    onClose={() => setFormOpen(false)}
+    onSubmit={(data) => {
+      
+
+             apiRequest("/orders/", {
+              method: "post",
+              
+              body: JSON.stringify({"phone":data.phone,"notes":data.details,"slug":product.slug,"currency":product.currency}),
+            });
+      setFormOpen(false);
+    }}
         />
       </div>
     </div>

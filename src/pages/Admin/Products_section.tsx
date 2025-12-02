@@ -44,6 +44,7 @@ type ProductListItem = {
   compare_price: string | null;
   cost_price: string | null;
   stock: number;
+  currency:string;
   low_stock_threshold: number;
   sku: string;
   barcode: string | null;
@@ -427,6 +428,7 @@ function ProductForm({
   const [productType, setProductType] = useState(
     initial?.product_type ?? "network-device"
   );
+  const [currency,setCurrency]=useState(initial?.currency ?? "EGP")
   const [isActive, setIsActive] = useState<boolean>(initial?.is_active ?? true);
   const [isFeatured, setIsFeatured] = useState<boolean>(
     initial?.is_featured ?? false
@@ -459,7 +461,7 @@ function ProductForm({
     setImageFile(f);
   };
   // تحديث صف
-  const updateSpec = (index: number, key: "name" | "value", value: string) => {
+  const updateSpec = (index: number, key: "name" | "value" |"name_ar" |"value_ar" ,value:string) => {
     const newSpecs = [...specifications];
     newSpecs[index][key] = value;
     setSpecifications(newSpecs);
@@ -496,7 +498,8 @@ function ProductForm({
           setRequiresShipping(data.requires_shipping ?? true);
           setMetaTitle(data.meta_title ?? "");
           setMetaDescription(data.meta_description ?? "");
-
+          setCurrency(data.currency ?? "EGP")
+          setSpecifications(data.specifications)
           if (data.category?.id) setCategoryId(data.category.id);
           if (data.brand?.id) setBrandId(data.brand.id);
         } catch (e) {
@@ -544,7 +547,7 @@ function ProductForm({
       if (metaTitle) fd.append("meta_title", metaTitle);
       if (metaDescription) fd.append("meta_description", metaDescription);
       if (imageFile) fd.append("image", imageFile);
-
+      if (currency) fd.append("currency",currency);
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
         : await createProduct(fd);
@@ -859,7 +862,7 @@ function ProductForm({
                   <input
                     type="text"
                     placeholder={
-                      language === "ar" ? "اسم المواصفة" : "Specification Name"
+                      language === "ar" ? "اسم المواصفة انجليزي" : "Specification Name EG"
                     }
                     value={spec.name}
                     onChange={(e) => updateSpec(idx, "name", e.target.value)}
@@ -872,8 +875,8 @@ function ProductForm({
                     type="text"
                     placeholder={
                       language === "ar"
-                        ? "قيمة المواصفة"
-                        : "Specification Value"
+                        ? "قيمة المواصفة انجليزي"
+                        : "Specification Value EG"
                     }
                     value={spec.value}
                     onChange={(e) => updateSpec(idx, "value", e.target.value)}
@@ -882,6 +885,34 @@ function ProductForm({
                     }`}
                     dir={language === "ar" ? "rtl" : "ltr"}
                   />
+                
+                  <input
+                    type="text"
+                    placeholder={
+                      language === "ar" ? " اسم المواصفة بالعربي" : "Specification Name Ar"
+                    }
+                    value={spec.name_ar}
+                    onChange={(e) => updateSpec(idx, "name_ar", e.target.value)}
+                    className={`flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir={language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <input
+                    type="text"
+                    placeholder={
+                      language === "ar"
+                        ? "قيمة المواصفة عربي"
+                        : "Specification Value Ar"
+                    }
+                    value={spec.value_ar}
+                    onChange={(e) => updateSpec(idx, "value_ar", e.target.value)}
+                    className={`flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir={language === "ar" ? "rtl" : "ltr"}
+                  />
+                 
                   <button
                     type="button"
                     onClick={() => removeSpec(idx)}
@@ -961,8 +992,10 @@ function ProductForm({
               )}
             </div>
           </div>
-
-          {/* Pricing and Stock */}
+              
+         {productRole== "tocart" && (
+          <>
+           {/* Pricing and Stock */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className={language === "ar" ? "text-right" : "text-left"}>
               <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -1034,27 +1067,45 @@ function ProductForm({
               />
             </div>
 
-            <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "سعر التكلفة" : "Cost Price"}
+            
+          </div>
+</>
+         )}
+            
+            
+ <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "العملة" : "Currency"}
               </label>
-              <input
-                type="number"
-                step="0.01"
-                value={costPrice as any}
-                onChange={(e) =>
-                  setCostPrice(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
                 className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   language === "ar" ? "text-right" : "text-left"
                 }`}
-                dir="ltr"
+                dir={language === "ar" ? "rtl" : "ltr"}
+              >
+                <option value="EGP">
+                  {language === "ar" ? "جنية" : "EGP"}
+                </option>
+                <option value="USD">
+                  {language === "ar" ? "دولا" : "USD"}
+                </option>
+              </select>
+         <label
+              className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 ${
+                language === "ar" ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
               />
-            </div>
-          </div>
-
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {language === "ar" ? "نشط" : "Is Active"}
+              </span>
+            </label>
           {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className={language === "ar" ? "text-right" : "text-left"}>

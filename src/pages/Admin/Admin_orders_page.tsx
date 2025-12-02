@@ -224,7 +224,8 @@ export default function AdminOrdersPage() {
 
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
-       
+        console.log(orderDatsData);
+        
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
         setEditingOrder({
@@ -233,6 +234,7 @@ export default function AdminOrdersPage() {
           total_price: orderDatsData.total_price || 0,
           order_status: orderDatsData.order_status || "pending",
           payment_status: orderDatsData.payment_status || "",
+          notes:orderDatsData.notes
         });
       } else {
         toast.error(
@@ -292,17 +294,20 @@ export default function AdminOrdersPage() {
       if (editingOrder.payment_status !== selectedOrder.payment_status) {
         updates.payment_status = editingOrder.payment_status;
       }
+      if (editingOrder.notes !== selectedOrder.notes){
+        updates.notes= editingOrder.notes;
+      }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
         
-
+        try {
         const [updateResult] = await Promise.allSettled([
           updateorders(selectedOrder.order_number, updates),
         ]);
 
         // دائماً نحاول إعادة جلب البيانات من السيرفر للتأكد
         let refreshSuccess = false;
-        try {
+        
           const [orderDats] = await Promise.allSettled([
             fechorder(selectedOrder.order_number),
           ]);
@@ -323,8 +328,34 @@ export default function AdminOrdersPage() {
               total_price: updatedOrderData.total_price || 0,
               order_status: updatedOrderData.order_status || "pending",
               payment_status: updatedOrderData.payment_status || "",
+              notes:updatedOrderData.notes
             });
+              // إذا نجح التحديث أو إعادة الجلب، نعرض رسالة نجاح ونغلق الـ modal
+        if (updateResult.status === "fulfilled") {
+                toast.success(
+          language === "ar"
+            ? "تم تعديل الطلب بنجاح"
+            : "Order Updated successfully"
+        );
+           //   // إغلاق الـ modal بعد الحفظ بنجاح
+          setTimeout(() => {
+            handleCloseDetails();
 
+          }, 500);        } else {
+          // فشل كلاهما - نحدث يدوياً على الأقل
+          
+
+          setEditingOrder((prev) => (prev ? { ...prev, ...updates } : null));
+
+          setOrders((prev) =>
+            prev.map((o) =>
+              o.order_number === selectedOrder.order_number
+                ? { ...o, ...updates }
+                : o
+            )
+          );
+
+        }
             // تحديث قائمة الطلبات بالبيانات الجديدة
             setOrders((prev) =>
               prev.map((o) =>
@@ -337,45 +368,12 @@ export default function AdminOrdersPage() {
             refreshSuccess = true;
           }
         } catch (refreshError) {
-          console.error("Error refreshing order data:", refreshError);
+          toast.error("Error refreshing order data:", refreshError);
         }
 
-        // إذا نجح التحديث أو إعادة الجلب، نعرض رسالة نجاح ونغلق الـ modal
-        if (updateResult.status === "fulfilled" || refreshSuccess) {
-          toast.success(
-            language === "ar"
-              ? "تم حفظ التعديلات بنجاح"
-              : "Changes saved successfully"
-          );
-          // إغلاق الـ modal بعد الحفظ بنجاح
-          setTimeout(() => {
-            handleCloseDetails();
-          }, 500); // تأخير بسيط لإظهار رسالة النجاح
-        } else {
-          // فشل كلاهما - نحدث يدوياً على الأقل
-          setSelectedOrder((prev) => ({
-            ...prev,
-            ...updates,
-            full_shipping_address:
-              updates.shipping_address || prev?.full_shipping_address,
-          }));
+        
 
-          setEditingOrder((prev) => (prev ? { ...prev, ...updates } : null));
-
-          setOrders((prev) =>
-            prev.map((o) =>
-              o.order_number === selectedOrder.order_number
-                ? { ...o, ...updates }
-                : o
-            )
-          );
-
-          toast.error(
-            language === "ar"
-              ? "فشل في حفظ التعديلات"
-              : "Failed to save changes"
-          );
-        }
+        /////////////////
       } else {
         toast(
           language === "ar" ? "لا توجد تغييرات للحفظ" : "No changes to save",
@@ -392,71 +390,6 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const handleUpdateStatus = async () => {
-    if (!selectedOrder || !orderStatus) {
-      toast.error(
-        language === "ar"
-          ? "يرجى اختيار حالة للطلب"
-          : "Please select an order status"
-      );
-      return;
-    }
-
-    if (selectedOrder.order_status === orderStatus) {
-      toast(
-        language === "ar"
-          ? "الحالة الحالية هي نفس الحالة المحددة"
-          : "Current status is the same as selected",
-        { icon: "ℹ️" }
-      );
-      return;
-    }
-
-    const confirmMessage =
-      language === "ar"
-        ? `هل أنت متأكد من تغيير حالة الطلب #${selectedOrder.order_number} إلى "${orderStatus}"؟`
-        : `Are you sure you want to change order #${selectedOrder.order_number} status to "${orderStatus}"?`;
-
-    if (!window.confirm(confirmMessage)) return;
-
-    setUpdating(true);
-    try {
-      const num = selectedOrder.order_number;
-      await updateorders(num, { order_status: orderStatus });
-
-      // Update local state immediately for better UX
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.order_number === num
-            ? { ...order, order_status: orderStatus }
-            : order
-        )
-      );
-
-      // Update selected order and editing order
-      setSelectedOrder({ ...selectedOrder, order_status: orderStatus });
-      setEditingOrder((prev) =>
-        prev ? { ...prev, order_status: orderStatus } : null
-      );
-
-      toast.success(
-        language === "ar"
-          ? "تم تحديث حالة الطلب بنجاح"
-          : "Order status updated successfully"
-      );
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        language === "ar"
-          ? "فشل في تحديث حالة الطلب"
-          : "Failed to update order status"
-      );
-      // Refresh orders on error
-      await fetchOrders();
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   const handleCancelOrder = async () => {
     if (!selectedOrder) return;
@@ -938,7 +871,7 @@ export default function AdminOrdersPage() {
                           }`}
                         >
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {order.total_price} EGP
+                            {order.total_price} {order.currency || "EGP"}
                           </div>
                         </td>
                         <td
@@ -947,10 +880,7 @@ export default function AdminOrdersPage() {
                           }`}
                         >
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSelectOrder(order.order_number);
-                            }}
+                            
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
                               statusBadge.bg
                             } ${
@@ -967,7 +897,7 @@ export default function AdminOrdersPage() {
                             }
                           >
                             <StatusIcon className="w-3.5 h-3.5" />
-                            <span>{order.order_status}</span>
+                            <span>{t(`${order.order_status}`)}</span>
                           </button>
                         </td>
                         <td
@@ -1028,26 +958,7 @@ export default function AdminOrdersPage() {
                                   (language === "ar" ? "عرض" : "View")}
                               </span>
                             </button>
-                            <button
-                              className={`inline-flex items-center gap-1 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded-md transition-colors duration-200 whitespace-nowrap ${
-                                language === "ar"
-                                  ? "flex-row-reverse"
-                                  : "flex-row"
-                              }`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSelectOrder(order.order_number);
-                              }}
-                              title={
-                                language === "ar" ? "تعديل الطلب" : "Edit order"
-                              }
-                            >
-                              <PencilIcon className="w-4 h-4" />
-                              <span className="text-sm">
-                                {t("edit") ||
-                                  (language === "ar" ? "تعديل" : "Edit")}
-                              </span>
-                            </button>
+                           
                           </div>
                         </td>
                       </motion.tr>
@@ -1375,16 +1286,11 @@ export default function AdminOrdersPage() {
                                     <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                                       {it.item_sku || it.sku || ""}
                                     </div>
-                                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 md:hidden">
-                                      {t("unitPrice") ||
-                                        (language === "ar"
-                                          ? "سعر الوحدة"
-                                          : "Unit Price")}
-                                      : {it.unit_price ?? it.price ?? "—"} EGP
-                                    </div>
+                                   
                                   </div>
                                   <div className="flex items-center justify-between md:flex-col md:items-end gap-2 md:gap-1">
                                     <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                                      
                                       {t("quantity") ||
                                         (language === "ar"
                                           ? "الكمية"
@@ -1392,19 +1298,20 @@ export default function AdminOrdersPage() {
                                       :{" "}
                                       <span className="font-medium text-gray-900 dark:text-white">
                                         {it.quantity}
+                                        
                                       </span>
                                     </div>
                                     <div className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
-                                      {it.total_price} EGP
+                                      {it.item_role=='toform' && it.total_price == 0? t('pricing'): it.total_price } {selectedOrder.currency}
                                     </div>
                                   </div>
-                                </div>
+                                </div> 
                                 <div className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden md:block">
-                                  {t("unitPrice") ||
+                                  {
                                     (language === "ar"
                                       ? "سعر الوحدة"
                                       : "Unit Price")}
-                                  : {it.unit_price ?? it.price ?? "—"} EGP
+                                  : {it.item_role== "toform" && it.unit_price ==0? t('pricing'): it.unit_price} {selectedOrder.currency}
                                 </div>
                               </div>
                             </div>
@@ -1594,6 +1501,18 @@ export default function AdminOrdersPage() {
 
                         {/* Payment Status Control */}
                         <div className="mt-4">
+                          {selectedOrder.items[0].item_role =="toform" &&(
+                            <input
+  type="number"
+  value={editingOrder?.total_price ?? selectedOrder.total_price}
+  onChange={(e) => handleEditField("total_price", e.target.value)}
+  className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
+  bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+/>
+
+                          )
+
+                          }
                           <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
                             {t("updatePaymentStatus") ||
                               (language === "ar"
@@ -1650,7 +1569,7 @@ export default function AdminOrdersPage() {
                                   </div>
                                   <div className="text-left sm:text-right text-xs flex-shrink-0">
                                     <div className="font-semibold text-gray-900 dark:text-white">
-                                      {tx.amount} EGP
+                                      {tx.amount} {selectedOrder.currency || "EGP"}
                                     </div>
                                     <div className="text-gray-500 dark:text-gray-400 mt-1 text-[10px] sm:text-xs">
                                       {tx.created_at

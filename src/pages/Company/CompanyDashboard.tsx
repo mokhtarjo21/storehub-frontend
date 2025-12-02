@@ -39,6 +39,8 @@ interface Company {
   employee_count: number;
   created_at: string;
   updated_at: string;
+  tax_card_image?: string;
+  commercial_registration_image?: string;
 }
 
 interface Employee {
@@ -112,10 +114,31 @@ const fetchEmployees = async () => {
     setLoading(false);
   }
 };
+  const handleImageUpdate = async (type: 'tax' | 'cr', file: File) => {
+    if (!company) return;
+    try {
+      const formData = new FormData();
+      formData.append(type === 'tax' ? 'tax_card_image' : 'commercial_registration_image', file);
+
+      const response = await apiRequest(`/auth/company/update-documents/`, {
+        method: 'POST',
+        body: formData,
+      });
+      await handleApiResponse(response);
+      toast.success('Document updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update document');
+    }
+  };
 
 
   const handleAddEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newEmployee.email.endsWith(`@${user?.email.split('@')[1]}`)) {
+    toast.error(`Employee email must match company domain: ${company?.email.split('@')[1]}`);
+    return;
+  }
+ 
     try {
       const response = await apiRequest('/auth/company/employees/add/', {
         method: 'POST',
@@ -232,106 +255,7 @@ const fetchEmployees = async () => {
           </p>
         </motion.div>
 
-        {/* Company Status Alert */}
-        {company && company.approval_status === 'pending' && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4"
-          >
-            <div className="flex items-center">
-              <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mr-3" />
-              <div>
-                <h3 className="text-lg font-medium text-yellow-800 dark:text-yellow-200">
-                  Company Approval Pending
-                </h3>
-                <p className="text-yellow-700 dark:text-yellow-300">
-                  Your company registration is under review. Some features may be limited until approval.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Company Information */}
-        {company && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center">
-                <BuildingOfficeIcon className="w-8 h-8 text-blue-600 dark:text-blue-400 mr-3" />
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {company.name}
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {company.industry} • {company.employee_count} employees
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(company.approval_status)}
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(company.approval_status)}`}>
-                  {company.approval_status.charAt(0).toUpperCase() + company.approval_status.slice(1)}
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                  Registration Number
-                </h3>
-                <p className="text-gray-900 dark:text-white">{company.registration_number}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                  Email
-                </h3>
-                <p className="text-gray-900 dark:text-white">{company.email}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                  Phone
-                </h3>
-                <p className="text-gray-900 dark:text-white">{company.phone}</p>
-              </div>
-              <div className="md:col-span-2">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                  Address
-                </h3>
-                <p className="text-gray-900 dark:text-white">
-                  {company.address_line1}
-                  {company.address_line2 && `, ${company.address_line2}`}
-                  <br />
-                  {company.city}, {company.state} {company.postal_code}
-                  <br />
-                  {company.country}
-                </p>
-              </div>
-              {company.website && (
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                    Website
-                  </h3>
-                  <a
-                    href={company.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {company.website}
-                  </a>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-
+      {company && <CompanyCard company={company} onUpdateImage={handleImageUpdate} />}
         {/* Employees Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -776,3 +700,125 @@ const fetchEmployees = async () => {
 };
 
 export default CompanyDashboard;
+
+
+// --- CompanyCard Component ---
+const CompanyCard: React.FC<{ company: Company; onUpdateImage: (type: 'tax' | 'cr', file: File) => void }> = ({
+  company,
+  onUpdateImage,
+}) => {
+  const [taxCard, setTaxCard] = useState(company.tax_card_image);
+  const [crCard, setCrCard] = useState(company.commercial_registration_image);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'tax' | 'cr') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      if (type === 'tax') setTaxCard(url);
+      else setCrCard(url);
+      onUpdateImage(type, file);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-8"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <BuildingOfficeIcon className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{company.name}</h2>
+            <p className="text-gray-600 dark:text-gray-300">
+              {company.industry || '—'} • {company.employee_count} employees
+            </p>
+          </div>
+        </div>
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-medium ${
+            company.approval_status === 'approved'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+              : company.approval_status === 'pending'
+              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+          }`}
+        >
+          {company.approval_status.charAt(0).toUpperCase() + company.approval_status.slice(1)}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Registration Number</h3>
+          <p className="text-gray-900 dark:text-white">{company.registration_number}</p>
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</h3>
+          <p className="text-gray-900 dark:text-white">{company.email}</p>
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</h3>
+          <p className="text-gray-900 dark:text-white">{company.phone || '—'}</p>
+        </div>
+        <div className="md:col-span-2">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</h3>
+          <p className="text-gray-900 dark:text-white">
+            {company.address_line1}
+            {company.address_line2 && `, ${company.address_line2}`}
+            <br />
+            {company.city}, {company.state} {company.postal_code}
+            <br />
+            {company.country}
+          </p>
+        </div>
+        {company.website && (
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Website</h3>
+            <a
+              href={company.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {company.website}
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* Documents */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Documents</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Tax Card */}
+          <div className="relative group">
+            <img
+              src={taxCard}
+              alt="Tax Card"
+              className="w-full h-64 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+            />
+            <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
+              <PencilIcon className="w-5 h-5 text-gray-800 dark:text-gray-100" />
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, 'tax')} />
+            </label>
+          </div>
+
+          {/* Commercial Registration */}
+          <div className="relative group">
+            <img
+              src={crCard}
+              alt="CR Certificate"
+              className="w-full h-64 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+            />
+            <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
+              <PencilIcon className="w-5 h-5 text-gray-800 dark:text-gray-100" />
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, 'cr')} />
+            </label>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};

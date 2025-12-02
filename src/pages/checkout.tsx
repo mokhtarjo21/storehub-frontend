@@ -384,6 +384,16 @@ export default function Checkout(): JSX.Element {
                 <span className="font-medium text-gray-900 dark:text-white">${total.toFixed(2)}</span>
               </div>
 
+
+          
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400">
+                  {t("orders.tax") || "Subtotal"}
+                </span>
+                <span className="font-medium text-gray-900 dark:text-white">${(total*0.1).toFixed(2)}</span>
+              </div>
+                
+                
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
                   {t("cart.shipping") || "Shipping"}
@@ -395,7 +405,7 @@ export default function Checkout(): JSX.Element {
 
               <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-gray-700 pt-3">
                 <span className="text-gray-900 dark:text-white">{t("common.total") || "Total"}</span>
-                <span className="text-gray-900 dark:text-white">${finalTotal.toFixed(2)}</span>
+                <span className="text-gray-900 dark:text-white">${(finalTotal*1.1).toFixed(2)}</span>
               </div>
             </div>
 

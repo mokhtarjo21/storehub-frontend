@@ -48,12 +48,12 @@ const OrderDetail: React.FC = () => {
 
     setCancelling(true);
     try {
-      // استخدام updateorders لتغيير الحالة إلى cancelled
+      
       const [cancelResult] = await Promise.allSettled([
         cancelorders(order.order_number),
       ]);
 
-      // إعادة جلب بيانات الطلب للتأكد من الإلغاء
+    
       let cancelSuccess = false;
       try {
         const [orderDats] = await Promise.allSettled([
@@ -173,7 +173,7 @@ const OrderDetail: React.FC = () => {
               >
                 {t("orders.orderStatus") ||
                   (language === "ar" ? "حالة الطلب" : "Order Status")}{" "}
-                {order.status_display || order.order_status}
+                {t(`${order.status_display}`) || t(`${order.order_status}`)}
               </span>
 
               {order.can_be_cancelled && (
@@ -222,7 +222,7 @@ const OrderDetail: React.FC = () => {
 
               <OrderStatusTimeline
                 timeline={order.timeline}
-                currentStatus={order.order_status}
+                currentStatus={t(`${order.order_status}`)}
               />
 
               {/* Tracking Information */}
@@ -305,7 +305,7 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "المجموع الفرعي:" : "Subtotal:")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-medium">
-                    {parseFloat(order.subtotal || 0).toFixed(2)} EGP
+                    {parseFloat(order.subtotal || 0).toFixed(2)} {order.currency}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
@@ -314,7 +314,7 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "الضريبة:" : "Tax:")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-medium">
-                    {parseFloat(order.tax_amount || 0).toFixed(2)} EGP
+                    {parseFloat(order.tax_amount || 0).toFixed(2)} {order.currency}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
@@ -326,7 +326,7 @@ const OrderDetail: React.FC = () => {
                     {parseFloat(order.shipping_amount || 0) === 0
                       ? t("orders.free") ||
                         (language === "ar" ? "مجاني" : "Free")
-                      : `${parseFloat(order.shipping_amount || 0).toFixed(2)} EGP`}
+                      : `${parseFloat(order.shipping_amount || 0).toFixed(2)}`} {order.currency}
                   </span>
                 </div>
                 {parseFloat(order.discount_amount || 0) > 0 && (
@@ -346,7 +346,7 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "المجموع:" : "Total:")}
                   </span>
                   <span className="text-gray-900 dark:text-white">
-                    {parseFloat(order.total_price || 0).toFixed(2)} EGP
+                    {parseFloat(order.total_price || 0).toFixed(2)} {order.currency}
                   </span>
                 </div>
               </div>
@@ -473,12 +473,13 @@ const OrderDetail: React.FC = () => {
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white mb-1">
-                    {parseFloat(item.unit_price || 0).toFixed(2)} EGP
+                    {item.item_role=='toform' && item.unit_price == 0? t('pricing'): parseFloat(item.unit_price || 0).toFixed(2) } {order.currency}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {t("orders.totalItem") ||
                       (language === "ar" ? "الإجمالي:" : "Total:")}{" "}
-                    {parseFloat(item.total_price || 0).toFixed(2)} EGP
+                   
+                    {item.item_role=='toform' && item.total_price == 0? t('pricing'): parseFloat(item.total_price || 0).toFixed(2) } {order.currency}
                   </p>
                 </div>
               </div>

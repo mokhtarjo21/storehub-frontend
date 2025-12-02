@@ -4,6 +4,7 @@ import {
   MagnifyingGlassIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
+import { apiRequest } from "../utils/api";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useCart } from "../contexts/CartContext";
@@ -267,7 +268,7 @@ const Products: React.FC = () => {
                     <span className="text-green-600 dark:text-green-400 font-medium">
                       {" "}
                       {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
-                      {product.stock}
+                      
                     </span>
                   </>
                 ) : (
@@ -283,7 +284,7 @@ const Products: React.FC = () => {
               ) : (
                 // ------- SERVICE: Show Availability -------
                 <>
-                  {product.stock ? (
+                  {product.product_role ? (
                     <>
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
                       <span className="text-green-600 dark:text-green-400 font-medium">
@@ -401,27 +402,17 @@ const Products: React.FC = () => {
       {formProduct && (
         <CustomerFormModal
           open={!!formProduct}
-          onClose={() => setFormProduct(null)}
-          onSubmit={(data) => {
-            const cartProduct = {
-              id: formProduct.id.toString(),
-              name: formProduct.name,
-              nameAr: formProduct.name_ar || formProduct.name,
-              description: formProduct.description,
-              descriptionAr:
-                formProduct.description_ar || formProduct.description,
-              category: formProduct.product_type,
-              price: parseFloat(formProduct.price),
-              image:
-                formProduct.primary_image ||
-                "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg",
-              inStock: formProduct.stock,
-              specifications: {},
-              tags: [],
-            };
-            addItem(cartProduct, 1);
-            setFormProduct(null);
-          }}
+    onClose={() => setFormProduct(null)}
+    onSubmit={(data) => {
+      
+
+             apiRequest("/orders/", {
+              method: "post",
+              
+              body: JSON.stringify({"phone":data.phone,"notes":data.details,"slug":formProduct.slug,"currency":formProduct.currency}),
+            });
+      setFormProduct(null);
+    }}
         />
       )}
     </div>

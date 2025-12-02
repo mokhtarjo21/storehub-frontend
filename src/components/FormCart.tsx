@@ -3,10 +3,12 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
 import toast from "react-hot-toast";
 
+import { useAuth } from "../contexts/AuthContext";
 type CustomerFormModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { phone: string; details: string }) => void;
+ onSubmit: (data: { phone: string; details: string }) => { phone: string; details: string };
+
 };
 
 const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
@@ -14,8 +16,9 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const {user}=useAuth()
   const { language } = useLanguage();
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(user?.phone);
   const [details, setDetails] = useState("");
 
   const handleSubmit = () => {
