@@ -34,7 +34,7 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
 
   const getLabel = (status: string, fallback: string) => {
     const key = `orders.timeline.${status}`;
-    console.log(status);
+   
     
     const translated = t(key);
     if (translated && translated !== key) {

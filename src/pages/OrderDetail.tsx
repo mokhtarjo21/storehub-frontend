@@ -23,6 +23,8 @@ const OrderDetail: React.FC = () => {
   const { t, language } = useLanguage();
   const {  fechorder ,cancelorders} = useAuth();
   const [cancelling, setCancelling] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
@@ -35,22 +37,15 @@ const OrderDetail: React.FC = () => {
     execute: refetchOrder,
   } = useApi(`/orders/${orderNumber}/`);
 
-  const handleCancelOrder = async () => {
+  const handleCancelOrder = async (notes:any) => {
     if (!order) return;
 
-    const confirmMessage =
-      t("orders.cancelConfirm") ||
-      (language === "ar"
-        ? "هل أنت متأكد من إلغاء هذا الطلب؟"
-        : "Are you sure you want to cancel this order?");
-
-    if (!window.confirm(confirmMessage)) return;
-
+    
     setCancelling(true);
     try {
       
       const [cancelResult] = await Promise.allSettled([
-        cancelorders(order.order_number),
+        cancelorders(order.order_number,rejectReason),
       ]);
 
     
@@ -178,7 +173,7 @@ const OrderDetail: React.FC = () => {
 
               {order.can_be_cancelled && (
                 <button
-                  onClick={handleCancelOrder}
+                  onClick={()=>setIsRejectModalOpen(true)}
                   disabled={cancelling}
                   className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:bg-red-400 dark:disabled:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -505,6 +500,83 @@ const OrderDetail: React.FC = () => {
           </motion.div>
         )}
       </div>
+       {isRejectModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-xl shadow-xl p-4 sm:p-6">
+                  <h2
+                    className={`text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {language === "ar" ? "رفض الطلب" : "cancel Order"}
+                  </h2>
+                  <label
+                    className={`block text-gray-600 dark:text-gray-300 mb-2 ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {language === "ar" ? "سبب الغاء:" : "Reason for Cancel:"}
+                  </label>
+                  <textarea
+                    className={`w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 min-h-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    placeholder={
+                      language === "ar"
+                        ? "اكتب سبب الالغاء..."
+                        : "Write the cancel reason..."
+                    }
+                    dir={language === "ar" ? "rtl" : "ltr"}
+                  />
+                  <div
+                    className={`flex justify-end gap-3 mt-4 ${
+                      language === "ar" ? "flex-row-reverse" : "flex-row"
+                    }`}
+                  >
+                    <button
+                      className="px-4 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors text-sm"
+                      onClick={() => {
+                        setIsRejectModalOpen(false);
+                        setRejectReason("");
+                      }}
+                    >
+                      {language === "ar" ? "إلغاء" : "Cancel"}
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors text-sm"
+                      onClick={async () => {
+                        if (!rejectReason.trim()) {
+                          alert(
+                            language === "ar"
+                              ? "الرجاء إدخال سبب الغاء"
+                              : "Please enter a cancel reason"
+                          );
+                          return;
+                        }
+                        try {
+                          await handleCancelOrder(rejectReason)
+                          
+                          setIsRejectModalOpen(false);
+                          setRejectReason("");
+                          
+                        } catch (error) {
+                          console.error(error);
+                          alert(
+                            language === "ar"
+                              ? "فشل في الغاء الطلب"
+                              : "Failed to cancel order"
+                          );
+                        }
+                      }}
+                    >
+                      {language === "ar" ? "تأكيد الغاء" : "Confirm Cancel"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
     </div>
   );
 };

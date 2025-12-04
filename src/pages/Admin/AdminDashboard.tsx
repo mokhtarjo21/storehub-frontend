@@ -1,30 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  UsersIcon,
-  ShoppingBagIcon,
-  CurrencyDollarIcon,
-  BuildingOfficeIcon,
-} from "@heroicons/react/24/outline";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  Area,
-  AreaChart,
-} from "recharts";
+import { UsersIcon, ShoppingBagIcon, CurrencyDollarIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Area, AreaChart } from "recharts";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useApi } from "../../hooks/useApi";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import styles for datepicker
 
 const COLORS = {
   primary: "#3B82F6",
@@ -36,19 +18,17 @@ const COLORS = {
 
 const AdminDashboard: React.FC = () => {
   const { language } = useLanguage();
-  const { data: overview, loading: overviewLoading } = useApi(
-    "/auth/admin/analytics/overview/"
-  );
-  const { data: salesData, loading: salesLoading } = useApi(
-    "/auth/admin/analytics/sales/"
-  );
-  const { data: usersData, loading: usersLoading } = useApi(
-    "/auth/admin/analytics/users/"
-  );
+  
+  // State for date range
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  // API hooks with date range filters
+  const { data: overview, loading: overviewLoading } = useApi(`/auth/admin/analytics/overview/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
+  const { data: salesData, loading: salesLoading } = useApi(`/auth/admin/analytics/sales/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
+  const { data: usersData, loading: usersLoading } = useApi(`/auth/admin/analytics/users/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
   const { data: usersList } = useApi("/auth/admin/users/?limit=5");
-  const { data: companiesList } = useApi(
-    "/auth/admin/companies/?status=pending"
-  );
+  const { data: companiesList } = useApi("/auth/admin/companies/?status=pending");
 
   if (overviewLoading || salesLoading || usersLoading) {
     return (
@@ -101,6 +81,13 @@ const AdminDashboard: React.FC = () => {
     },
   ];
 
+  // Handle Date Change
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -118,6 +105,22 @@ const AdminDashboard: React.FC = () => {
               : "Manage your platform and monitor key metrics"}
           </p>
         </motion.div>
+
+        {/* Date Picker */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {language === "ar" ? "اختيار المدة" : "Select Date Range"}
+          </label>
+          <DatePicker
+            selected={startDate}
+            onChange={handleDateChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+            dateFormat="yyyy-MM-dd"
+          />
+        </div>
 
         {/* Stats Grid */}
         <motion.div

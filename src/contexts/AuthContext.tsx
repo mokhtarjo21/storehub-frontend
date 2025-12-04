@@ -12,7 +12,7 @@ interface AuthContextType {
   fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
   updateorders: (order_number: any, updates: any) => Promise<any[]>;
   // Add product endpoints
-  cancelorders: (order_number: any) => Promise<any[]>;
+  cancelorders: (order_number: any,notes:any) => Promise<any[]>;
   checkApiConnection: () => Promise<boolean>;
   getNotifications: (num:number) => Promise<any[]>;
   myorders: (page:any) => Promise<any>;
@@ -590,7 +590,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
    const cancelorders = async (
-    order_number: any
+    order_number: any,notes:any
   ): Promise<any[]> => {
     setIsLoading(true);
     try {
@@ -599,7 +599,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         {
           method: "POST",
           headers: getAuthHeaders(),
-          
+          body: JSON.stringify({"notes":notes} )
         }
       );
       const data = await handleApiResponse(response);
