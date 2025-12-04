@@ -522,11 +522,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-  const fetchorders = async (search: any, status: any,page:any): Promise<any[]> => {
+  const fetchorders = async (search: any, status: any,page:any,date:any): Promise<any[]> => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/?page=${page}&search=${search}&status=${status}`,
+        `${API_BASE_URL}/orders/admin/orders/?search=${search}&page=${page}&status=${status}&date=${date}`,
         {
           method: "GET",
           headers: getAuthHeaders(),

@@ -58,6 +58,7 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
+  const [date,setDate] = useState("")
   const [currentPage, setCurrentPage] = useState(1); // الصفحة الحالية
   const [pageSize, setPageSize] = useState(10); // عدد العناصر لكل صفحة
   const [totalOrders, setTotalOrders] = useState(0); // إجمالي الطلبات
@@ -69,32 +70,30 @@ export default function AdminOrdersPage() {
   const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
 
   // Calculate statistics
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      const matchesStatus = status ? order.order_status === status : true;
-      if (!matchesStatus) return false;
+const filteredOrders = useMemo(() => {
+  return orders.filter((order) => {
+    const matchesStatus = status ? order.order_status === status : true;
+    if (!matchesStatus) return false;
 
-      if (!search.trim()) return true;
-      const searchTerm = search.toLowerCase();
-      const orderNumber = String(order.order_number || "").toLowerCase();
-      const userName = (order.user_name || "").toLowerCase();
-      const shippingName = (order.shipping_name || "").toLowerCase();
-      return (
-        orderNumber.includes(searchTerm) ||
-        userName.includes(searchTerm) ||
-        shippingName.includes(searchTerm)
-      );
-    });
-  }, [orders, search, status]);
-
+    if (!search.trim()) return true;
+    const searchTerm = search.toLowerCase();
+    const orderNumber = String(order.order_number || "").toLowerCase();
+    const userName = (order.user_name || "").toLowerCase();
+    const shippingName = (order.shipping_name || "").toLowerCase();
+    return (
+      orderNumber.includes(searchTerm) ||
+      userName.includes(searchTerm) ||
+      shippingName.includes(searchTerm)
+    );
+  });
+}, [orders, search, status]);
   const stats = useMemo(() => {
     const total = filteredOrders.length;
     const pending = filteredOrders.filter(
       (o) => o.order_status === "pending"
     ).length;
     const confirmed = filteredOrders.filter(
-      (o) => o.order_status === "confirmed" || o.order_status === "confirmed"
-    ).length;
+      (o) => o.order_status === "confirmed" ).length;
     const processing = filteredOrders.filter(
       (o) => o.order_status === "processing"
     ).length;
@@ -159,48 +158,43 @@ export default function AdminOrdersPage() {
     };
     return statusMap[status] || statusMap.pending;
   };
+const fetchOrders = async (
+  searchTerm = search,
+  statusFilter = status,
+  page = currentPage,
+  selectedDate = date
+) => {
+  setLoading(true);
+  try {
+    const [cRes] = await Promise.allSettled([
+      fetchorders(searchTerm , statusFilter, page, selectedDate),
+    ]);
 
-  const fetchOrders = async (
-    searchTerm = search,
-    statusFilter = status,
-    page = currentPage,
-    size = pageSize
-  ) => {
-    setLoading(true);
-    try {
-     
-      const [cRes] = await Promise.allSettled([
-        fetchorders(searchTerm || "", statusFilter || "", page, size),
-      ]);
+    if (cRes.status === "fulfilled") {
+      const cdata = cRes.value;
 
-      if (cRes.status === "fulfilled") {
-        const cdata = cRes.value;
+      setOrders(cdata.results); // تأكد من أن النتائج يتم تعيينها
+      console.log(cdata.results);
       
-
-        if (Array.isArray(cdata.results)) {
-          setOrders(cdata.results);
-          setTotalOrders(cdata.count); // Update total orders
-        } else {
-          setOrders([]);
-          setTotalOrders(0);
-        }
-      } else {
-        console.error("Failed to fetch orders:", cRes.reason);
-        toast.error(
-          language === "ar" ? "فشل في جلب الطلبات" : "Failed to fetch orders"
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+      
+      setTotalOrders(cdata.count || 0); // تحديث إجمالي الطلبات
+    } else {
+      console.error("Failed to fetch orders:", cRes.reason);
       toast.error(
-        language === "ar"
-          ? "حدث خطأ أثناء جلب الطلبات"
-          : "An error occurred while fetching orders"
+        language === "ar" ? "فشل في جلب الطلبات" : "Failed to fetch orders"
       );
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    toast.error(
+      language === "ar"
+        ? "حدث خطأ أثناء جلب الطلبات"
+        : "An error occurred while fetching orders"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchOrders();
@@ -211,12 +205,12 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     if (isInitialLoad) return;
 
-    const timer = setTimeout(() => {
-      fetchOrders(search, status);
-    }, 500);
+    // const timer = setTimeout(() => {
+      fetchOrders(search, status,currentPage,date);
+    // }, 600);
 
-    return () => clearTimeout(timer);
-  }, [search, status]);
+    // return () => clearTimeout(timer);
+  }, [search, status,date]);
 
   const handleSelectOrder = async (order_number: string | number) => {
     try {
@@ -670,9 +664,7 @@ export default function AdminOrdersPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  fetchOrders(search, status);
-                }
+                
               }}
             />
           </div>
@@ -701,21 +693,25 @@ export default function AdminOrdersPage() {
             </option>
           </select>
           <div className="flex gap-2">
-            <button
-              onClick={() => fetchOrders(search, status)}
-              disabled={loading}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <MagnifyingGlassIcon className="w-5 h-5" />
-              <span className="hidden sm:inline">
-                {language === "ar" ? "بحث" : "Search"}
-              </span>
-            </button>
-            {(search || status) && (
+           
+              <input
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-gray-900 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              type="Date"
+              onChange={(e)=>{
+              
+                console.log(e.target.value);
+                
+                setDate(e.target.value)
+              }}
+              
+              />
+
+            {(search || status || date) && (
               <button
                 onClick={() => {
                   setSearch("");
                   setStatus("");
+                  setDate("")
                   fetchOrders("", "");
                 }}
                 className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
@@ -977,7 +973,7 @@ export default function AdminOrdersPage() {
           onClick={() => {
             if (currentPage > 1) {
               setCurrentPage(currentPage - 1);
-              fetchOrders(search, status, currentPage - 1, pageSize);
+              fetchOrders(search, status, currentPage - 1, date);
             }
           }}
           disabled={currentPage === 1}
@@ -998,7 +994,7 @@ export default function AdminOrdersPage() {
           onClick={() => {
             if (currentPage < Math.ceil(totalOrders / pageSize)) {
               setCurrentPage(currentPage + 1);
-              fetchOrders(search, status, currentPage + 1, pageSize);
+              fetchOrders(search, status, currentPage + 1, date);
             }
           }}
           disabled={currentPage === Math.ceil(totalOrders / pageSize)}
