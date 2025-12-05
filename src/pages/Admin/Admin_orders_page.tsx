@@ -47,7 +47,6 @@ function TabButton({
   );
 }
 export default function AdminOrdersPage() {
-
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -58,7 +57,7 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
-  const [date,setDate] = useState("")
+  const [date, setDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1); // الصفحة الحالية
   const [pageSize, setPageSize] = useState(10); // عدد العناصر لكل صفحة
   const [totalOrders, setTotalOrders] = useState(0); // إجمالي الطلبات
@@ -70,30 +69,36 @@ export default function AdminOrdersPage() {
   const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
 
   // Calculate statistics
-const filteredOrders = useMemo(() => {
-  return orders.filter((order) => {
-    const matchesStatus = status ? order.order_status === status : true;
-    if (!matchesStatus) return false;
+  const filteredOrders = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return orders.filter((order) => {
+      const matchesStatus = status ? order.order_status === status : true;
+      if (!matchesStatus) return false;
 
-    if (!search.trim()) return true;
-    const searchTerm = search.toLowerCase();
-    const orderNumber = String(order.order_number || "").toLowerCase();
-    const userName = (order.user_name || "").toLowerCase();
-    const shippingName = (order.shipping_name || "").toLowerCase();
-    return (
-      orderNumber.includes(searchTerm) ||
-      userName.includes(searchTerm) ||
-      shippingName.includes(searchTerm)
-    );
-  });
-}, [orders, search, status]);
+      if (!term) return true;
+      const orderNumber = String(order.order_number || "").toLowerCase();
+      const userName = String(order.user_name || "").toLowerCase();
+      const phone = String(order.phone || "").toLowerCase();
+      const shippingPhone = String(order.shipping_phone || "").toLowerCase();
+      const shippingName = String(order.shipping_name || "").toLowerCase();
+
+      return (
+        orderNumber.includes(term) ||
+        userName.includes(term) ||
+        phone.includes(term) ||
+        shippingPhone.includes(term) ||
+        shippingName.includes(term)
+      );
+    });
+  }, [orders, search, status]);
   const stats = useMemo(() => {
     const total = filteredOrders.length;
     const pending = filteredOrders.filter(
       (o) => o.order_status === "pending"
     ).length;
     const confirmed = filteredOrders.filter(
-      (o) => o.order_status === "confirmed" ).length;
+      (o) => o.order_status === "confirmed"
+    ).length;
     const processing = filteredOrders.filter(
       (o) => o.order_status === "processing"
     ).length;
@@ -158,43 +163,42 @@ const filteredOrders = useMemo(() => {
     };
     return statusMap[status] || statusMap.pending;
   };
-const fetchOrders = async (
-  searchTerm = search,
-  statusFilter = status,
-  page = currentPage,
-  selectedDate = date
-) => {
-  setLoading(true);
-  try {
-    const [cRes] = await Promise.allSettled([
-      fetchorders(searchTerm , statusFilter, page, selectedDate),
-    ]);
+  const fetchOrders = async (
+    searchTerm = search,
+    statusFilter = status,
+    page = currentPage,
+    selectedDate = date
+  ) => {
+    setLoading(true);
+    try {
+      const [cRes] = await Promise.allSettled([
+        fetchorders(searchTerm, statusFilter, page, selectedDate),
+      ]);
 
-    if (cRes.status === "fulfilled") {
-      const cdata = cRes.value;
+      if (cRes.status === "fulfilled") {
+        const cdata = cRes.value;
 
-      setOrders(cdata.results); // تأكد من أن النتائج يتم تعيينها
-      console.log(cdata.results);
-      
-      
-      setTotalOrders(cdata.count || 0); // تحديث إجمالي الطلبات
-    } else {
-      console.error("Failed to fetch orders:", cRes.reason);
+        setOrders(cdata.results); // تأكد من أن النتائج يتم تعيينها
+        console.log(cdata.results);
+
+        setTotalOrders(cdata.count || 0); // تحديث إجمالي الطلبات
+      } else {
+        console.error("Failed to fetch orders:", cRes.reason);
+        toast.error(
+          language === "ar" ? "فشل في جلب الطلبات" : "Failed to fetch orders"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
       toast.error(
-        language === "ar" ? "فشل في جلب الطلبات" : "Failed to fetch orders"
+        language === "ar"
+          ? "حدث خطأ أثناء جلب الطلبات"
+          : "An error occurred while fetching orders"
       );
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    toast.error(
-      language === "ar"
-        ? "حدث خطأ أثناء جلب الطلبات"
-        : "An error occurred while fetching orders"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -206,11 +210,11 @@ const fetchOrders = async (
     if (isInitialLoad) return;
 
     // const timer = setTimeout(() => {
-      fetchOrders(search, status,currentPage,date);
+    fetchOrders(search, status, currentPage, date);
     // }, 600);
 
     // return () => clearTimeout(timer);
-  }, [search, status,date]);
+  }, [search, status, date]);
 
   const handleSelectOrder = async (order_number: string | number) => {
     try {
@@ -219,7 +223,7 @@ const fetchOrders = async (
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
         console.log(orderDatsData);
-        
+
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
         setEditingOrder({
@@ -228,7 +232,7 @@ const fetchOrders = async (
           total_price: orderDatsData.total_price || 0,
           order_status: orderDatsData.order_status || "pending",
           payment_status: orderDatsData.payment_status || "",
-          notes:orderDatsData.notes
+          notes: orderDatsData.notes,
         });
       } else {
         toast.error(
@@ -288,20 +292,19 @@ const fetchOrders = async (
       if (editingOrder.payment_status !== selectedOrder.payment_status) {
         updates.payment_status = editingOrder.payment_status;
       }
-      if (editingOrder.notes !== selectedOrder.notes){
-        updates.notes= editingOrder.notes;
+      if (editingOrder.notes !== selectedOrder.notes) {
+        updates.notes = editingOrder.notes;
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
-        
         try {
-        const [updateResult] = await Promise.allSettled([
-          updateorders(selectedOrder.order_number, updates),
-        ]);
+          const [updateResult] = await Promise.allSettled([
+            updateorders(selectedOrder.order_number, updates),
+          ]);
 
-        // دائماً نحاول إعادة جلب البيانات من السيرفر للتأكد
-        let refreshSuccess = false;
-        
+          // دائماً نحاول إعادة جلب البيانات من السيرفر للتأكد
+          let refreshSuccess = false;
+
           const [orderDats] = await Promise.allSettled([
             fechorder(selectedOrder.order_number),
           ]);
@@ -322,34 +325,34 @@ const fetchOrders = async (
               total_price: updatedOrderData.total_price || 0,
               order_status: updatedOrderData.order_status || "pending",
               payment_status: updatedOrderData.payment_status || "",
-              notes:updatedOrderData.notes
+              notes: updatedOrderData.notes,
             });
-              // إذا نجح التحديث أو إعادة الجلب، نعرض رسالة نجاح ونغلق الـ modal
-        if (updateResult.status === "fulfilled") {
-                toast.success(
-          language === "ar"
-            ? "تم تعديل الطلب بنجاح"
-            : "Order Updated successfully"
-        );
-           //   // إغلاق الـ modal بعد الحفظ بنجاح
-          setTimeout(() => {
-            handleCloseDetails();
+            // إذا نجح التحديث أو إعادة الجلب، نعرض رسالة نجاح ونغلق الـ modal
+            if (updateResult.status === "fulfilled") {
+              toast.success(
+                language === "ar"
+                  ? "تم تعديل الطلب بنجاح"
+                  : "Order Updated successfully"
+              );
+              //   // إغلاق الـ modal بعد الحفظ بنجاح
+              setTimeout(() => {
+                handleCloseDetails();
+              }, 500);
+            } else {
+              // فشل كلاهما - نحدث يدوياً على الأقل
 
-          }, 500);        } else {
-          // فشل كلاهما - نحدث يدوياً على الأقل
-          
+              setEditingOrder((prev) =>
+                prev ? { ...prev, ...updates } : null
+              );
 
-          setEditingOrder((prev) => (prev ? { ...prev, ...updates } : null));
-
-          setOrders((prev) =>
-            prev.map((o) =>
-              o.order_number === selectedOrder.order_number
-                ? { ...o, ...updates }
-                : o
-            )
-          );
-
-        }
+              setOrders((prev) =>
+                prev.map((o) =>
+                  o.order_number === selectedOrder.order_number
+                    ? { ...o, ...updates }
+                    : o
+                )
+              );
+            }
             // تحديث قائمة الطلبات بالبيانات الجديدة
             setOrders((prev) =>
               prev.map((o) =>
@@ -364,8 +367,6 @@ const fetchOrders = async (
         } catch (refreshError) {
           toast.error("Error refreshing order data:", refreshError);
         }
-
-        
 
         /////////////////
       } else {
@@ -383,7 +384,6 @@ const fetchOrders = async (
       setUpdating(false);
     }
   };
-
 
   const handleCancelOrder = async () => {
     if (!selectedOrder) return;
@@ -663,9 +663,7 @@ const fetchOrders = async (
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                
-              }}
+              onKeyDown={(e) => {}}
             />
           </div>
           <select
@@ -693,25 +691,22 @@ const fetchOrders = async (
             </option>
           </select>
           <div className="flex gap-2">
-           
-              <input
+            <input
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-gray-900 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="Date"
-              onChange={(e)=>{
-              
+              onChange={(e) => {
                 console.log(e.target.value);
-                
-                setDate(e.target.value)
+
+                setDate(e.target.value);
               }}
-              
-              />
+            />
 
             {(search || status || date) && (
               <button
                 onClick={() => {
                   setSearch("");
                   setStatus("");
-                  setDate("")
+                  setDate("");
                   fetchOrders("", "");
                 }}
                 className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
@@ -751,6 +746,13 @@ const fetchOrders = async (
                   >
                     {t("customer") ||
                       (language === "ar" ? "العميل" : "Customer")}
+                  </th>
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    {t("phone") || (language === "ar" ? "رقم الهاتف" : "Phone")}
                   </th>
                   <th
                     className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
@@ -866,6 +868,23 @@ const fetchOrders = async (
                             language === "ar" ? "text-right" : "text-left"
                           }`}
                         >
+                          <div
+                            className={`flex items-center ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
+                          >
+                            <div className="text-sm text-gray-900 dark:text-white">
+                              {order.phone || "N/A"}
+                            </div>
+                          </div>
+                        </td>
+                        <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">
                             {order.total_price} {order.currency || "EGP"}
                           </div>
@@ -876,7 +895,6 @@ const fetchOrders = async (
                           }`}
                         >
                           <button
-                            
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
                               statusBadge.bg
                             } ${
@@ -954,7 +972,6 @@ const fetchOrders = async (
                                   (language === "ar" ? "عرض" : "View")}
                               </span>
                             </button>
-                           
                           </div>
                         </td>
                       </motion.tr>
@@ -968,7 +985,7 @@ const fetchOrders = async (
       </motion.div>
 
       {/* pagination */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center gap-6 justify-center">
         <button
           onClick={() => {
             if (currentPage > 1) {
@@ -1282,11 +1299,9 @@ const fetchOrders = async (
                                     <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
                                       {it.item_sku || it.sku || ""}
                                     </div>
-                                   
                                   </div>
                                   <div className="flex items-center justify-between md:flex-col md:items-end gap-2 md:gap-1">
                                     <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                                      
                                       {t("quantity") ||
                                         (language === "ar"
                                           ? "الكمية"
@@ -1294,20 +1309,27 @@ const fetchOrders = async (
                                       :{" "}
                                       <span className="font-medium text-gray-900 dark:text-white">
                                         {it.quantity}
-                                        
                                       </span>
                                     </div>
                                     <div className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
-                                      {it.item_role=='toform' && it.total_price == 0? t('pricing'): it.total_price } {selectedOrder.currency}
+                                      {it.item_role == "toform" &&
+                                      it.total_price == 0
+                                        ? t("pricing")
+                                        : it.total_price}{" "}
+                                      {selectedOrder.currency}
                                     </div>
                                   </div>
-                                </div> 
+                                </div>
                                 <div className="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden md:block">
-                                  {
-                                    (language === "ar"
-                                      ? "سعر الوحدة"
-                                      : "Unit Price")}
-                                  : {it.item_role== "toform" && it.unit_price ==0? t('pricing'): it.unit_price} {selectedOrder.currency}
+                                  {language === "ar"
+                                    ? "سعر الوحدة"
+                                    : "Unit Price"}
+                                  :{" "}
+                                  {it.item_role == "toform" &&
+                                  it.unit_price == 0
+                                    ? t("pricing")
+                                    : it.unit_price}{" "}
+                                  {selectedOrder.currency}
                                 </div>
                               </div>
                             </div>
@@ -1434,14 +1456,14 @@ const fetchOrders = async (
                             className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <option value="pending">{t(`pending`)}</option>
-                            <option value="processing">{t('processing')}</option>
-                            <option value="confirmed">{t('confirmed')}</option>
-                            <option value="preparing">{t('preparing')}</option>
-                            <option value="shipped">{t('shipped')}</option>
-                            <option value="delivered">{t('delivered')}</option>
+                            <option value="processing">
+                              {t("processing")}
+                            </option>
+                            <option value="confirmed">{t("confirmed")}</option>
+                            <option value="preparing">{t("preparing")}</option>
+                            <option value="shipped">{t("shipped")}</option>
+                            <option value="delivered">{t("delivered")}</option>
                           </select>
-
-                        
 
                           {selectedOrder.can_be_cancelled ? (
                             <button
@@ -1497,18 +1519,20 @@ const fetchOrders = async (
 
                         {/* Payment Status Control */}
                         <div className="mt-4">
-                          {selectedOrder.items[0].item_role =="toform" &&(
+                          {selectedOrder.items[0].item_role == "toform" && (
                             <input
-  type="number"
-  value={editingOrder?.total_price ?? selectedOrder.total_price}
-  onChange={(e) => handleEditField("total_price", e.target.value)}
-  className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
+                              type="number"
+                              value={
+                                editingOrder?.total_price ??
+                                selectedOrder.total_price
+                              }
+                              onChange={(e) =>
+                                handleEditField("total_price", e.target.value)
+                              }
+                              className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
   bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
-/>
-
-                          )
-
-                          }
+                            />
+                          )}
                           <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
                             {t("updatePaymentStatus") ||
                               (language === "ar"
@@ -1537,13 +1561,10 @@ const fetchOrders = async (
                               {language === "ar" ? "مدفوع" : "Paid"}
                             </option>
 
-
                             <option value="refunded">
                               {language === "ar" ? "مُسترد" : "Refunded"}
                             </option>
                           </select>
-
-                         
                         </div>
                         {Array.isArray(selectedOrder.payment_transactions) &&
                           selectedOrder.payment_transactions.length > 0 && (
@@ -1565,7 +1586,8 @@ const fetchOrders = async (
                                   </div>
                                   <div className="text-left sm:text-right text-xs flex-shrink-0">
                                     <div className="font-semibold text-gray-900 dark:text-white">
-                                      {tx.amount} {selectedOrder.currency || "EGP"}
+                                      {tx.amount}{" "}
+                                      {selectedOrder.currency || "EGP"}
                                     </div>
                                     <div className="text-gray-500 dark:text-gray-400 mt-1 text-[10px] sm:text-xs">
                                       {tx.created_at
@@ -1577,31 +1599,26 @@ const fetchOrders = async (
                                   </div>
                                 </div>
                               ))}
-                              
                             </div>
-                            
                           )}
-                          
                       </div>
                     </div>
-                        <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSaveOrder();
-                            }}
-                            disabled={updating || !selectedOrder.can_be_edited}
-                            className="w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                          >
-                            {updating
-                              ? t("saving") ||
-                                (language === "ar"
-                                  ? "جاري الحفظ..."
-                                  : "Saving...")
-                              : t("saveChanges") ||
-                                (language === "ar"
-                                  ? "حفظ التغييرات"
-                                  : "Save Changes")}
-                          </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSaveOrder();
+                      }}
+                      disabled={updating || !selectedOrder.can_be_edited}
+                      className="w-full px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                    >
+                      {updating
+                        ? t("saving") ||
+                          (language === "ar" ? "جاري الحفظ..." : "Saving...")
+                        : t("saveChanges") ||
+                          (language === "ar"
+                            ? "حفظ التغييرات"
+                            : "Save Changes")}
+                    </button>
                   </div>
                 </aside>
               </div>

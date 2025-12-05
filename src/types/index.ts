@@ -51,6 +51,7 @@ export interface Order {
   shipping_name: string;
   shipping_phone: string;
   shipping_address: string;
+  phone: string;
   userId: string;
   notes?: string;
   items: OrderItem[];

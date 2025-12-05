@@ -46,7 +46,7 @@ export default function AdminCompaniesPage() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -387,16 +387,10 @@ export default function AdminCompaniesPage() {
 
       {/* Pagination */}
       <div
-        className={`flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 ${
+        className={`flex items-center gap-6 justify-center mt-4 ${
           language === "ar" ? "text-right" : "text-left"
         }`}
       >
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {language === "ar" ? "عرض" : "Showing"}{" "}
-          {(currentPage - 1) * perPage + 1} -{" "}
-          {Math.min(currentPage * perPage, companies.length)}{" "}
-          {language === "ar" ? "من" : "of"} {companies.length}
-        </div>
         <div className="flex gap-2">
           <button
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
@@ -405,8 +399,11 @@ export default function AdminCompaniesPage() {
           >
             {language === "ar" ? "السابق" : "Previous"}
           </button>
+          {/* Page Info */}
           <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
-            {currentPage} / {totalPages}
+            {language === "ar"
+              ? `الصفحة ${currentPage} من ${Math.ceil(totalPages / pageSize)}`
+              : `Page ${currentPage} of ${Math.ceil(totalPages / pageSize)}`}
           </span>
           <button
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"

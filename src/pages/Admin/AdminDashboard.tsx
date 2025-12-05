@@ -1,13 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { UsersIcon, ShoppingBagIcon, CurrencyDollarIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Area, AreaChart } from "recharts";
+import {
+  UsersIcon,
+  ShoppingBagIcon,
+  CurrencyDollarIcon,
+  BuildingOfficeIcon,
+} from "@heroicons/react/24/outline";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Area,
+  AreaChart,
+} from "recharts";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useApi } from "../../hooks/useApi";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Import styles for datepicker
-
+import "react-datepicker/dist/react-datepicker.css";
+import { Calendar } from "lucide-react";
 const COLORS = {
   primary: "#3B82F6",
   success: "#10B981",
@@ -18,17 +38,31 @@ const COLORS = {
 
 const AdminDashboard: React.FC = () => {
   const { language } = useLanguage();
-  
+  const isArabic = language === "ar";
   // State for date range
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
   // API hooks with date range filters
-  const { data: overview, loading: overviewLoading } = useApi(`/auth/admin/analytics/overview/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
-  const { data: salesData, loading: salesLoading } = useApi(`/auth/admin/analytics/sales/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
-  const { data: usersData, loading: usersLoading } = useApi(`/auth/admin/analytics/users/?start_date=${startDate ? startDate.toISOString() : ''}&end_date=${endDate ? endDate.toISOString() : ''}`);
+  const { data: overview, loading: overviewLoading } = useApi(
+    `/auth/admin/analytics/overview/?start_date=${
+      startDate ? startDate.toISOString() : ""
+    }&end_date=${endDate ? endDate.toISOString() : ""}`
+  );
+  const { data: salesData, loading: salesLoading } = useApi(
+    `/auth/admin/analytics/sales/?start_date=${
+      startDate ? startDate.toISOString() : ""
+    }&end_date=${endDate ? endDate.toISOString() : ""}`
+  );
+  const { data: usersData, loading: usersLoading } = useApi(
+    `/auth/admin/analytics/users/?start_date=${
+      startDate ? startDate.toISOString() : ""
+    }&end_date=${endDate ? endDate.toISOString() : ""}`
+  );
   const { data: usersList } = useApi("/auth/admin/users/?limit=5");
-  const { data: companiesList } = useApi("/auth/admin/companies/?status=pending");
+  const { data: companiesList } = useApi(
+    "/auth/admin/companies/?status=pending"
+  );
 
   if (overviewLoading || salesLoading || usersLoading) {
     return (
@@ -107,19 +141,160 @@ const AdminDashboard: React.FC = () => {
         </motion.div>
 
         {/* Date Picker */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            {language === "ar" ? "اختيار المدة" : "Select Date Range"}
-          </label>
-          <DatePicker
-            selected={startDate}
-            onChange={handleDateChange}
-            startDate={startDate}
-            endDate={endDate}
-            selectsRange
-            inline
-            dateFormat="yyyy-MM-dd"
-          />
+        {/* Enhanced Date Picker */}
+        <div className={`mb-6 ${isArabic ? "text-right" : "text-left"}`}>
+          <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-100 dark:border-gray-800 shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="p-5">
+              {/* Label with Icon */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <label className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  {isArabic ? "اختيار المدة الزمنية" : "Select Date Range"}
+                </label>
+              </div>
+
+              {/* Date Input Container */}
+              <div className="relative group">
+                {/* Icon */}
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Calendar className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                </div>
+
+                {/* Selected Dates Preview */}
+                {startDate && endDate && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md">
+                      {startDate.toLocaleDateString()} →{" "}
+                      {endDate.toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+
+                {/* DatePicker */}
+                <DatePicker
+                  selected={startDate}
+                  onChange={handleDateChange}
+                  startDate={startDate}
+                  endDate={endDate}
+                  selectsRange
+                  inline={false}
+                  dateFormat="MMM dd, yyyy"
+                  placeholderText={
+                    isArabic
+                      ? "اختر تاريخ البداية والنهاية"
+                      : "Select start and end dates"
+                  }
+                  className={`
+            w-full py-3 pl-10 pr-24 rounded-lg
+            border border-gray-200 dark:border-gray-700
+            bg-white dark:bg-gray-800
+            text-gray-700 dark:text-gray-200
+            placeholder:text-gray-400 dark:placeholder:text-gray-500
+            focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
+            transition-all duration-200
+            ${isArabic ? "text-right" : "text-left"}
+          `}
+                  calendarClassName={`
+            rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 
+            overflow-hidden mt-2
+            ${isArabic ? "rtl-calendar" : ""}
+          `}
+                  wrapperClassName="w-full"
+                  showPopperArrow={false}
+                  popperPlacement={isArabic ? "bottom-end" : "bottom-start"}
+                  popperModifiers={[
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, 8],
+                      },
+                    },
+                  ]}
+                />
+              </div>
+
+              {/* Quick Actions */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setDate(start.getDate() - 7);
+                    setStartDate(start);
+                    setEndDate(end);
+                  }}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 
+          text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+          hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  {isArabic ? "أخر 7 أيام" : "Last 7 days"}
+                </button>
+                <button
+                  onClick={() => {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setMonth(start.getMonth() - 1);
+                    setStartDate(start);
+                    setEndDate(end);
+                  }}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 
+          text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
+          hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  {isArabic ? "أخر 30 يوم" : "Last 30 days"}
+                </button>
+                <button
+                  onClick={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 
+          text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 
+          hover:border-red-300 dark:hover:border-red-700 transition-colors"
+                >
+                  {isArabic ? "مسح" : "Clear"}
+                </button>
+              </div>
+
+              {/* Selection Summary */}
+              {startDate && endDate && (
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {isArabic ? "المدة المختارة" : "Selected Range"}
+                      </p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        {Math.ceil(
+                          (endDate - startDate) / (1000 * 60 * 60 * 24)
+                        )}
+                        {isArabic ? " يوم" : " days"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        {isArabic ? "الفترة" : "Period"}
+                      </p>
+                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        {startDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        -
+                        {endDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Stats Grid */}
