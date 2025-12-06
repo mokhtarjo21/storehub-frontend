@@ -407,14 +407,14 @@ function ProductForm({
   const [descriptionAr, setDescriptionAr] = useState(
     initial?.description_ar ?? ""
   );
-  const [price, setPrice] = useState(initial?.price ?? 1);
+  const [price, setPrice] = useState(initial?.price ?? "");
   const [comparePrice, setComparePrice] = useState<number | "">(
     initial?.compare_price ?? ""
   );
   const [costPrice, setCostPrice] = useState<number | "">(
     initial?.cost_price ?? ""
   );
-  const [stock, setStock] = useState(initial?.stock ?? 0);
+  const [stock, setStock] = useState(initial?.stock ?? "");
   const [lowStockThreshold, setLowStockThreshold] = useState(
     initial?.low_stock_threshold ?? 10
   );

@@ -24,7 +24,7 @@ const profileSchema = yup.object({
 type ProfileFormData = yup.InferType<typeof profileSchema>;
 
 const MyInfo: React.FC = () => {
-  const { user } = useAuth();
+  const { user ,checkApiConnection} = useAuth();
   const { t, language } = useLanguage();
   const isRTL = language === "ar";
 
@@ -49,6 +49,7 @@ const MyInfo: React.FC = () => {
         company_name: data.companyName,
       });
       toast.success("Profile updated successfully!");
+      checkApiConnection()
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update profile";

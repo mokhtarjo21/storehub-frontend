@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { updateAvatat } from "../utils/api";
+import { updateAvatar } from "../utils/api";
 import toast from "react-hot-toast";
+
 import {
   UserIcon,
   CameraIcon,
@@ -43,7 +44,7 @@ const passwordSchema = yup.object({
 type PasswordFormData = yup.InferType<typeof passwordSchema>;
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user,checkApiConnection } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("info");
@@ -55,6 +56,7 @@ const Profile: React.FC = () => {
     push: false,
     sms: false,
   });
+
 
   const isRTL = language === "ar";
 
@@ -111,33 +113,36 @@ const Profile: React.FC = () => {
   if (user?.role === "affiliate") {
     additionalTabs.push({ id: "affiliate", icon: ChartBarIcon });
   }
-  // Handle file selection and preview
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl); // Show a preview of the selected image
+
+  
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setImageFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl); // Show a preview of the selected image
+
+    try {
+      // Add sleep function to delay execution
+      await sleep(3000); // 3000ms = 3 seconds
+
+      // Prepare FormData with the image file and other user data
+      const formData = new FormData();
+      formData.append("avatar", file);  // Appending the image file (use 'file' instead of 'imageFile')
+
+      // Pass the formData directly to the updateAvatar function
+      await updateAvatar(formData);
+      await checkApiConnection()
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error(t("profile.imageUpdateFailed"));
     }
-  };
-
-const handleImageUpload = async () => {
-  if (!imageFile) return;
-
-  try {
-    // Prepare FormData with the image file and other user data
-    const formData = new FormData();
-    formData.append("avatar", imageFile);  // Appending the image file
-    
-
-    // Pass the formData directly to the updateUserInfo function
-    await updateAvatat(formData);
-
-    toast.success("Profile updated successfully!");
-  } catch (error) {
-    toast.error(t("profile.imageUpdateFailed"));
   }
 };
+
+// Sleep function to introduce delay
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 
   const tabs = [...baseTabs, ...additionalTabs];
 
@@ -203,17 +208,10 @@ const handleImageUpload = async () => {
                 </div>
                   <div className="p-4 lg:p-6">
                 {/* Add a button to trigger the image upload */}
-                <div className="flex justify-end">
-                  <button
-                    onClick={handleImageUpload}
-                    className="px-4 lg:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors text-sm lg:text-base"
-                  >
-                    {t("profile.uploadImage")}
-                  </button>
-                </div>
+                
               </div>
                 <h3 className="mt-3 lg:mt-4 text-base lg:text-lg font-medium text-gray-900 dark:text-white">
-                  {user?.name}
+                  {user?.full_name}
                 </h3>
                 <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">
                   {user?.email}

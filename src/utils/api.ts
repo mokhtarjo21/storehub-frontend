@@ -137,10 +137,13 @@ export const updateUserProfile = async (profileData: any) => {
   return handleApiResponse(response);
 };
 
-export const updateAvatat = async (userData: any) => {
-  const response = await apiRequest("/orders/avatar/", {
-    method: "PUT",
-    
+export const updateAvatar = async (userData: any) => {
+  const token = localStorage.getItem("access_token");
+  const response = await fetch(`${API_BASE_URL}/auth/avatar/`, {
+    method: "PATCH",
+     headers: {
+      "Authorization":`Bearer ${token}`
+    },
     body: userData
   });
   return handleApiResponse(response);
@@ -165,7 +168,7 @@ export const changePassword = async (passwordData: any) => {
 export default {
   verifyOTP,
   resendOTP,
-  updateAvatat,
+  updateAvatar,
   getCurrentUser,
   updateUserProfile,
   updateUserInfo,

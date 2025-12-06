@@ -90,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           role: userData.role,
           address: userData.address,
           phone: userData.phone,
+          avatar:userData.avatar,
           points: userData.points || 0,
           companyName: userData.company_name,
           affiliateCode: userData.affiliate_code,
@@ -131,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         name: userData.full_name,
         email: userData.email,
         phone: userData.phone,
+        avatar:userData.avatar,
         address: userData.address,
         role: userData.role,
         points: userData.points || 0,
@@ -183,9 +185,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       // Even if we get 401 (unauthorized), it means the API is running
-      if (response.status === 401 || response.ok) {
+      if ( response.ok) {
+        const data = await handleApiResponse(response);
+       const userData = data;
+      setUser({
+        id: userData.id.toString(),
+        name: userData.full_name,
+        email: userData.email,
+        phone: userData.phone,
+        avatar:userData.avatar,
+        address: userData.address,
+        role: userData.role,
+        points: userData.points || 0,
+        companyName: userData.company_name,
+        affiliateCode: userData.affiliate_code,
+        createdAt: userData.date_joined,
+      });
         return true;
       } else {
+        logout()
         return false;
       }
     } catch (error) {
