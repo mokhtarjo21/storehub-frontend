@@ -60,6 +60,8 @@ const AdminDashboard: React.FC = () => {
     }&end_date=${endDate ? endDate.toISOString() : ""}`
   );
   const { data: usersList } = useApi("/auth/admin/users/?limit=5");
+
+  
   const { data: companiesList } = useApi(
     "/auth/admin/companies/?status=pending"
   );
@@ -404,7 +406,7 @@ const AdminDashboard: React.FC = () => {
             transition={{ delay: 0.3 }}
             className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-2 border border-gray-200 dark:border-gray-700"
           >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-lg  font-semibold text-gray-900 dark:text-white mb-4">
               {language === "ar" ? "توزيع المستخدمين" : "Users by Role"}
             </h3>
 

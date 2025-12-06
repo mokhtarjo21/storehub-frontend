@@ -137,6 +137,15 @@ export const updateUserProfile = async (profileData: any) => {
   return handleApiResponse(response);
 };
 
+export const updateAvatat = async (userData: any) => {
+  const response = await apiRequest("/orders/avatar/", {
+    method: "PUT",
+    
+    body: userData
+  });
+  return handleApiResponse(response);
+};
+
 export const updateUserInfo = async (userData: any) => {
   const response = await apiRequest("/auth/update/", {
     method: "PATCH",
@@ -156,6 +165,7 @@ export const changePassword = async (passwordData: any) => {
 export default {
   verifyOTP,
   resendOTP,
+  updateAvatat,
   getCurrentUser,
   updateUserProfile,
   updateUserInfo,

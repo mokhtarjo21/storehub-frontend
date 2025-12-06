@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { updateAvatat } from "../utils/api";
 import toast from "react-hot-toast";
 import {
   UserIcon,
@@ -46,6 +47,9 @@ const Profile: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("info");
+  const [imageFile, setImageFile] = useState<File | null>(null); // Add state for image
+  const [imagePreview, setImagePreview] = useState<string | null>(null); // Add state for image preview
+
   const [notifications, setNotifications] = useState({
     email: true,
     push: false,
@@ -107,6 +111,33 @@ const Profile: React.FC = () => {
   if (user?.role === "affiliate") {
     additionalTabs.push({ id: "affiliate", icon: ChartBarIcon });
   }
+  // Handle file selection and preview
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl); // Show a preview of the selected image
+    }
+  };
+
+const handleImageUpload = async () => {
+  if (!imageFile) return;
+
+  try {
+    // Prepare FormData with the image file and other user data
+    const formData = new FormData();
+    formData.append("avatar", imageFile);  // Appending the image file
+    
+
+    // Pass the formData directly to the updateUserInfo function
+    await updateAvatat(formData);
+
+    toast.success("Profile updated successfully!");
+  } catch (error) {
+    toast.error(t("profile.imageUpdateFailed"));
+  }
+};
 
   const tabs = [...baseTabs, ...additionalTabs];
 
@@ -149,16 +180,38 @@ const Profile: React.FC = () => {
               <div className={"text-center mb-6"}>
                 <div className="relative inline-block">
                   <div className="w-20 h-20 lg:w-24 lg:h-24 bg-blue-500 rounded-full flex items-center justify-center">
-                    <UserIcon className="w-8 h-8 lg:w-12 lg:h-12 text-white" />
+                    <img
+                      src={imagePreview || user?.avatar || "/default-avatar.png"} // Show preview or default image
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover"
+                    />
                   </div>
                   <button
-                    className={`absolute bottom-0 ${
-                      isRTL ? "left-0" : "right-0"
-                    } bg-white dark:bg-gray-700 rounded-full p-1 lg:p-2 shadow-lg border border-gray-200 dark:border-gray-600`}
+                    onClick={() => document.getElementById("fileInput")?.click()}
+                    className={`absolute bottom-0 ${isRTL ? "left-0" : "right-0"} bg-white dark:bg-gray-700 rounded-full p-1 lg:p-2 shadow-lg border border-gray-200 dark:border-gray-600`}
                   >
                     <CameraIcon className="w-3 h-3 lg:w-4 lg:h-4 text-gray-600 dark:text-gray-300" />
                   </button>
+                  {/* Hidden file input */}
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
                 </div>
+                  <div className="p-4 lg:p-6">
+                {/* Add a button to trigger the image upload */}
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleImageUpload}
+                    className="px-4 lg:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors text-sm lg:text-base"
+                  >
+                    {t("profile.uploadImage")}
+                  </button>
+                </div>
+              </div>
                 <h3 className="mt-3 lg:mt-4 text-base lg:text-lg font-medium text-gray-900 dark:text-white">
                   {user?.name}
                 </h3>
@@ -216,6 +269,8 @@ const Profile: React.FC = () => {
             className="lg:col-span-3"
           >
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[500px]">
+              
+             
               {/* My Info Tab */}
               {activeTab === "info" && <MyInfo />}
 

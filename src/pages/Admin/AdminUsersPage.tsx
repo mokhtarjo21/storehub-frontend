@@ -78,7 +78,7 @@ export default function AdminUsersPage() {
       };
       const res = await axiosInstance.get("/api/auth/admin/users/", { params });
       setUsers(res.data.results);
-      setTotalPages(Math.ceil(res.data.count / perPage));
+      setTotalPages(Math.ceil(res.data.count / pageSize));
     } catch (error) {
       console.error(error);
     } finally {
@@ -685,8 +685,8 @@ export default function AdminUsersPage() {
           {/* Page Info */}
           <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
             {language === "ar"
-              ? `الصفحة ${currentPage} من ${Math.ceil(totalPages / pageSize)}`
-              : `Page ${currentPage} of ${Math.ceil(totalPages / pageSize)}`}
+              ? `الصفحة ${currentPage} من ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
           </span>
           <button
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
