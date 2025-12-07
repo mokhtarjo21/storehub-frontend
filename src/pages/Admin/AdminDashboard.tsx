@@ -61,7 +61,45 @@ const AdminDashboard: React.FC = () => {
   );
   const { data: usersList } = useApi("/auth/admin/users/?limit=5");
 
-  
+   // Handle predefined filters
+  const handlePresetFilter = (filter: string) => {
+    const end = new Date();
+    let start;
+
+    switch (filter) {
+      case "today":
+        start = new Date();
+        start.setHours(0, 0, 0, 0); // start of today
+        setStartDate(start);
+        setEndDate(end);
+        break;
+      case "yesterday":
+        start = new Date();
+        start.setDate(end.getDate() - 1); // yesterday
+        start.setHours(0, 0, 0, 0); // start of yesterday
+        setStartDate(start);
+        setEndDate(end);
+        break;
+      case "last3Months":
+        start = new Date();
+        start.setMonth(end.getMonth() - 3); // last 3 months
+        start.setDate(1); // start of the month 3 months ago
+        setStartDate(start);
+        setEndDate(end);
+        break;
+      case "lastYear":
+        start = new Date();
+        start.setFullYear(end.getFullYear() - 1); // last year
+        start.setMonth(0); // start of the year
+        start.setDate(1); // start of the year
+        setStartDate(start);
+        setEndDate(end);
+        break;
+      default:
+        setStartDate(null);
+        setEndDate(null);
+    }
+  };
   const { data: companiesList } = useApi(
     "/auth/admin/companies/?status=pending"
   );
@@ -218,6 +256,33 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Quick Actions */}
+              {/* Filter Buttons */}
+              <div className="mt-4 flex gap-4">
+                <button
+                  onClick={() => handlePresetFilter("today")}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => handlePresetFilter("yesterday")}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  Yesterday
+                </button>
+                <button
+                  onClick={() => handlePresetFilter("last3Months")}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  Last 3 Months
+                </button>
+                <button
+                  onClick={() => handlePresetFilter("lastYear")}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  Last Year
+                </button>
+              </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => {

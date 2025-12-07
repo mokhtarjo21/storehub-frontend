@@ -114,6 +114,16 @@ const OrderStatusTimeline: React.FC<OrderStatusTimelineProps> = ({
         return <ClockIcon className={iconClass} />;
     }
   };
+// إذا كانت حالة الطلب ملغية، اعرض كلمة "ملغي" فقط
+if (currentStatus === "cancelled") {
+  return (
+    <div className="w-full flex justify-center items-center py-16">
+      <span className="text-red-600 text-7xl font-extrabold tracking-widest opacity-90">
+        {language === "ar" ? "مـلـغـي" : "CANCELLED"}
+      </span>
+    </div>
+  );
+}
 
   return (
     <div className="flow-root">
