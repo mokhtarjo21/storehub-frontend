@@ -175,46 +175,57 @@ export default function AdminBrandsSection() {
       {/* Table Container */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <table className="min-w-max w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
+                {/* Logo */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الشعار" : "Logo"}
                 </th>
+
+                {/* Name */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الاسم" : "Name"}
                 </th>
+
+                {/* Website */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap hidden md:table-cell ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الموقع الإلكتروني" : "Website"}
                 </th>
+
+                {/* Description  */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap hidden lg:table-cell ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الوصف" : "Description"}
                 </th>
+
+                {/* Status */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الحالة" : "Status"}
                 </th>
+
+                {/* Actions */}
                 <th
-                  className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                  className={`px-3 py-3 text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
@@ -222,6 +233,7 @@ export default function AdminBrandsSection() {
                 </th>
               </tr>
             </thead>
+
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
                 <tr>
@@ -257,10 +269,10 @@ export default function AdminBrandsSection() {
                         <img
                           src={brand.logo}
                           alt={brand.name}
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-fill border border-gray-200 dark:border-gray-600"
+                          className="w-10 h-10 sm:w-16 sm:h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-600"
                         />
                       ) : (
-                        <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                        <PhotoIcon className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 dark:text-gray-500" />
                       )}
                     </td>
 
@@ -274,42 +286,12 @@ export default function AdminBrandsSection() {
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {brand.name}
                         </div>
-                        {/* Website on mobile */}
-                        <div className="md:hidden mt-1">
-                          {brand.website ? (
-                            <a
-                              href={brand.website}
-                              target="_blank"
-                              rel="noreferrer"
-                              className={`inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline ${
-                                language === "ar"
-                                  ? "flex-row-reverse"
-                                  : "flex-row"
-                              }`}
-                            >
-                              <LinkIcon className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate max-w-[120px]">
-                                {brand.website}
-                              </span>
-                            </a>
-                          ) : (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              —
-                            </span>
-                          )}
-                        </div>
-                        {/* Description on mobile */}
-                        <div className="lg:hidden mt-1">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                            {brand.description || "—"}
-                          </p>
-                        </div>
                       </div>
                     </td>
 
-                    {/* Website - Hidden on mobile */}
+                    {/* Website */}
                     <td
-                      className={`px-3 py-3 hidden md:table-cell ${
+                      className={`px-3 py-3  ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
@@ -318,11 +300,9 @@ export default function AdminBrandsSection() {
                           href={brand.website}
                           target="_blank"
                           rel="noreferrer"
-                          className={`inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline ${
-                            language === "ar" ? "flex-row-reverse" : "flex-row"
-                          }`}
+                          className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
                         >
-                          <LinkIcon className="w-4 h-4 flex-shrink-0" />
+                          <LinkIcon className="w-4 h-4" />
                           <span className="truncate max-w-[150px]">
                             {brand.website}
                           </span>
@@ -334,9 +314,9 @@ export default function AdminBrandsSection() {
                       )}
                     </td>
 
-                    {/* Description - Hidden on mobile and medium screens */}
+                    {/* Description */}
                     <td
-                      className={`px-3 py-3 hidden lg:table-cell ${
+                      className={`px-3 py-3  ${
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
@@ -374,18 +354,17 @@ export default function AdminBrandsSection() {
                         language === "ar" ? "text-right" : "text-left"
                       }`}
                     >
-                      <div className="flex gap-1 sm:gap-2">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => openEdit(brand)}
                           className="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition"
-                          title={language === "ar" ? "تعديل" : "Edit"}
                         >
                           <PencilSquareIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 dark:text-yellow-400" />
                         </button>
+
                         <button
                           onClick={() => handleDelete(brand.id)}
                           className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition"
-                          title={language === "ar" ? "حذف" : "Delete"}
                         >
                           <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-700 dark:text-red-400" />
                         </button>

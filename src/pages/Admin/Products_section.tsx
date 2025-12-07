@@ -44,7 +44,7 @@ type ProductListItem = {
   compare_price: string | null;
   cost_price: string | null;
   stock: number;
-  currency:string;
+  currency: string;
   low_stock_threshold: number;
   sku: string;
   barcode: string | null;
@@ -250,117 +250,119 @@ export default function AdminProductsSection() {
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "صورة" : "Image"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الاسم" : "Name"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "الفئة" : "Category"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "البراند" : "Brand"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "السعر" : "Price"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "المخزون" : "Stock"}
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {language === "ar" ? "التحكم" : "Actions"}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {loading ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
-                <td
-                  colSpan={7}
-                  className="p-6 text-center text-gray-500 dark:text-gray-400"
-                >
-                  {language === "ar" ? "جاري التحميل..." : "Loading..."}
-                </td>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "صورة" : "Image"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "الاسم" : "Name"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "الفئة" : "Category"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "البراند" : "Brand"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "السعر" : "Price"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "المخزون" : "Stock"}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {language === "ar" ? "التحكم" : "Actions"}
+                </th>
               </tr>
-            ) : products.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="p-6 text-center text-gray-500 dark:text-gray-400"
-                >
-                  {language === "ar" ? "لا توجد منتجات" : "No products found"}
-                </td>
-              </tr>
-            ) : (
-              products.map((p) => (
-                <tr
-                  key={p.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
-                >
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {p.primary_image ? (
-                      <img
-                        src={p.primary_image}
-                        alt={p.name}
-                        className="w-16 h-16 object-fill rounded border border-gray-200 dark:border-gray-600"
-                      />
-                    ) : (
-                      <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
-                    )}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
-                    {language === "ar" ? p.name_ar || p.name : p.name}
-                  </td>
-
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {p.category_name ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {p.brand_name ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
-                    EGP {Number(p.price).toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        p.stock > 10
-                          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                          : p.stock > 0
-                          ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                          : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                      }`}
-                    >
-                      {p.stock}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openEdit(p)}
-                        className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"
-                        title={language === "ar" ? "تعديل" : "Edit"}
-                      >
-                        <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
-                        title={language === "ar" ? "حذف" : "Delete"}
-                      >
-                        <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="p-6 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    {language === "ar" ? "جاري التحميل..." : "Loading..."}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : products.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="p-6 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    {language === "ar" ? "لا توجد منتجات" : "No products found"}
+                  </td>
+                </tr>
+              ) : (
+                products.map((p) => (
+                  <tr
+                    key={p.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {p.primary_image ? (
+                        <img
+                          src={p.primary_image}
+                          alt={p.name}
+                          className="w-16 h-16 object-fill rounded border border-gray-200 dark:border-gray-600"
+                        />
+                      ) : (
+                        <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+                      {language === "ar" ? p.name_ar || p.name : p.name}
+                    </td>
+
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {p.category_name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {p.brand_name ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
+                      EGP {Number(p.price).toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          p.stock > 10
+                            ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                            : p.stock > 0
+                            ? "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                            : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                        }`}
+                      >
+                        {p.stock}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEdit(p)}
+                          className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"
+                          title={language === "ar" ? "تعديل" : "Edit"}
+                        >
+                          <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
+                          title={language === "ar" ? "حذف" : "Delete"}
+                        >
+                          <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showForm && (
@@ -428,7 +430,7 @@ function ProductForm({
   const [productType, setProductType] = useState(
     initial?.product_type ?? "network-device"
   );
-  const [currency,setCurrency]=useState(initial?.currency ?? "EGP")
+  const [currency, setCurrency] = useState(initial?.currency ?? "EGP");
   const [isActive, setIsActive] = useState<boolean>(initial?.is_active ?? true);
   const [isFeatured, setIsFeatured] = useState<boolean>(
     initial?.is_featured ?? false
@@ -461,7 +463,11 @@ function ProductForm({
     setImageFile(f);
   };
   // تحديث صف
-  const updateSpec = (index: number, key: "name" | "value" |"name_ar" |"value_ar" ,value:string) => {
+  const updateSpec = (
+    index: number,
+    key: "name" | "value" | "name_ar" | "value_ar",
+    value: string
+  ) => {
     const newSpecs = [...specifications];
     newSpecs[index][key] = value;
     setSpecifications(newSpecs);
@@ -498,8 +504,8 @@ function ProductForm({
           setRequiresShipping(data.requires_shipping ?? true);
           setMetaTitle(data.meta_title ?? "");
           setMetaDescription(data.meta_description ?? "");
-          setCurrency(data.currency ?? "EGP")
-          setSpecifications(data.specifications)
+          setCurrency(data.currency ?? "EGP");
+          setSpecifications(data.specifications);
           if (data.category?.id) setCategoryId(data.category.id);
           if (data.brand?.id) setBrandId(data.brand.id);
         } catch (e) {
@@ -547,7 +553,7 @@ function ProductForm({
       if (metaTitle) fd.append("meta_title", metaTitle);
       if (metaDescription) fd.append("meta_description", metaDescription);
       if (imageFile) fd.append("image", imageFile);
-      if (currency) fd.append("currency",currency);
+      if (currency) fd.append("currency", currency);
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
         : await createProduct(fd);
@@ -862,7 +868,9 @@ function ProductForm({
                   <input
                     type="text"
                     placeholder={
-                      language === "ar" ? "اسم المواصفة انجليزي" : "Specification Name EG"
+                      language === "ar"
+                        ? "اسم المواصفة انجليزي"
+                        : "Specification Name EG"
                     }
                     value={spec.name}
                     onChange={(e) => updateSpec(idx, "name", e.target.value)}
@@ -885,11 +893,13 @@ function ProductForm({
                     }`}
                     dir={language === "ar" ? "rtl" : "ltr"}
                   />
-                
+
                   <input
                     type="text"
                     placeholder={
-                      language === "ar" ? " اسم المواصفة بالعربي" : "Specification Name Ar"
+                      language === "ar"
+                        ? " اسم المواصفة بالعربي"
+                        : "Specification Name Ar"
                     }
                     value={spec.name_ar}
                     onChange={(e) => updateSpec(idx, "name_ar", e.target.value)}
@@ -906,13 +916,15 @@ function ProductForm({
                         : "Specification Value Ar"
                     }
                     value={spec.value_ar}
-                    onChange={(e) => updateSpec(idx, "value_ar", e.target.value)}
+                    onChange={(e) =>
+                      updateSpec(idx, "value_ar", e.target.value)
+                    }
                     className={`flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                     dir={language === "ar" ? "rtl" : "ltr"}
                   />
-                 
+
                   <button
                     type="button"
                     onClick={() => removeSpec(idx)}
@@ -992,120 +1004,115 @@ function ProductForm({
               )}
             </div>
           </div>
-              
-         {productRole== "tocart" && (
-          <>
-           {/* Pricing and Stock */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "السعر *" : "Price *"}
-              </label>
-              <input
-                required
-                type="number"
-                step="0.01"
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                dir="ltr"
-              />
-            </div>
 
-            <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "المخزون" : "Stock"}
-              </label>
-              <input
-                type="number"
-                value={stock}
-                onChange={(e) => setStock(Number(e.target.value))}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                dir="ltr"
-              />
-            </div>
+          {productRole == "tocart" && (
+            <>
+              {/* Pricing and Stock */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className={language === "ar" ? "text-right" : "text-left"}>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {language === "ar" ? "السعر *" : "Price *"}
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    value={price}
+                    onChange={(e) => setPrice(Number(e.target.value))}
+                    className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir="ltr"
+                  />
+                </div>
 
-            <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "حد إنذار المخزون" : "Low Stock Alert"}
-              </label>
-              <input
-                type="number"
-                value={lowStockThreshold}
-                onChange={(e) => setLowStockThreshold(Number(e.target.value))}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                dir="ltr"
-              />
-            </div>
-          </div>
+                <div className={language === "ar" ? "text-right" : "text-left"}>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {language === "ar" ? "المخزون" : "Stock"}
+                  </label>
+                  <input
+                    type="number"
+                    value={stock}
+                    onChange={(e) => setStock(Number(e.target.value))}
+                    className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir="ltr"
+                  />
+                </div>
 
-          {/* Additional Pricing */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "سعر المقارنة" : "Compare Price"}
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={comparePrice as any}
-                onChange={(e) =>
-                  setComparePrice(
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                dir="ltr"
-              />
-            </div>
+                <div className={language === "ar" ? "text-right" : "text-left"}>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {language === "ar" ? "حد إنذار المخزون" : "Low Stock Alert"}
+                  </label>
+                  <input
+                    type="number"
+                    value={lowStockThreshold}
+                    onChange={(e) =>
+                      setLowStockThreshold(Number(e.target.value))
+                    }
+                    className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir="ltr"
+                  />
+                </div>
+              </div>
 
-            
-          </div>
-</>
-         )}
-            
-            
- <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "العملة" : "Currency"}
-              </label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                dir={language === "ar" ? "rtl" : "ltr"}
-              >
-                <option value="EGP">
-                  {language === "ar" ? "جنية" : "EGP"}
-                </option>
-                <option value="USD">
-                  {language === "ar" ? "دولا" : "USD"}
-                </option>
-              </select>
-         <label
-              className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 ${
-                language === "ar" ? "flex-row-reverse" : "flex-row"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {language === "ar" ? "نشط" : "Is Active"}
-              </span>
-            </label>
+              {/* Additional Pricing */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={language === "ar" ? "text-right" : "text-left"}>
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {language === "ar" ? "سعر المقارنة" : "Compare Price"}
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={comparePrice as any}
+                    onChange={(e) =>
+                      setComparePrice(
+                        e.target.value === "" ? "" : Number(e.target.value)
+                      )
+                    }
+                    className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            {language === "ar" ? "العملة" : "Currency"}
+          </label>
+          <select
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              language === "ar" ? "text-right" : "text-left"
+            }`}
+            dir={language === "ar" ? "rtl" : "ltr"}
+          >
+            <option value="EGP">{language === "ar" ? "جنية" : "EGP"}</option>
+            <option value="USD">{language === "ar" ? "دولا" : "USD"}</option>
+          </select>
+          <label
+            className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 ${
+              language === "ar" ? "flex-row-reverse" : "flex-row"
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {language === "ar" ? "نشط" : "Is Active"}
+            </span>
+          </label>
           {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className={language === "ar" ? "text-right" : "text-left"}>
