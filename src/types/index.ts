@@ -35,6 +35,9 @@ export interface PaymentTransaction {
   transaction_id?: string;
   reference_number?: string;
   notes?: string;
+  vendor?: string;
+  hint_note?: string;
+  currency?: string;
   metadata?: Record<string, any>;
   created_at: string;
   completed_at?: string;

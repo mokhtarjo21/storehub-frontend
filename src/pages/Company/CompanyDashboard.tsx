@@ -104,8 +104,7 @@ const fetchEmployees = async () => {
   try {
     const response = await apiRequest('/auth/company/employees/');
     const data = await handleApiResponse(response);
-    console.log(data);
-    
+  
     // Ensure we always have an array
     setEmployees(Array.isArray(data) ? data : []);
   } catch (error) {

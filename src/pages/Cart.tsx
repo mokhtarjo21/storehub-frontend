@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useCart } from "../contexts/CartContext";
 
 const Cart: React.FC = () => {
-  const { t } = useLanguage();
+  const { t ,language} = useLanguage();
   const { user } = useAuth();
   const [usePoints, setUsePoints] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -25,7 +25,8 @@ const Cart: React.FC = () => {
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
   
-
+  
+  
   const pointsDiscount = usePoints
     ? Math.min(user?.points || 0, total * 0.1)
     : 0;
@@ -141,16 +142,16 @@ const Cart: React.FC = () => {
                       <img
                         src={
                           item.product?.image ||
-                          item.service?.image ||
+                          
                           "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                         }
-                        alt={item.item_name}
+                        alt={item.product?.name || "Item Image"}
                         className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                        {item.item_name}
+                        {item.product?.name || "Product Name"}
                       </h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         <span
@@ -160,16 +161,14 @@ const Cart: React.FC = () => {
                               : "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300"
                           }`}
                         >
-                          {item.item_type === "product"
-                            ? t("orders.product")
-                            : t("orders.service")}
+                          {t("cart.product")}
                         </span>
                       </p>
                       <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
                         {parseFloat(
                           item.product?.price || item.service?.price || 0
                         ).toLocaleString()}{" "}
-                        EGP
+                        {item.product.currency}
                       </p>
                     </div>
                     <div className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -305,30 +304,6 @@ const Cart: React.FC = () => {
                 </div>
               </div>
 
-              {/* Points */}
-              {user && user.points > 0 && (
-                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <label className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={usePoints}
-                      onChange={(e) => setUsePoints(e.target.checked)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {t("cart.usePoints")} ({user.points} {t("common.points")})
-                    </span>
-                  </label>
-                  {usePoints && (
-                    <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded border border-green-200 dark:border-green-800">
-                      <p className="text-sm font-semibold text-green-700 dark:text-green-400">
-                        -{pointsDiscount.toFixed(2)} EGP {t("cart.discount")}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Summary */}
               <div className="space-y-3 mb-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between text-sm">
@@ -336,10 +311,10 @@ const Cart: React.FC = () => {
                     {t("cart.subtotal")}
                   </span>
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {Number(total).toFixed(2)} EGP
+                    {Number(total).toFixed(2)} {items.currency}
                   </span>
                 </div>
-                {pointsDiscount > 0 && (
+                {/* {pointsDiscount > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
                       {t("cart.pointsDiscount")}
@@ -348,7 +323,7 @@ const Cart: React.FC = () => {
                       -{pointsDiscount.toFixed(2)} EGP
                     </span>
                   </div>
-                )}
+                )} */}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 dark:text-gray-400">
                     {t("cart.shipping")}
@@ -363,7 +338,7 @@ const Cart: React.FC = () => {
                       {t("common.total")}
                     </span>
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {finalTotal.toFixed(2)} EGP
+                      {finalTotal.toFixed(2)} {}
                     </span>
                   </div>
                 </div>

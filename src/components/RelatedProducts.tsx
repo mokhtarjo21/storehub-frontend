@@ -13,7 +13,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
   const { data: products, loading } = useApi(
     `/products/${productSlug}/related/`
   );
-  console.log(products);
+ 
   if (loading) {
     return (
       <div className="py-12">

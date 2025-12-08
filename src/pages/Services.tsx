@@ -31,10 +31,10 @@ const Services: React.FC = () => {
     if (servicesData.status === "fulfilled") {
         const cdata = (servicesData.value.results ?? servicesData.value.data) 
         if (Array.isArray(cdata)) setServiceList(cdata);
-        console.log(cdata);
+       
         
       }
-      console.log(services);
+   
       
 
  }
@@ -45,8 +45,7 @@ const Services: React.FC = () => {
      if (categoriesData.status === "fulfilled") {
         const cdata = (categoriesData.value.results ?? categoriesData.value.data) 
         if (Array.isArray(cdata)) setCategories(cdata);
-        console.log(cdata);
-        
+     
       } 
                                                              
   }

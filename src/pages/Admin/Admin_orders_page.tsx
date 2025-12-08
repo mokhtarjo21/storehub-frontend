@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
         const cdata = cRes.value;
 
         setOrders(cdata.results); // تأكد من أن النتائج يتم تعيينها
-        console.log(cdata.results);
+        
 
         setTotalOrders(cdata.count || 0); // تحديث إجمالي الطلبات
       } else {
@@ -222,7 +222,7 @@ export default function AdminOrdersPage() {
 
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
-        console.log(orderDatsData);
+    
 
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
@@ -233,6 +233,9 @@ export default function AdminOrdersPage() {
           order_status: orderDatsData.order_status || "pending",
           payment_status: orderDatsData.payment_status || "",
           notes: orderDatsData.notes,
+          vendor: orderDatsData.vendor || "",
+          currency: orderDatsData.currency || "EGP",
+          hint_note: orderDatsData.hint_note || "",
         });
       } else {
         toast.error(
@@ -271,15 +274,7 @@ export default function AdminOrdersPage() {
       const updates = {};
 
       // مقارنة القيم القديمة بالجديدة
-      if (editingOrder.shipping_name !== selectedOrder.shipping_name) {
-        updates.shipping_name = editingOrder.shipping_name;
-      }
-      if (
-        editingOrder.shipping_address !==
-        (selectedOrder.full_shipping_address || selectedOrder.shipping_address)
-      ) {
-        updates.shipping_address = editingOrder.shipping_address;
-      }
+
       if (
         parseFloat(editingOrder.total_price) !==
         parseFloat(selectedOrder.total_price)
@@ -294,6 +289,15 @@ export default function AdminOrdersPage() {
       }
       if (editingOrder.notes !== selectedOrder.notes) {
         updates.notes = editingOrder.notes;
+      }
+      if (editingOrder.currency !== selectedOrder.currency) {
+        updates.currency = editingOrder.currency; 
+      }
+      if (editingOrder.hint_note !== selectedOrder.hint_note) {
+        updates.hint_note = editingOrder.hint_note; 
+      }
+      if (editingOrder.vendor !== selectedOrder.vendor) {
+        updates.vendor = editingOrder.vendor; 
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
@@ -326,6 +330,9 @@ export default function AdminOrdersPage() {
               order_status: updatedOrderData.order_status || "pending",
               payment_status: updatedOrderData.payment_status || "",
               notes: updatedOrderData.notes,
+              vendor: updatedOrderData.vendor || "",
+              currency: updatedOrderData.currency || "EGP",
+              hint_note: updatedOrderData.hint_note || "",
             });
             // إذا نجح التحديث أو إعادة الجلب، نعرض رسالة نجاح ونغلق الـ modal
             if (updateResult.status === "fulfilled") {
@@ -695,7 +702,7 @@ export default function AdminOrdersPage() {
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-gray-900 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               type="Date"
               onChange={(e) => {
-                console.log(e.target.value);
+                
 
                 setDate(e.target.value);
               }}
@@ -1411,8 +1418,81 @@ export default function AdminOrdersPage() {
                     }
                   ></textarea>
                 </div>
+ {selectedOrder.items[0].item_role == "toform" && (
+  <>
+   <div className="xl:col-span-2 bg-white dark:bg-gray-900 rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700">
+                          <div className="flex flex-col 2xl:flex-row gap-4 sm:gap-5">
+                            <div className="flex-1 min-w-0">
+                              <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
+                                {t("cotation") ||
+                                  (language === "ar"
+                                    ? "تفاصيل العرص السعري"
+                                    : "Cotation Details")}
+                                    : {selectedOrder.order_number}
+                              </h5>
 
-                {/* Right - Actions column */}
+    <div className="flex items-center space-x-4 mb-4">
+      <div className="w-1/2">
+        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+          {language === "ar" ? "السعر" : "Price"}
+        </label>
+        <input
+          type="number"
+          value={editingOrder?.total_price ?? selectedOrder.total_price}
+          onChange={(e) => handleEditField("total_price", e.target.value)}
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+        />
+      </div>
+      
+      <div className="w-1/2">
+        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+          {language === "ar" ? "العملة" : "Currency"}
+        </label>
+        <select
+          value={editingOrder?.currency ?? selectedOrder.currency}
+          onChange={(e) => handleEditField("currency", e.target.value)}
+          className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all duration-300 ${
+            language === "ar" ? "text-right" : "text-left"
+          }`}
+          dir={language === "ar" ? "rtl" : "ltr"}
+        >
+          <option value="EGP">{language === "ar" ? "جنية" : "EGP"}</option>
+          <option value="USD">{language === "ar" ? "دولا" : "USD"}</option>
+        </select>
+      </div>
+    </div>
+
+    <div className="mb-4">
+      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+        {language === "ar" ? "البائع" : "Vendor"}
+      </label>
+      <input
+        type="text"
+        value={editingOrder?.vendor ?? selectedOrder.vendor}
+        onChange={(e) => handleEditField("vendor", e.target.value)}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+      />
+    </div>
+
+    <div className="mb-4">
+      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+        {language === "ar" ? "ملاحظات داخلية" : "Internal Notes"}
+      </label>
+      <textarea
+        value={editingOrder?.hint_note ?? selectedOrder.hint_note}
+        onChange={(e) => handleEditField("hint_note", e.target.value)}
+        rows={3}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+        placeholder={language === "ar" ? "اكتب ملاحظات الخاصة..." : "Write internal notes ..."}
+      ></textarea>
+    </div>
+     </div>
+      </div>
+       </div>
+  </>
+)}
+
+             {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
                   <div className="sticky top-4">
                     {/* تغيير من space-y-3 إلى grid */}
@@ -1519,20 +1599,7 @@ export default function AdminOrdersPage() {
 
                         {/* Payment Status Control */}
                         <div className="mt-4">
-                          {selectedOrder.items[0].item_role == "toform" && (
-                            <input
-                              type="number"
-                              value={
-                                editingOrder?.total_price ??
-                                selectedOrder.total_price
-                              }
-                              onChange={(e) =>
-                                handleEditField("total_price", e.target.value)
-                              }
-                              className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 
-  bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
-                            />
-                          )}
+                          
                           <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
                             {t("updatePaymentStatus") ||
                               (language === "ar"

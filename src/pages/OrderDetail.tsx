@@ -380,7 +380,7 @@ const OrderDetail: React.FC = () => {
             </div>
 
             {/* Points Information */}
-            {(order.points_used > 0 || order.points_earned > 0) && (
+            {/* {(order.points_used > 0 || order.points_earned > 0) && (
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
                   {t("orders.points") ||
@@ -416,7 +416,7 @@ const OrderDetail: React.FC = () => {
                   )}
                 </div>
               </div>
-            )}
+            )} */}
           </motion.div>
         </div>
 

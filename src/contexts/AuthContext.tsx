@@ -9,26 +9,21 @@ interface AuthContextType {
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
-  fetchorders: (search: any, status: any,page:any) => Promise<any[]>;
+  fetchorders: (search: any, status: any,page:any,date:any) => Promise<any[]>;
   updateorders: (order_number: any, updates: any) => Promise<any[]>;
   // Add product endpoints
   cancelorders: (order_number: any,notes:any) => Promise<any[]>;
   checkApiConnection: () => Promise<boolean>;
   getNotifications: (num:number) => Promise<any[]>;
   myorders: (page:any) => Promise<any>;
-  fetchServices: () => Promise<any[]>;
   fetchRelatedProducts: (productSlug: string) => Promise<any[]>;
-   fetchService: (slug: string | number) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
   fechorder: (order_number: string | number) => Promise<any>;
   fetchcategories: () => Promise<any[]>;
   fetchbrands: () => Promise<any[]>;
   fetchProduct: (id: string | number) => Promise<any>;
   createProduct: (productData: any) => Promise<any>;
-  createService: (productData: any) => Promise<any>;
   updateProduct: (id: string | number, productData: any) => Promise<any>;
-  updateservice: (id: string | number, productData: any) => Promise<any>;
-  deleteService:(id: string | number) => Promise<void>;
   deleteProduct: (id: string | number) => Promise<void>;
 }
 
@@ -367,31 +362,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-    const createService = async (formData: FormData): Promise<any> => {
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-
-      const response = await fetch(`${API_BASE_URL}/products/services/`, {
-        method: "POST",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: formData,
-      });
-
-      const data = await handleApiResponse(response);
-      toast.success("Product created successfully!");
-      return data;
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to create product"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
 
   // 4. تحديث منتج
@@ -427,37 +397,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-    const updateservice = async (
-    id: string | number,
-    formData: FormData
-  ): Promise<any> => {
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-
-      const response = await fetch(
-        `${API_BASE_URL}/products/admin/services/${id}/update/`,
-        {
-          method: "PUT",
-          headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: formData,
-        }
-      );
-
-      const data = await handleApiResponse(response);
-      toast.success("Product updated successfully!");
-      return data;
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update product"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
 
   // 5. حذف منتج
@@ -588,6 +528,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   ): Promise<any[]> => {
     setIsLoading(true);
     try {
+      console.log(updates);
+      
       const response = await fetch(
         `${API_BASE_URL}/orders/admin/orders/${order_number}/update-status/`,
         {
@@ -654,28 +596,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     }
   };
-  const fetchService=async (slug: string | number): Promise<any> => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/products/services/${slug}/`,
-        {
-          method: "GET",
-          headers: getAuthHeaders(),
-        }
-      );
-      const data = await handleApiResponse(response);
-      return data;    
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch order"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);  
 
-    }
-  };
   const fetchRelatedProducts=async (productSlug: string): Promise<any[]> => {
     setIsLoading(true);
     try {
@@ -697,40 +618,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);  
     }
   };
-   const fetchServices=async (): Promise<any> => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/products/services/`,
-        {
-          method: "GET",
-          headers: getAuthHeaders(),
-        }
-      );
-      const data = await handleApiResponse(response);
-      return data;    
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch order"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);  
-
-    }
-  };
+ 
   return (
     <AuthContext.Provider
       value={{
-        fetchService,
+       
         user,
         login,
         logout,
         register,
         isLoading,
-        fetchServices,
+       
         isInitializing,
-        createService,
+        
         fetchProducts,
         fetchRelatedProducts,
         fetchorders,
@@ -743,7 +643,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         updateProduct,
         myorders,
         getNotifications,
-        updateservice,
+       
         deleteProduct,
         cancelorders,
         checkApiConnection,

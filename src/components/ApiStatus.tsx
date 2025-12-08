@@ -20,9 +20,7 @@ const ApiStatus: React.FC = () => {
     try {
       const response = await checkApiConnection();
         
-      console.log(response);
-      
-      
+   
       // Even if we get 401 (unauthorized), it means the API is running
       if (response) {
         setStatus('connected');

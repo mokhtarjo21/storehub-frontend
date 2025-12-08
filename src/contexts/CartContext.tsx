@@ -68,14 +68,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!res.ok) {
         const errData = await res.json();
-        console.log("API Error:", errData, res.reson);
-        throw new Error("Failed to add product");
+        
+        throw new Error(errData.message || "Failed to add item");
       }
 
       await fetchCart();
       toast.success("Product added to cart");
     } catch (err) {
-      toast.error("Failed to add product to cart");
+      toast.error(err instanceof Error ? err.message : "Failed to add item" );
     }
   };
 
@@ -97,8 +97,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!res.ok) {
         const errData = await res.json();
-        console.log("API Error:", errData);
-        throw new Error("Failed to add service");
+        
+        throw new Error(errData.message || "Failed to add service");
       }
 
       await fetchCart();

@@ -238,7 +238,7 @@ const ProductDetail: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-6 mt-2">
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold text-gray-900 dark:text-white">
-                      {language === "ar" ? "جنيه" : "EGP"}{" "}
+                      {product.currency}
                       {parseFloat(product.price).toLocaleString()}
                     </span>
 

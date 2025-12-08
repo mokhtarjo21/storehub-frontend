@@ -23,13 +23,7 @@ const Notifications: React.FC = () => {
     () => [
       { value: "all", label: t("notifications.types.all") || "All Types" },
       { value: "order", label: t("notifications.types.order") || "Order" },
-      { value: "company", label: t("notifications.types.company") || "Company" },
-      { value: "points", label: t("notifications.types.points") || "Points" },
-      { value: "service", label: t("notifications.types.service") || "Service" },
-      {
-        value: "marketing",
-        label: t("notifications.types.marketing") || "Marketing",
-      },
+      
       { value: "security", label: t("notifications.types.security") || "Security" },
     ],
     [t]
@@ -38,7 +32,7 @@ const Notifications: React.FC = () => {
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      let url = "http://localhost:8000/api/accounts/notifications/";
+      let url = "http://192.168.1.7:8000/api/auth/notifications/";
       const params = new URLSearchParams();
 
       if (filter !== "all") {
@@ -104,7 +98,7 @@ const Notifications: React.FC = () => {
   const markAsRead = async (notificationId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/accounts/notifications/${notificationId}/read/`,
+        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/read/`,
         {
           method: "POST",
           headers: {
@@ -140,7 +134,7 @@ const Notifications: React.FC = () => {
   const markAllAsRead = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8000/api/accounts/notifications/mark-all-read/",
+        "http://192.168.1.7:8000/api/auth/notifications/mark-all-read/",
         {
           method: "POST",
           headers: {
@@ -172,7 +166,7 @@ const Notifications: React.FC = () => {
   const deleteNotification = async (notificationId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/accounts/notifications/${notificationId}/delete/`,
+        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/delete/`,
         {
           method: "DELETE",
           headers: {
@@ -208,7 +202,7 @@ const Notifications: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/accounts/notifications/delete-all/",
+        "http://192.168.1.7:8000/api/auth/notifications/delete-all/",
         {
           method: "DELETE",
           headers: {
