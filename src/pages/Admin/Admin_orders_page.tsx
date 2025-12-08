@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { Order } from "../../types";
@@ -18,9 +17,7 @@ import {
   EyeIcon,
   CalendarIcon,
   UserIcon,
-  PencilIcon,
 } from "@heroicons/react/24/outline";
-/* Helper TabButton component - keep inside same file or import */
 function TabButton({
   children,
   active,
@@ -58,17 +55,16 @@ export default function AdminOrdersPage() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
   const [date, setDate] = useState("");
-  const [currentPage, setCurrentPage] = useState(1); // الصفحة الحالية
-  const [pageSize, setPageSize] = useState(10); // عدد العناصر لكل صفحة
-  const [totalOrders, setTotalOrders] = useState(0); // إجمالي الطلبات
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [pageSize, setPageSize] = useState(10); 
+  const [totalOrders, setTotalOrders] = useState(0); 
   const { t, language } = useLanguage();
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
   );
-  const [activeTab, setActiveTab] = useState("overview"); // overview | items | timeline | raw
+  const [activeTab, setActiveTab] = useState("overview"); 
 
-  // Calculate statistics
   const filteredOrders = useMemo(() => {
     const term = search.trim().toLowerCase();
     return orders.filter((order) => {
@@ -91,6 +87,7 @@ export default function AdminOrdersPage() {
       );
     });
   }, [orders, search, status]);
+
   const stats = useMemo(() => {
     const total = filteredOrders.length;
     const pending = filteredOrders.filter(
@@ -127,7 +124,6 @@ export default function AdminOrdersPage() {
     };
   }, [filteredOrders]);
 
-  // Get status badge color
   const getStatusBadge = (status: string) => {
     const statusMap = {
       pending: {
@@ -178,10 +174,10 @@ export default function AdminOrdersPage() {
       if (cRes.status === "fulfilled") {
         const cdata = cRes.value;
 
-        setOrders(cdata.results); // تأكد من أن النتائج يتم تعيينها
+        setOrders(cdata.results);
         
 
-        setTotalOrders(cdata.count || 0); // تحديث إجمالي الطلبات
+        setTotalOrders(cdata.count || 0);
       } else {
         console.error("Failed to fetch orders:", cRes.reason);
         toast.error(
@@ -205,15 +201,9 @@ export default function AdminOrdersPage() {
     setIsInitialLoad(false);
   }, []);
 
-  // Debounce search - works for both search and status (skip initial load)
   useEffect(() => {
     if (isInitialLoad) return;
-
-    // const timer = setTimeout(() => {
     fetchOrders(search, status, currentPage, date);
-    // }, 600);
-
-    // return () => clearTimeout(timer);
   }, [search, status, date]);
 
   const handleSelectOrder = async (order_number: string | number) => {
@@ -375,7 +365,6 @@ export default function AdminOrdersPage() {
           toast.error("Error refreshing order data:", refreshError);
         }
 
-        /////////////////
       } else {
         toast(
           language === "ar" ? "لا توجد تغييرات للحفظ" : "No changes to save",
