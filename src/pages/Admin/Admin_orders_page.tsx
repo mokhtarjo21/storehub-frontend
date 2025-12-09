@@ -6,7 +6,7 @@ import { Order } from "../../types";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
-import { useFloating } from '@floating-ui/react-dom';
+import { useFloating } from "@floating-ui/react-dom";
 import ar from "date-fns/locale/ar";
 import enGB from "date-fns/locale/en-GB";
 
@@ -27,6 +27,7 @@ import {
   CalendarIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
+import { Calendar, ChevronDownIcon } from "lucide-react";
 function TabButton({
   children,
   active,
@@ -64,10 +65,10 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
- 
-  const [currentPage, setCurrentPage] = useState(1); 
-  const [pageSize, setPageSize] = useState(10); 
-  const [totalOrders, setTotalOrders] = useState(0); 
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalOrders, setTotalOrders] = useState(0);
   const { t, language } = useLanguage();
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -75,15 +76,13 @@ export default function AdminOrdersPage() {
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
   );
-  const [activeTab, setActiveTab] = useState("overview"); 
+  const [activeTab, setActiveTab] = useState("overview");
 
-
-
-const handleDateChange = (dates: [Date | null, Date | null]) => {
-  const [start, end] = dates;
-  setStartDate(start);
-  setEndDate(end);
-};
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+  };
   const filteredOrders = useMemo(() => {
     const term = search.trim().toLowerCase();
     return orders.filter((order) => {
@@ -182,8 +181,8 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
     searchTerm = search,
     statusFilter = status,
     page = currentPage,
-    stardate=startDate,
-    enddate=endDate
+    stardate = startDate,
+    enddate = endDate
   ) => {
     setLoading(true);
     try {
@@ -195,7 +194,6 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
         const cdata = cRes.value;
 
         setOrders(cdata.results);
-        
 
         setTotalOrders(cdata.count || 0);
       } else {
@@ -232,7 +230,6 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
 
       if (orderDats.status === "fulfilled" && orderDats.value) {
         const orderDatsData = orderDats.value;
-    
 
         setSelectedOrder(orderDatsData);
         setOrderStatus(orderDatsData.order_status);
@@ -301,13 +298,13 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
         updates.notes = editingOrder.notes;
       }
       if (editingOrder.currency !== selectedOrder.currency) {
-        updates.currency = editingOrder.currency; 
+        updates.currency = editingOrder.currency;
       }
       if (editingOrder.hint_note !== selectedOrder.hint_note) {
-        updates.hint_note = editingOrder.hint_note; 
+        updates.hint_note = editingOrder.hint_note;
       }
       if (editingOrder.vendor !== selectedOrder.vendor) {
-        updates.vendor = editingOrder.vendor; 
+        updates.vendor = editingOrder.vendor;
       }
       // إذا في تغييرات
       if (Object.keys(updates).length > 0) {
@@ -384,7 +381,6 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
         } catch (refreshError) {
           toast.error("Error refreshing order data:", refreshError);
         }
-
       } else {
         toast(
           language === "ar" ? "لا توجد تغييرات للحفظ" : "No changes to save",
@@ -663,81 +659,250 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 border border-gray-200 dark:border-gray-700"
+        className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 md:p-6"
       >
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="relative md:col-span-2">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder={
-                t("searchPlaceholder") ||
-                (language === "ar"
-                  ? "ابحث برقم الطلب أو اسم العميل..."
-                  : "Search by order number or customer name...")
-              }
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {}}
-            />
+        {/* Header Section */}
+          {/* Mobile Filter Counter */}
+          <div className="sm:hidden flex items-center justify-between">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {language === "ar" ? "التصفيات:" : "Filters:"}
+            </span>
+            <div className="flex items-center gap-2">
+              <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+                {[search, status, startDate].filter(Boolean).length}
+              </div>
+              <ChevronDownIcon className="w-5 h-5 text-gray-400" />
+            </div>
           </div>
-          <select
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="">
-              {t("filterAll") ||
-                (language === "ar" ? "جميع الحالات" : "All Status")}
-            </option>
-            <option value="pending">{t("filterPending") || "Pending"}</option>
-            <option value="confirmed">
-              {t("filterConfirmed") || "Confirmed"}
-            </option>
-            <option value="processing">
-              {t("filterProcessing") || "Processing"}
-            </option>
-            <option value="shipped">{t("filterShipped") || "Shipped"}</option>
-            <option value="delivered">
-              {t("filterDelivered") || "Delivered"}
-            </option>
-            <option value="cancelled">
-              {t("filterCancelled") || "Cancelled"}
-            </option>
-          </select>
-          <div className="flex gap-2">
-              <DatePicker
-  locale={language === "ar" ? "ar" : "en-GB"}
-  selected={startDate}
-  onChange={handleDateChange}
-  startDate={startDate}
-  endDate={endDate}
-  selectsRange
-  dateFormat="MMM dd, yyyy"
-  placeholderText={
-    language === "ar"
-      ? "اختر تاريخ البداية والنهاية"
-      : "Select start and end dates"
-  }
-/>
+        {/* Filters Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Search Input - Full width on mobile, 1/3 on lg+ */}
+          <div className="lg:col-span-1">
+            <div className="relative group">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+              <input
+                type="text"
+                placeholder={
+                  t("searchPlaceholder") ||
+                  (language === "ar"
+                    ? "ابحث برقم الطلب أو اسم العميل..."
+                    : "Search by order number or customer name...")
+                }
+                className="w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl 
+                     bg-white dark:bg-gray-700/60 text-gray-900 dark:text-white 
+                     placeholder-gray-500 dark:placeholder-gray-400 
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200
+                     text-sm md:text-base"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 
+                       text-gray-400 hover:text-red-500 dark:text-gray-400 
+                       dark:hover:text-red-400 p-1 rounded-lg 
+                       hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  title={language === "ar" ? "مسح البحث" : "Clear search"}
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
 
-            {(search || status || endDate) && (
-              <button
-                onClick={() => {
-                  setSearch("");
-                  setStatus("");                            
-                  setStartDate(null);
-                  setEndDate(null);
-                }}
-                className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-                title={language === "ar" ? "مسح الفلاتر" : "Clear Filters"}
+          {/* Status Filter */}
+          <div className="lg:col-span-1">
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    status === "pending"
+                      ? "bg-yellow-500"
+                      : status === "confirmed"
+                      ? "bg-blue-500"
+                      : status === "processing"
+                      ? "bg-indigo-500"
+                      : status === "shipped"
+                      ? "bg-purple-500"
+                      : status === "delivered"
+                      ? "bg-green-500"
+                      : status === "cancelled"
+                      ? "bg-red-500"
+                      : "bg-gray-300"
+                  }`}
+                />
+              </div>
+              <select
+                className="w-full pl-12 pr-10 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl 
+                     bg-white dark:bg-gray-700/60 text-gray-900 dark:text-white 
+                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                     hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200
+                     appearance-none cursor-pointer text-sm md:text-base"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
               >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            )}
+                <option value="">
+                  {t("filterAll") ||
+                    (language === "ar" ? "جميع الحالات" : "All Status")}
+                </option>
+                <option value="pending">
+                  {t("filterPending") || "Pending"}
+                </option>
+                <option value="confirmed">
+                  {t("filterConfirmed") || "Confirmed"}
+                </option>
+                <option value="processing">
+                  {t("filterProcessing") || "Processing"}
+                </option>
+                <option value="shipped">
+                  {t("filterShipped") || "Shipped"}
+                </option>
+                <option value="delivered">
+                  {t("filterDelivered") || "Delivered"}
+                </option>
+                <option value="cancelled">
+                  {t("filterCancelled") || "Cancelled"}
+                </option>
+              </select>
+              <ChevronDownIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Date Range Filter */}
+          <div className="lg:col-span-1">
+            <div className="relative group">
+              {/* Calendar Icon */}
+              <div
+                className={`absolute top-1/2 transform -translate-y-1/2 ${
+                  language === "ar" ? "right-4" : "left-4"
+                } pointer-events-none z-10`}
+              >
+                <Calendar className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+              </div>
+
+              {/* DatePicker */}
+              <DatePicker
+                locale={language === "ar" ? "ar" : "en-GB"}
+                selected={startDate}
+                onChange={handleDateChange}
+                startDate={startDate}
+                endDate={endDate}
+                selectsRange
+                dateFormat="MMM dd, yyyy"
+                placeholderText={
+                  language === "ar"
+                    ? "اختر الفترة الزمنية..."
+                    : "Select date range..."
+                }
+                className={`w-full ${
+                  language === "ar" ? "pr-12 pl-10" : "pl-12 pr-10"
+                } py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl 
+             bg-white dark:bg-gray-700/60 text-gray-900 dark:text-white 
+             placeholder-gray-500 dark:placeholder-gray-400 
+             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+             hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200
+             cursor-pointer text-sm md:text-base`}
+                calendarClassName="border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl mt-2"
+                popperClassName="z-50"
+                popperPlacement="bottom-start"
+              />
+
+              {/* Clear Button */}
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                  className={`absolute top-1/2 transform -translate-y-1/2 ${
+                    language === "ar" ? "left-4" : "right-4"
+                  } text-gray-400 hover:text-red-500 dark:text-gray-400 
+             dark:hover:text-red-400 cursor-pointer transition-all duration-200 
+             p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 z-20`}
+                  title={language === "ar" ? "مسح التاريخ" : "Clear Dates"}
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Selected Filters Badges (Desktop Only) */}
+        {(search || status || startDate || endDate) && (
+          <div className="hidden lg:flex flex-wrap items-center gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {language === "ar" ? "التصفيات المطبقة:" : "Active Filters:"}
+            </span>
+
+            {search && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+                <MagnifyingGlassIcon className="w-4 h-4" />
+                <span className="truncate max-w-[200px]">{search}</span>
+                <button
+                  onClick={() => setSearch("")}
+                  className="ml-1 text-blue-400 hover:text-blue-600 dark:hover:text-blue-200 p-0.5 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800/40"
+                >
+                  <XMarkIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {status && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-sm font-medium">
+                <span className="capitalize">{status}</span>
+                <button
+                  onClick={() => setStatus("")}
+                  className="text-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-200 p-0.5 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-800/40"
+                >
+                  <XMarkIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {startDate && endDate && (
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium">
+                <Calendar className="w-4 h-4" />
+                <span>
+                  {startDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}{" "}
+                  -{" "}
+                  {endDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+                <button
+                  onClick={() => {
+                    setStartDate(null);
+                    setEndDate(null);
+                  }}
+                  className="text-purple-400 hover:text-purple-600 dark:hover:text-purple-200 p-0.5 rounded-full hover:bg-purple-100 dark:hover:bg-purple-800/40"
+                >
+                  <XMarkIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={() => {
+                setSearch("");
+                setStatus("");
+                setStartDate(null);
+                setEndDate(null);
+              }}
+              className="ml-auto text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium flex items-center gap-2 px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            >
+              <XMarkIcon className="w-4 h-4" />
+              {language === "ar" ? "مسح الكل" : "Clear All"}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       {/* Orders Table */}
@@ -1432,81 +1597,110 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
                     }
                   ></textarea>
                 </div>
- {selectedOrder.items[0].item_role == "toform" && (
-  <>
-   <div className="xl:col-span-2 bg-white dark:bg-gray-900 rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700">
-                          <div className="flex flex-col 2xl:flex-row gap-4 sm:gap-5">
-                            <div className="flex-1 min-w-0">
-                              <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
-                                {t("cotation") ||
-                                  (language === "ar"
-                                    ? "تفاصيل العرص السعري"
-                                    : "Cotation Details")}
-                                    : {selectedOrder.order_number}
-                              </h5>
+                {selectedOrder.items[0].item_role == "toform" && (
+                  <>
+                    <div className="xl:col-span-2 bg-white dark:bg-gray-900 rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700">
+                      <div className="flex flex-col 2xl:flex-row gap-4 sm:gap-5">
+                        <div className="flex-1 min-w-0">
+                          <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
+                            {t("cotation") ||
+                              (language === "ar"
+                                ? "تفاصيل العرص السعري"
+                                : "Cotation Details")}
+                            : {selectedOrder.order_number}
+                          </h5>
 
-    <div className="flex items-center space-x-4 mb-4">
-      <div className="w-1/2">
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-          {language === "ar" ? "السعر" : "Price"}
-        </label>
-        <input
-          type="number"
-          value={editingOrder?.total_price ?? selectedOrder.total_price}
-          onChange={(e) => handleEditField("total_price", e.target.value)}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
-        />
-      </div>
-      
-      <div className="w-1/2">
-        <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-          {language === "ar" ? "العملة" : "Currency"}
-        </label>
-        <select
-          value={editingOrder?.currency ?? selectedOrder.currency}
-          onChange={(e) => handleEditField("currency", e.target.value)}
-          className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all duration-300 ${
-            language === "ar" ? "text-right" : "text-left"
-          }`}
-          dir={language === "ar" ? "rtl" : "ltr"}
-        >
-          <option value="EGP">{language === "ar" ? "جنية" : "EGP"}</option>
-          <option value="USD">{language === "ar" ? "دولا" : "USD"}</option>
-        </select>
-      </div>
-    </div>
+                          <div className="flex items-center space-x-4 mb-4">
+                            <div className="w-1/2">
+                              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                {language === "ar" ? "السعر" : "Price"}
+                              </label>
+                              <input
+                                type="number"
+                                value={
+                                  editingOrder?.total_price ??
+                                  selectedOrder.total_price
+                                }
+                                onChange={(e) =>
+                                  handleEditField("total_price", e.target.value)
+                                }
+                                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+                              />
+                            </div>
 
-    <div className="mb-4">
-      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-        {language === "ar" ? "البائع" : "Vendor"}
-      </label>
-      <input
-        type="text"
-        value={editingOrder?.vendor ?? selectedOrder.vendor}
-        onChange={(e) => handleEditField("vendor", e.target.value)}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
-      />
-    </div>
+                            <div className="w-1/2">
+                              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                                {language === "ar" ? "العملة" : "Currency"}
+                              </label>
+                              <select
+                                value={
+                                  editingOrder?.currency ??
+                                  selectedOrder.currency
+                                }
+                                onChange={(e) =>
+                                  handleEditField("currency", e.target.value)
+                                }
+                                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none transition-all duration-300 ${
+                                  language === "ar" ? "text-right" : "text-left"
+                                }`}
+                                dir={language === "ar" ? "rtl" : "ltr"}
+                              >
+                                <option value="EGP">
+                                  {language === "ar" ? "جنية" : "EGP"}
+                                </option>
+                                <option value="USD">
+                                  {language === "ar" ? "دولا" : "USD"}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
 
-    <div className="mb-4">
-      <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-        {language === "ar" ? "ملاحظات داخلية" : "Internal Notes"}
-      </label>
-      <textarea
-        value={editingOrder?.hint_note ?? selectedOrder.hint_note}
-        onChange={(e) => handleEditField("hint_note", e.target.value)}
-        rows={3}
-        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
-        placeholder={language === "ar" ? "اكتب ملاحظات الخاصة..." : "Write internal notes ..."}
-      ></textarea>
-    </div>
-     </div>
-      </div>
-       </div>
-  </>
-)}
+                          <div className="mb-4">
+                            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                              {language === "ar" ? "البائع" : "Vendor"}
+                            </label>
+                            <input
+                              type="text"
+                              value={
+                                editingOrder?.vendor ?? selectedOrder.vendor
+                              }
+                              onChange={(e) =>
+                                handleEditField("vendor", e.target.value)
+                              }
+                              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+                            />
+                          </div>
 
-             {/* Right - Actions column */}
+                          <div className="mb-4">
+                            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                              {language === "ar"
+                                ? "ملاحظات داخلية"
+                                : "Internal Notes"}
+                            </label>
+                            <textarea
+                              value={
+                                editingOrder?.hint_note ??
+                                selectedOrder.hint_note
+                              }
+                              onChange={(e) =>
+                                handleEditField("hint_note", e.target.value)
+                              }
+                              rows={3}
+                              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+                              placeholder={
+                                language === "ar"
+                                  ? "اكتب ملاحظات الخاصة..."
+                                  : "Write internal notes ..."
+                              }
+                            ></textarea>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
                   <div className="sticky top-4">
                     {/* تغيير من space-y-3 إلى grid */}
@@ -1613,7 +1807,6 @@ const handleDateChange = (dates: [Date | null, Date | null]) => {
 
                         {/* Payment Status Control */}
                         <div className="mt-4">
-                          
                           <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
                             {t("updatePaymentStatus") ||
                               (language === "ar"
