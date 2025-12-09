@@ -29,7 +29,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const {fetchCart}=useCart()
+
 const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
@@ -70,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-
+const {fetchCart}=useCart()
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const savedUser = localStorage.getItem("user");
@@ -136,7 +136,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         affiliateCode: userData.affiliate_code,
         createdAt: userData.date_joined,
       });
-      await fetchCart();
+
+     
       toast.success("Login successful!");
     } catch (error) {
       const errorMessage =
@@ -156,21 +157,12 @@ const refreshToken = async (): Promise<void> => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
       if (!refreshToken) throw new Error("No refresh token available");
-
-      const response = await fetch(`${API_BASE_URL}/auth/refresh/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refresh: refreshToken }),
-      });
-
-      const data = await handleApiResponse(response);
-
-      localStorage.setItem("access_token", data.access);
+      
+      await fetchCart();
+      checkApiConnection();
     } catch (error) {
       console.error("Token refresh error:", error);
-      logout();
+     
     }
   }
   const logout = async () => {
