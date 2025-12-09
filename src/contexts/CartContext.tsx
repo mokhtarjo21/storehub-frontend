@@ -13,7 +13,6 @@ interface CartContextType {
   loading: boolean;
   items: CartItem[];
   addItem: (product: Product, quantity?: number) => Promise<void>;
-  addService: (service: any, customerInfo: any) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -79,34 +78,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const addService = async (service: any, customerInfo: any) => {
-    try {
-      const res = await fetch(`${API_BASE}/add/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          item_id: service.id,
-          quantity: 1,
-          item_type: "service",
-          customer_info: customerInfo,
-        }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        
-        throw new Error(errData.message || "Failed to add service");
-      }
-
-      await fetchCart();
-    } catch (err) {
-      toast.error("Failed to add service to cart");
-      throw err;
-    }
-  };
 
   const removeItem = async (itemId: string) => {
     try {
@@ -140,7 +111,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const data = await res.json();
 
-      // ← التحديث مباشرة بدون إعادة fetch
+     
       setItems((prev) =>
         prev.map((item) =>
           item.id === itemId ? { ...item, quantity: data.quantity } : item
@@ -170,7 +141,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const total = items.reduce((sum, item) => {
     const rawPrice =
-      item.product?.price ?? item.service?.price ?? item.price ?? 0;
+      item.product?.price  ??  0;
     const price = Number(rawPrice) || 0;
     const qty = Number(item.quantity) || 1;
 
@@ -185,7 +156,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         items,
         setItems,
         addItem,
-        addService,
+     
         removeItem,
         updateQuantity,
         clearCart,

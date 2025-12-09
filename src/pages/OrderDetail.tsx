@@ -21,7 +21,7 @@ import toast from "react-hot-toast";
 const OrderDetail: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const { t, language } = useLanguage();
-  const {  fechorder ,cancelorders} = useAuth();
+  const { cancelorders} = useAuth();
   const [cancelling, setCancelling] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -51,16 +51,9 @@ const OrderDetail: React.FC = () => {
     
       let cancelSuccess = false;
       try {
-        const [orderDats] = await Promise.allSettled([
-          fechorder(order.order_number),
-        ]);
+        refetchOrder();
 
-        if (orderDats.status === "fulfilled" && orderDats.value) {
-          const updatedOrderData = orderDats.value;
-          if (updatedOrderData.order_status === "cancelled") {
-            cancelSuccess = true;
-          }
-        }
+        
       } catch (refreshError) {
         console.error("Error refreshing order data:", refreshError);
       }
