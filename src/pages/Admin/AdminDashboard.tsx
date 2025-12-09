@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -39,78 +39,39 @@ const COLORS = {
 const AdminDashboard: React.FC = () => {
   const { language } = useLanguage();
   const isArabic = language === "ar";
-  // State for date range
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [filters, setFilters] = useState({ startDate: null, endDate: null });
 
-  // API hooks with date range filters
-  const { data: overview, loading: overviewLoading } = useApi(
+  const { data: overview } = useApi(
     `/auth/admin/analytics/overview/?start_date=${
-      startDate ? startDate.toISOString() : ""
-    }&end_date=${endDate ? endDate.toISOString() : ""}`
+      filters.startDate ? filters.startDate.toISOString() : ""
+    }&end_date=${filters.endDate ? filters.endDate.toISOString() : ""}`
   );
-  const { data: salesData, loading: salesLoading } = useApi(
+
+  const { data: salesData } = useApi(
     `/auth/admin/analytics/sales/?start_date=${
-      startDate ? startDate.toISOString() : ""
-    }&end_date=${endDate ? endDate.toISOString() : ""}`
+      filters.startDate ? filters.startDate.toISOString() : ""
+    }&end_date=${filters.endDate ? filters.endDate.toISOString() : ""}`
   );
-  const { data: usersData, loading: usersLoading } = useApi(
+
+  const { data: usersData } = useApi(
     `/auth/admin/analytics/users/?start_date=${
-      startDate ? startDate.toISOString() : ""
-    }&end_date=${endDate ? endDate.toISOString() : ""}`
+      filters.startDate ? filters.startDate.toISOString() : ""
+    }&end_date=${filters.endDate ? filters.endDate.toISOString() : ""}`
   );
+
   const { data: usersList } = useApi("/auth/admin/users/?limit=5");
 
-  // Handle predefined filters
-  const handlePresetFilter = (filter: string) => {
-    const end = new Date();
-    let start;
-
-    switch (filter) {
-      case "today":
-        start = new Date();
-        start.setHours(0, 0, 0, 0); // start of today
-        setStartDate(start);
-        setEndDate(end);
-        break;
-      case "yesterday":
-        start = new Date();
-        start.setDate(end.getDate() - 1); // yesterday
-        start.setHours(0, 0, 0, 0); // start of yesterday
-        setStartDate(start);
-        setEndDate(end);
-        break;
-      case "last3Months":
-        start = new Date();
-        start.setMonth(end.getMonth() - 3); // last 3 months
-        start.setDate(1); // start of the month 3 months ago
-        setStartDate(start);
-        setEndDate(end);
-        break;
-      case "lastYear":
-        start = new Date();
-        start.setFullYear(end.getFullYear() - 1); // last year
-        start.setMonth(0); // start of the year
-        start.setDate(1); // start of the year
-        setStartDate(start);
-        setEndDate(end);
-        break;
-      default:
-        setStartDate(null);
-        setEndDate(null);
-    }
-  };
   const { data: companiesList } = useApi(
     "/auth/admin/companies/?status=pending"
   );
-
-  if (overviewLoading || salesLoading || usersLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  // Handle predefined filters
+  const handlePresetFilter = (filter: string) => {
+    const fn = presetFilters[filter];
+    if (fn) {
+      const { start, end } = fn();
+      setFilters({ startDate: start, endDate: end });
+    }
+  };
 
   const adminStats = [
     {
@@ -158,16 +119,57 @@ const AdminDashboard: React.FC = () => {
   // Handle Date Change
   const handleDateChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-
-    // تحقق لو التاريخ اتغير فعلاً
-    const startChanged = start?.getTime() !== startDate?.getTime();
-    const endChanged = end?.getTime() !== endDate?.getTime();
-
-    if (startChanged || endChanged) {
-      setStartDate(start);
-      setEndDate(end);
-    }
+    setFilters({ startDate: start, endDate: end });
   };
+
+  const filterButtons = [
+    { key: "today", label: isArabic ? "اليوم" : "Today" },
+    { key: "yesterday", label: isArabic ? "الأمس" : "Yesterday" },
+    { key: "last7Days", label: isArabic ? "آخر 7 أيام" : "Last 7 days" },
+    { key: "last30Days", label: isArabic ? "آخر 30 يوم" : "Last 30 days" },
+    { key: "last3Months", label: isArabic ? "آخر 3 أشهر" : "Last 3 Months" },
+    { key: "lastYear", label: isArabic ? "السنة الماضية" : "Last Year" },
+    { key: "allTime", label: isArabic ? "مسح" : "Clear" },
+  ];
+
+  const presetFilters: Record<string, () => { start: Date | null; end: Date }> =
+    {
+      today: () => {
+        const start = new Date();
+        start.setHours(0, 0, 0, 0);
+        return { start, end: new Date() };
+      },
+      yesterday: () => {
+        const start = new Date();
+        start.setDate(start.getDate() - 1);
+        start.setHours(0, 0, 0, 0);
+        return { start, end: new Date() };
+      },
+      last7Days: () => {
+        const start = new Date();
+        start.setDate(start.getDate() - 7);
+        return { start, end: new Date() };
+      },
+      last30Days: () => {
+        const start = new Date();
+        start.setDate(start.getDate() - 30);
+        return { start, end: new Date() };
+      },
+      last3Months: () => {
+        const start = new Date();
+        start.setMonth(start.getMonth() - 3);
+        start.setDate(1);
+        return { start, end: new Date() };
+      },
+      lastYear: () => {
+        const start = new Date();
+        start.setFullYear(start.getFullYear() - 1);
+        start.setMonth(0);
+        start.setDate(1);
+        return { start, end: new Date() };
+      },
+      allTime: () => ({ start: null, end: null }),
+    };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-8">
@@ -188,187 +190,61 @@ const AdminDashboard: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Date Picker - Mobile Optimized */}
+        {/* Date Picker - Professional UI */}
         <div
           className={`mb-6 px-2 sm:px-0 ${
             isArabic ? "text-right" : "text-left"
           }`}
         >
-          <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm sm:shadow-md hover:shadow-lg transition-all duration-300">
-            <div className="p-4 sm:p-5">
+          <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl border border-gray-100 dark:border-gray-800 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="p-5 sm:p-6">
               {/* Label with Icon */}
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center gap-3 mb-4 flex-nowrap">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <label className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">
+                <label className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">
                   {isArabic ? "اختيار المدة الزمنية" : "Select Date Range"}
                 </label>
               </div>
 
-              {/* Date Input Container */}
-              <div className="relative group w-full">
-                {/* Icon */}
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+              {/* Date Input */}
+              <div className="relative w-full">
+                <div
+                  className={`absolute inset-y-0 ${
+                    isArabic ? "right-0 pr-3" : "left-0 pl-3"
+                  } flex items-center pointer-events-none`}
+                >
+                  <Calendar className="h-5 w-5 text-gray-400" />
                 </div>
-
-                {/* Selected Dates Preview */}
-                {startDate && endDate && (
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <span className="hidden xs:inline text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md whitespace-nowrap">
-                      {startDate.toLocaleDateString()} →{" "}
-                      {endDate.toLocaleDateString()}
-                    </span>
-                    <span className="xs:hidden text-xs text-gray-500 dark:text-gray-400">
-                      📅
-                    </span>
-                  </div>
-                )}
-
-                {/* DatePicker */}
                 <DatePicker
-                  selected={startDate}
+                  className="w-full border border-gray-300 dark:border-gray-700 rounded-lg py-2 pl-10 pr-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                  selected={filters.startDate}
                   onChange={handleDateChange}
-                  startDate={startDate}
-                  endDate={endDate}
+                  startDate={filters.startDate}
+                  endDate={filters.endDate}
                   selectsRange
-                  inline={false}
-                  dateFormat="MMM dd, yyyy"
-                  placeholderText={
-                    isArabic
-                      ? "اختر تاريخ البداية والنهاية"
-                      : "Select start and end dates"
-                  }
-                  shouldCloseOnSelect={false}
-                  className={`
-                    w-full py-2.5 sm:py-3 pl-9 sm:pl-10 pr-20 sm:pr-24 rounded-lg
-                    border border-gray-200 dark:border-gray-700
-                    bg-white dark:bg-gray-800
-                    text-sm sm:text-base text-gray-700 dark:text-gray-200
-                    placeholder:text-gray-400 dark:placeholder:text-gray-500
-                    focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
-                    transition-all duration-200
-                    ${isArabic ? "text-right" : "text-left"}
-                  `}
-                  wrapperClassName="w-full"
-                  calendarClassName={`
-                    rounded-xl shadow-xl border border-gray-100 dark:border-gray-800
-                    overflow-hidden mt-2
-                    w-[calc(100vw-2rem)] sm:w-auto
-                    ${isArabic ? "rtl-calendar" : ""}
-                  `}
-                  showPopperArrow={false}
-                  popperPlacement={isArabic ? "bottom-end" : "bottom-start"}
-                  popperModifiers={[
-                    {
-                      name: "offset",
-                      options: { offset: [0, 8] },
-                    },
-                    {
-                      name: "preventOverflow",
-                      options: { padding: 10 },
-                    },
-                  ]}
+                  placeholderText={isArabic ? "اختر الفترة" : "Select period"}
                 />
               </div>
-
-              {/* Filter Buttons - Responsive Grid */}
-              <div className="mt-4 overflow-x-auto pb-2">
-                <div className="flex space-x-2 sm:space-x-3 min-w-max sm:min-w-0 sm:grid sm:grid-cols-4 md:grid-cols-7 sm:gap-2 sm:space-x-0">
+              {/* Filter Buttons */}
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+                {filterButtons.map((btn) => (
                   <button
-                    onClick={() => handlePresetFilter("today")}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
+                    key={btn.key}
+                    onClick={() => handlePresetFilter(btn.key)}
+                    className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
                   >
-                    {isArabic ? "اليوم" : "Today"}
+                    {btn.label}
                   </button>
-
-                  <button
-                    onClick={() => handlePresetFilter("yesterday")}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "الأمس" : "Yesterday"}
-                  </button>
-
-                  <button
-                    onClick={() => handlePresetFilter("last3Months")}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "آخر 3 أشهر" : "Last 3 Months"}
-                  </button>
-
-                  <button
-                    onClick={() => handlePresetFilter("lastYear")}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "السنة الماضية" : "Last Year"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const end = new Date();
-                      const start = new Date();
-                      start.setDate(start.getDate() - 7);
-                      setStartDate(start);
-                      setEndDate(end);
-                    }}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "آخر 7 أيام" : "Last 7 days"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const end = new Date();
-                      const start = new Date();
-                      start.setMonth(start.getMonth() - 1);
-                      setStartDate(start);
-                      setEndDate(end);
-                    }}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 
-                      hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "آخر 30 يوم" : "Last 30 days"}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setStartDate(null);
-                      setEndDate(null);
-                    }}
-                    className="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 dark:border-gray-700 
-                      text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 
-                      hover:border-red-300 dark:hover:border-red-700 transition-colors whitespace-nowrap"
-                  >
-                    {isArabic ? "مسح" : "Clear"}
-                  </button>
-                </div>
+                ))}
               </div>
 
               {/* Selection Summary */}
-              {startDate && endDate && (
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+              {filters.startDate && filters.endDate && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div
-                    className={`
-                      flex flex-col gap-3 
-                      sm:flex-row sm:items-center sm:justify-between
-                      ${
-                        isArabic
-                          ? "text-right sm:flex-row-reverse"
-                          : "text-left"
-                      }
-                    `}
+                    className={`flex flex-col sm:flex-row sm:justify-between gap-4`}
                   >
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
@@ -376,27 +252,23 @@ const AdminDashboard: React.FC = () => {
                       </p>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
                         {Math.ceil(
-                          (endDate - startDate) / (1000 * 60 * 60 * 24)
-                        )}
-                        {isArabic ? " يوم" : " days"}
+                          (filters.endDate - filters.startDate) /
+                            (1000 * 60 * 60 * 24)
+                        )}{" "}
+                        {isArabic ? "يوم" : "days"}
                       </p>
                     </div>
-                    <div className={`${isArabic ? "text-right" : "text-left"}`}>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {isArabic ? "الفترة" : "Period"}
-                      </p>
-                      <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400">
-                        {startDate.toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}{" "}
-                        -
-                        {endDate.toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
+                    <div className="text-sm text-blue-600 dark:text-blue-400">
+                      {filters.startDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}{" "}
+                      -{" "}
+                      {filters.endDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
                     </div>
                   </div>
                 </div>
@@ -427,7 +299,7 @@ const AdminDashboard: React.FC = () => {
         >
           {adminStats.map((stat, index) => (
             <motion.div
-              key={`${stat.name}-${startDate?.getTime()}-${endDate?.getTime()}`}
+              key={stat.name}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.1 }}
