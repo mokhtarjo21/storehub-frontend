@@ -268,7 +268,6 @@ const Products: React.FC = () => {
                     <span className="text-green-600 dark:text-green-400 font-medium">
                       {" "}
                       {language === "ar" ? "الكمية المتوفرة" : "In Stock"}{" "}
-                      
                     </span>
                   </>
                 ) : (
@@ -371,7 +370,7 @@ const Products: React.FC = () => {
         {/* Products Grid */}
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-6"
         >
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -402,17 +401,20 @@ const Products: React.FC = () => {
       {formProduct && (
         <CustomerFormModal
           open={!!formProduct}
-    onClose={() => setFormProduct(null)}
-    onSubmit={(data) => {
-      
-
-             apiRequest("/orders/", {
+          onClose={() => setFormProduct(null)}
+          onSubmit={(data) => {
+            apiRequest("/orders/", {
               method: "post",
-              
-              body: JSON.stringify({"phone":data.phone,"notes":data.details,"slug":formProduct.slug,"currency":formProduct.currency}),
+
+              body: JSON.stringify({
+                phone: data.phone,
+                notes: data.details,
+                slug: formProduct.slug,
+                currency: formProduct.currency,
+              }),
             });
-      setFormProduct(null);
-    }}
+            setFormProduct(null);
+          }}
         />
       )}
     </div>
