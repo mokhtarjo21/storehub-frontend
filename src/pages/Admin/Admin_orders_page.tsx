@@ -3,7 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { Order } from "../../types";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
+import { useFloating } from '@floating-ui/react-dom';
+import ar from "date-fns/locale/ar";
+import enGB from "date-fns/locale/en-GB";
+
+registerLocale("ar", ar);
+registerLocale("en-GB", enGB);
+
 import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
@@ -43,6 +52,7 @@ function TabButton({
     </button>
   );
 }
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,17 +64,26 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
-  const [date, setDate] = useState("");
+ 
   const [currentPage, setCurrentPage] = useState(1); 
   const [pageSize, setPageSize] = useState(10); 
   const [totalOrders, setTotalOrders] = useState(0); 
   const { t, language } = useLanguage();
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
   );
   const [activeTab, setActiveTab] = useState("overview"); 
 
+
+
+const handleDateChange = (dates: [Date | null, Date | null]) => {
+  const [start, end] = dates;
+  setStartDate(start);
+  setEndDate(end);
+};
   const filteredOrders = useMemo(() => {
     const term = search.trim().toLowerCase();
     return orders.filter((order) => {
@@ -163,12 +182,13 @@ export default function AdminOrdersPage() {
     searchTerm = search,
     statusFilter = status,
     page = currentPage,
-    selectedDate = date
+    stardate=startDate,
+    enddate=endDate
   ) => {
     setLoading(true);
     try {
       const [cRes] = await Promise.allSettled([
-        fetchorders(searchTerm, statusFilter, page, selectedDate),
+        fetchorders(searchTerm, statusFilter, page, stardate, enddate),
       ]);
 
       if (cRes.status === "fulfilled") {
@@ -203,8 +223,8 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     if (isInitialLoad) return;
-    fetchOrders(search, status, currentPage, date);
-  }, [search, status, date]);
+    fetchOrders(search, status, currentPage);
+  }, [search, status, endDate]);
 
   const handleSelectOrder = async (order_number: string | number) => {
     try {
@@ -687,23 +707,28 @@ export default function AdminOrdersPage() {
             </option>
           </select>
           <div className="flex gap-2">
-            <input
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-gray-900 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              type="Date"
-              onChange={(e) => {
-                
+              <DatePicker
+  locale={language === "ar" ? "ar" : "en-GB"}
+  selected={startDate}
+  onChange={handleDateChange}
+  startDate={startDate}
+  endDate={endDate}
+  selectsRange
+  dateFormat="MMM dd, yyyy"
+  placeholderText={
+    language === "ar"
+      ? "اختر تاريخ البداية والنهاية"
+      : "Select start and end dates"
+  }
+/>
 
-                setDate(e.target.value);
-              }}
-            />
-
-            {(search || status || date) && (
+            {(search || status || endDate) && (
               <button
                 onClick={() => {
                   setSearch("");
-                  setStatus("");
-                  setDate("");
-                  fetchOrders("", "");
+                  setStatus("");                            
+                  setStartDate(null);
+                  setEndDate(null);
                 }}
                 className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
                 title={language === "ar" ? "مسح الفلاتر" : "Clear Filters"}

@@ -93,7 +93,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                   <div className="flex flex-wrap items-center gap-6 mt-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-gray-900 dark:text-white">
-                        {language === "ar" ? "جنيه" : "EGP"}{" "}
+                        {product.currency}
                         {parseFloat(product.price).toLocaleString()}
                       </span>
 
@@ -127,7 +127,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                           {language === "ar"
                             ? "الكمية المتوفرة"
                             : "In Stock"}{" "}
-                          {product.stock}
+                        
                         </span>
                       </>
                     ) : (
@@ -143,7 +143,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                   ) : (
                     // ------- SERVICE: Show Availability -------
                     <>
-                      {product.stock ? (
+                      {product.product_role==="toform" ? (
                         <>
                           <div className="w-2 h-2 rounded-full bg-green-500"></div>
                           <span className="text-green-600 dark:text-green-400 font-medium">

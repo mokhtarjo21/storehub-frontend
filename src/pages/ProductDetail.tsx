@@ -272,7 +272,7 @@ const ProductDetail: React.FC = () => {
                         {language === "ar"
                           ? "الكمية المتوفرة"
                           : "In Stock"}{" "}
-                        {product.stock}
+                        
                       </span>
                     </>
                   ) : (
