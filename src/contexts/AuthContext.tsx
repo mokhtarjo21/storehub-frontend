@@ -10,13 +10,19 @@ interface AuthContextType {
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
-  fetchorders: (search: any, status: any,page:any,start:any,end:any) => Promise<any[]>;
+  fetchorders: (
+    search: any,
+    status: any,
+    page: any,
+    start: any,
+    end: any
+  ) => Promise<any[]>;
   updateorders: (order_number: any, updates: any) => Promise<any[]>;
   // Add product endpoints
-  cancelorders: (order_number: any,notes:any) => Promise<any[]>;
+  cancelorders: (order_number: any, notes: any) => Promise<any[]>;
   checkApiConnection: () => Promise<boolean>;
-  getNotifications: (num:number) => Promise<any[]>;
-  myorders: (page:any) => Promise<any>;
+  getNotifications: (num: number) => Promise<any[]>;
+  myorders: (page: any) => Promise<any>;
   fetchRelatedProducts: (productSlug: string) => Promise<any[]>;
   fetchProducts: () => Promise<any[]>;
   fechorder: (order_number: string | number) => Promise<any>;
@@ -70,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-const {fetchCart}=useCart()
+  const { fetchCart } = useCart();
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const savedUser = localStorage.getItem("user");
@@ -86,7 +92,7 @@ const {fetchCart}=useCart()
           role: userData.role,
           address: userData.address,
           phone: userData.phone,
-          avatar:userData.avatar,
+          avatar: userData.avatar,
           points: userData.points || 0,
           companyName: userData.company_name,
           affiliateCode: userData.affiliate_code,
@@ -115,7 +121,7 @@ const {fetchCart}=useCart()
       });
 
       const data = await handleApiResponse(response);
-      
+
       // Store tokens
       localStorage.setItem("access_token", data.tokens.access);
       localStorage.setItem("refresh_token", data.tokens.refresh);
@@ -128,7 +134,7 @@ const {fetchCart}=useCart()
         name: userData.full_name,
         email: userData.email,
         phone: userData.phone,
-        avatar:userData.avatar,
+        avatar: userData.avatar,
         address: userData.address,
         role: userData.role,
         points: userData.points || 0,
@@ -137,7 +143,6 @@ const {fetchCart}=useCart()
         createdAt: userData.date_joined,
       });
 
-     
       toast.success("Login successful!");
     } catch (error) {
       const errorMessage =
@@ -146,25 +151,24 @@ const {fetchCart}=useCart()
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
-     
+
       toast.error(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
-const refreshToken = async (): Promise<void> => {
+  const refreshToken = async (): Promise<void> => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
       if (!refreshToken) throw new Error("No refresh token available");
-      
+
       await fetchCart();
       checkApiConnection();
     } catch (error) {
       console.error("Token refresh error:", error);
-     
     }
-  }
+  };
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
@@ -191,29 +195,29 @@ const refreshToken = async (): Promise<void> => {
       if (!token) throw new Error("No access token available");
       const response = await fetch(`${API_BASE_URL}/auth/me/`, {
         method: "GET",
-       headers: getAuthHeaders(),
+        headers: getAuthHeaders(),
       });
 
       // Even if we get 401 (unauthorized), it means the API is running
-      if ( response.ok) {
+      if (response.ok) {
         const data = await handleApiResponse(response);
-       const userData = data;
-      setUser({
-        id: userData.id.toString(),
-        name: userData.full_name,
-        email: userData.email,
-        phone: userData.phone,
-        avatar:userData.avatar,
-        address: userData.address,
-        role: userData.role,
-        points: userData.points || 0,
-        companyName: userData.company_name,
-        affiliateCode: userData.affiliate_code,
-        createdAt: userData.date_joined,
-      });
+        const userData = data;
+        setUser({
+          id: userData.id.toString(),
+          name: userData.full_name,
+          email: userData.email,
+          phone: userData.phone,
+          avatar: userData.avatar,
+          address: userData.address,
+          role: userData.role,
+          points: userData.points || 0,
+          companyName: userData.company_name,
+          affiliateCode: userData.affiliate_code,
+          createdAt: userData.date_joined,
+        });
         return true;
       } else {
-        logout()
+        logout();
         return false;
       }
     } catch (error) {
@@ -252,9 +256,6 @@ const refreshToken = async (): Promise<void> => {
         formData.append("affiliate_job_title", userData.affiliateJobTitle);
         formData.append("affiliate_reason", userData.affiliateReason);
       }
-      
-
-     
 
       const response = await fetch(`${API_BASE_URL}/auth/register/`, {
         method: "POST",
@@ -273,18 +274,17 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
- const getNotifications = async (num:number): Promise<any[]> => {
+  const getNotifications = async (num: number): Promise<any[]> => {
     setIsLoading(true);
     try {
-      
-      
-      
-      const response = await fetch(`${API_BASE_URL}/auth/notifications/?page=${num}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/auth/notifications/?page=${num}`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        }
+      );
       return await handleApiResponse(response);
-     
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to fetch notifications"
@@ -331,7 +331,6 @@ const refreshToken = async (): Promise<void> => {
     }
   };
 
-  
   // 2. جلب منتج واحد
   const fetchProduct = async (id: string | number): Promise<any> => {
     setIsLoading(true);
@@ -378,7 +377,6 @@ const refreshToken = async (): Promise<void> => {
     }
   };
 
-
   // 4. تحديث منتج
   const updateProduct = async (
     id: string | number,
@@ -412,9 +410,6 @@ const refreshToken = async (): Promise<void> => {
     }
   };
 
- 
-
-
   // 5. حذف منتج
   const deleteProduct = async (id: string | number): Promise<void> => {
     setIsLoading(true);
@@ -437,7 +432,6 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
- 
 
   const fetchcategories = async (): Promise<any[]> => {
     setIsLoading(true);
@@ -475,11 +469,19 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
-  const fetchorders = async (search: any, status: any,page:any,start:any,end:any): Promise<any[]> => {
+  const fetchorders = async (
+    search: any,
+    status: any,
+    page: any,
+    start: any,
+    end: any
+  ): Promise<any[]> => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/?search=${search}&page=${page}&status=${status}&start_date=${start ? start.toISOString():""}&end_date=${end ?end.toISOString():""}`,
+        `${API_BASE_URL}/orders/admin/orders/?search=${search}&page=${page}&status=${status}&start_date=${
+          start ? start.toISOString() : ""
+        }&end_date=${end ? end.toISOString() : ""}`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -496,16 +498,13 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
-   const myorders = async (page:any) => {
+  const myorders = async (page: any) => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/orders/?page=${page}`,
-        {
-          method: "GET",
-          headers: getAuthHeaders(),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/orders/?page=${page}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
       const data = await handleApiResponse(response);
       return data;
     } catch (error) {
@@ -524,13 +523,13 @@ const refreshToken = async (): Promise<void> => {
     setIsLoading(true);
     try {
       console.log(updates);
-      
+
       const response = await fetch(
         `${API_BASE_URL}/orders/admin/orders/${order_number}/update-status/`,
         {
           method: "POST",
           headers: getAuthHeaders(),
-          body: JSON.stringify(updates), 
+          body: JSON.stringify(updates),
         }
       );
       const data = await handleApiResponse(response);
@@ -544,8 +543,9 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
-   const cancelorders = async (
-    order_number: any,notes:any
+  const cancelorders = async (
+    order_number: any,
+    notes: any
   ): Promise<any[]> => {
     setIsLoading(true);
     try {
@@ -554,7 +554,7 @@ const refreshToken = async (): Promise<void> => {
         {
           method: "POST",
           headers: getAuthHeaders(),
-          body: JSON.stringify({"notes":notes} )
+          body: JSON.stringify({ notes: notes }),
         }
       );
       const data = await handleApiResponse(response);
@@ -568,8 +568,8 @@ const refreshToken = async (): Promise<void> => {
       setIsLoading(false);
     }
   };
-  
-  const fechorder=async (order_number: string | number): Promise<any> => {
+
+  const fechorder = async (order_number: string | number): Promise<any> => {
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -580,19 +580,18 @@ const refreshToken = async (): Promise<void> => {
         }
       );
       const data = await handleApiResponse(response);
-      return data;    
+      return data;
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to fetch order"
       );
       throw error;
     } finally {
-      setIsLoading(false);  
-
+      setIsLoading(false);
     }
   };
 
-  const fetchRelatedProducts=async (productSlug: string): Promise<any[]> => {
+  const fetchRelatedProducts = async (productSlug: string): Promise<any[]> => {
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -603,30 +602,31 @@ const refreshToken = async (): Promise<void> => {
         }
       );
       const data = await handleApiResponse(response);
-      return data;    
+      return data;
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to fetch related products"
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch related products"
       );
       throw error;
     } finally {
-      setIsLoading(false);  
+      setIsLoading(false);
     }
   };
- 
+
   return (
     <AuthContext.Provider
       value={{
-       
         user,
         refreshToken,
         login,
         logout,
         register,
         isLoading,
-       
+
         isInitializing,
-        
+
         fetchProducts,
         fetchRelatedProducts,
         fetchorders,
@@ -639,11 +639,10 @@ const refreshToken = async (): Promise<void> => {
         updateProduct,
         myorders,
         getNotifications,
-       
+
         deleteProduct,
         cancelorders,
         checkApiConnection,
-      
       }}
     >
       {children}
