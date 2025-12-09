@@ -18,7 +18,7 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
 }) => {
   const {user}=useAuth()
   const { language } = useLanguage();
-  const [phone, setPhone] = useState(user?.phone);
+  const [phone, setPhone] = useState(user?.phone || "");
   const [details, setDetails] = useState("");
 
   const handleSubmit = () => {

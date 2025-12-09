@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User } from "../types";
 import toast from "react-hot-toast";
-
+import { useCart } from "./CartContext";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  refreshToken: () => Promise<void>;
   logout: () => void;
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
@@ -28,7 +29,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
+const {fetchCart}=useCart()
 const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
@@ -135,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         affiliateCode: userData.affiliate_code,
         createdAt: userData.date_joined,
       });
-
+      await fetchCart();
       toast.success("Login successful!");
     } catch (error) {
       const errorMessage =
@@ -144,14 +145,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
-      toast.success("Logged out successfully");
+     
       toast.error(errorMessage);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
+const refreshToken = async (): Promise<void> => {
+    try {
+      const refreshToken = localStorage.getItem("refresh_token");
+      if (!refreshToken) throw new Error("No refresh token available");
 
+      const response = await fetch(`${API_BASE_URL}/auth/refresh/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+
+      const data = await handleApiResponse(response);
+
+      localStorage.setItem("access_token", data.access);
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      logout();
+    }
+  }
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
@@ -174,6 +195,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   const checkApiConnection = async () => {
     try {
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("No access token available");
       const response = await fetch(`${API_BASE_URL}/auth/me/`, {
         method: "GET",
        headers: getAuthHeaders(),
@@ -422,27 +445,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   };
-    const deleteService = async (id: string | number): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/products/admin/services/${id}/delete/`,
-        {
-          method: "DELETE",
-          headers: getAuthHeaders(),
-        }
-      );
-      await handleApiResponse(response);
-      toast.success("Product deleted successfully!");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to delete product"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
   const fetchcategories = async (): Promise<any[]> => {
     setIsLoading(true);
@@ -624,6 +627,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
        
         user,
+        refreshToken,
         login,
         logout,
         register,
@@ -647,7 +651,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteProduct,
         cancelorders,
         checkApiConnection,
-        deleteService,
+      
       }}
     >
       {children}

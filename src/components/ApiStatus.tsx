@@ -9,7 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 const ApiStatus: React.FC = () => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
   const [showStatus, setShowStatus] = useState(true);
-  const { checkApiConnection } = useAuth();
+  const { checkApiConnection,refreshToken } = useAuth();
   useEffect(() => {
     checkConnection();
     const interval = setInterval(checkConnection, 30000); // Check every 30 seconds
@@ -18,6 +18,7 @@ const ApiStatus: React.FC = () => {
 
   const checkConnection = async () => {
     try {
+      await refreshToken(); 
       const response = await checkApiConnection();
         
    
@@ -32,39 +33,8 @@ const ApiStatus: React.FC = () => {
     }
   };
 
-  const getStatusConfig = () => {
-    switch (status) {
-      case 'connected':
-        return {
-          icon: CheckCircleIcon,
-          color: 'text-green-600 dark:text-green-400',
-          bgColor: 'bg-green-50 dark:bg-green-900/20',
-          borderColor: 'border-green-200 dark:border-green-800',
-          message: 'Django API Connected',
-        };
-      case 'disconnected':
-        return {
-          icon: ExclamationTriangleIcon,
-          color: 'text-red-600 dark:text-red-400',
-          bgColor: 'bg-red-50 dark:bg-red-900/20',
-          borderColor: 'border-red-200 dark:border-red-800',
-          message: 'Django API Disconnected - Start backend server',
-        };
-      default:
-        return {
-          icon: ArrowPathIcon,
-          color: 'text-blue-600 dark:text-blue-400',
-          bgColor: 'bg-blue-50 dark:bg-blue-900/20',
-          borderColor: 'border-blue-200 dark:border-blue-800',
-          message: 'Checking API Connection...',
-        };
-    }
-  };
+  
 
-  const config = getStatusConfig();
-  const IconComponent = config.icon;
-
-  if (!showStatus) return null;
 
   return (
     <AnimatePresence>
