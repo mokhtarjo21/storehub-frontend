@@ -77,8 +77,6 @@ const AdminDashboard: React.FC = () => {
     {
       name: language === "ar" ? "إجمالي المستخدمين" : "Total Users",
       value: overview?.users?.total || 0,
-      change: overview?.users?.new_30d || 0,
-      changeLabel: language === "ar" ? "جديد" : "new",
       icon: UsersIcon,
       color: "blue",
       bgColor: "bg-blue-100 dark:bg-blue-900/20",
@@ -87,8 +85,6 @@ const AdminDashboard: React.FC = () => {
     {
       name: language === "ar" ? "إجمالي الطلبات" : "Total Orders",
       value: overview?.orders?.total || 0,
-      change: overview?.orders?.last_30_days || 0,
-      changeLabel: language === "ar" ? "آخر 30 يوم" : "last 30d",
       icon: ShoppingBagIcon,
       color: "green",
       bgColor: "bg-green-100 dark:bg-green-900/20",
@@ -96,9 +92,8 @@ const AdminDashboard: React.FC = () => {
     },
     {
       name: language === "ar" ? "الإيرادات" : "Total Revenue",
-      value: `$${(overview?.revenue?.total || 0).toLocaleString()}`,
-      change: `$${(overview?.revenue?.last_30_days || 0).toLocaleString()}`,
-      changeLabel: language === "ar" ? "آخر 30 يوم" : "last 30d",
+      value: `$${(overview?.revenue?.total_in_range || 0).toLocaleString()}`,
+     
       icon: CurrencyDollarIcon,
       color: "purple",
       bgColor: "bg-purple-100 dark:bg-purple-900/20",
@@ -107,8 +102,6 @@ const AdminDashboard: React.FC = () => {
     {
       name: language === "ar" ? "الشركات المعلقة" : "Pending Companies",
       value: overview?.companies?.pending || 0,
-      change: overview?.companies?.active || 0,
-      changeLabel: language === "ar" ? "نشط" : "active",
       icon: BuildingOfficeIcon,
       color: "yellow",
       bgColor: "bg-yellow-100 dark:bg-yellow-900/20",
@@ -121,6 +114,7 @@ const AdminDashboard: React.FC = () => {
     const [start, end] = dates;
     setFilters({ startDate: start, endDate: end });
   };
+
 
   const filterButtons = [
     { key: "today", label: isArabic ? "اليوم" : "Today" },
