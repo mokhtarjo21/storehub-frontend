@@ -1,7 +1,7 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Dialog, Transition } from "@headlessui/react";
+
 import {
   ShoppingBagIcon,
   CurrencyDollarIcon,
@@ -11,9 +11,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   EyeIcon,
-  XMarkIcon,
-  ArrowPathIcon,
-  ExclamationTriangleIcon,
+
 } from "@heroicons/react/24/outline";
 import {
   BarChart,
@@ -30,16 +28,14 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useApi } from "../hooks/useApi";
-import toast from "react-hot-toast";
+
 
 const Dashboard: React.FC = () => {
-  const { user, updateorders, fechorder } = useAuth();
+  const { user } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
-  const [cancelling, setCancelling] = useState(false);
+  const [activeTab, setActiveTab] = useState("orders");
+ 
 
   // Fetch user orders
   const {
@@ -55,55 +51,7 @@ const Dashboard: React.FC = () => {
     ? ordersData.results
     : [];
 
-  // const { data: orders = [], loading: ordersLoading } = useApi('/orders/');
-  const { data: orderStats } = useApi("/orders/statistics/");
-
-  // Mock data for charts
-  const monthlyOrders = [
-    { month: "Jan", orders: 12, revenue: 15000 },
-    { month: "Feb", orders: 19, revenue: 22000 },
-    { month: "Mar", orders: 15, revenue: 18000 },
-    { month: "Apr", orders: 25, revenue: 32000 },
-    { month: "May", orders: 22, revenue: 28000 },
-    { month: "Jun", orders: 30, revenue: 35000 },
-  ];
-
-  const categoryData = [
-    { name: "Network Devices", value: 45, color: "#3B82F6" },
-    { name: "Software Licenses", value: 35, color: "#10B981" },
-    { name: "Installation Services", value: 20, color: "#8B5CF6" },
-  ];
-
-  const stats = [
-    {
-      name: t("dashboard.stats.orders"),
-      value: orderStats?.total_orders?.toString() || "0",
-      icon: ShoppingBagIcon,
-      color: "blue",
-      change: "+12%",
-    },
-    // {
-    //   name: t('dashboard.stats.points'),
-    //   value: user?.points?.toString() || '0',
-    //   icon: GiftIcon,
-    //   color: 'green',
-    //   change: '+8%',
-    // },
-    {
-      name: t("dashboard.stats.spent"),
-      value: `$${orderStats?.total_revenue?.toFixed(2) || "0.00"}`,
-      icon: CurrencyDollarIcon,
-      color: "purple",
-      change: "+15%",
-    },
-    {
-      name: t("dashboard.processingOrders"),
-      value: orderStats?.processing_orders?.toString() || "0",
-      icon: TruckIcon,
-      color: "orange",
-      change: "+3%",
-    },
-  ];
+  
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -141,80 +89,10 @@ const Dashboard: React.FC = () => {
     navigate(`/orders/${orderNumber}`);
   };
 
-  const handleOpenCancelModal = (order: any) => {
-    setSelectedOrder(order);
-    setCancelModalOpen(true);
-  };
+ 
+  
 
-  const handleCloseCancelModal = () => {
-    setCancelModalOpen(false);
-    setSelectedOrder(null);
-  };
-
-  const handleCancelOrder = async () => {
-    if (!selectedOrder) return;
-
-    setCancelling(true);
-    try {
-      // استخدام updateorders لتغيير الحالة إلى cancelled
-      const [cancelResult] = await Promise.allSettled([
-        updateorders(selectedOrder.order_number, { order_status: "cancelled" }),
-      ]);
-
-      // إعادة جلب بيانات الطلب للتأكد من الإلغاء
-      let cancelSuccess = false;
-      try {
-        const [orderDats] = await Promise.allSettled([
-          fechorder(selectedOrder.order_number),
-        ]);
-
-        if (orderDats.status === "fulfilled" && orderDats.value) {
-          const updatedOrderData = orderDats.value;
-
-          // التحقق من أن الطلب تم إلغاؤه
-          if (updatedOrderData.order_status === "cancelled") {
-            cancelSuccess = true;
-          }
-        }
-      } catch (refreshError) {
-        console.error("Error refreshing order data:", refreshError);
-      }
-
-      // إذا نجح الإلغاء أو التحديث في السيرفر
-      if (cancelResult.status === "fulfilled" || cancelSuccess) {
-        // تحديث قائمة الطلبات
-        await refetchOrders();
-
-        toast.success(
-          language === "ar"
-            ? "تم إلغاء الطلب بنجاح"
-            : "Order cancelled successfully"
-        );
-
-        // إغلاق الـ modal
-        handleCloseCancelModal();
-      } else {
-        // حتى لو فشل الـ API، قد يكون التحديث نجح
-        await refetchOrders();
-
-        toast.success(
-          language === "ar"
-            ? "تم إلغاء الطلب (تم التحديث محلياً)"
-            : "Order cancelled (updated locally)"
-        );
-
-        handleCloseCancelModal();
-      }
-    } catch (error) {
-      console.error("Cancel order error:", error);
-
-      toast.error(
-        language === "ar" ? "فشل في إلغاء الطلب" : "Failed to cancel order"
-      );
-    } finally {
-      setCancelling(false);
-    }
-  };
+ 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -240,7 +118,7 @@ const Dashboard: React.FC = () => {
         >
           <div className="border-b border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-8">
-              <button
+              {/* <button
                 onClick={() => setActiveTab("overview")}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === "overview"
@@ -250,7 +128,7 @@ const Dashboard: React.FC = () => {
               >
                 {t("dashboard.overview") ||
                   (language === "ar" ? "نظرة عامة" : "Overview")}
-              </button>
+              </button> */}
               <button
                 onClick={() => setActiveTab("orders")}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -344,28 +222,28 @@ const Dashboard: React.FC = () => {
                       ? "الطلبات والإيرادات الشهرية"
                       : "Monthly Orders & Revenue")}
                 </h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={monthlyOrders}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      className="opacity-30"
-                    />
-                    <XAxis
-                      dataKey="month"
-                      className="text-gray-600 dark:text-gray-300"
-                    />
-                    <YAxis className="text-gray-600 dark:text-gray-300" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "rgb(31 41 55)",
-                        border: "none",
-                        borderRadius: "8px",
-                        color: "white",
-                      }}
-                    />
-                    <Bar dataKey="orders" fill="#3B82F6" radius={4} />
-                  </BarChart>
-                </ResponsiveContainer>
+                {monthlyOrdersLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={monthlyOrders}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="month" className="text-gray-600 dark:text-gray-300" />
+                      <YAxis className="text-gray-600 dark:text-gray-300" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "rgb(31 41 55)",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "white",
+                        }}
+                      />
+                      <Bar dataKey="orders" fill="#3B82F6" radius={4} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </motion.div>
 
               {/* Category Distribution */}
@@ -559,122 +437,7 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Cancel Order Modal */}
-      <Transition appear show={cancelModalOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50"
-          onClose={handleCloseCancelModal}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25 dark:bg-opacity-50" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex-shrink-0 p-3 rounded-full bg-red-100 dark:bg-red-900/30">
-                      <ExclamationTriangleIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
-                    </div>
-                    <Dialog.Title
-                      as="h3"
-                      className="text-lg font-semibold leading-6 text-gray-900 dark:text-white"
-                    >
-                      {language === "ar" ? "إلغاء الطلب" : "Cancel Order"}
-                    </Dialog.Title>
-                  </div>
-
-                  <div className="mb-6">
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
-                      {language === "ar"
-                        ? `هل أنت متأكد من إلغاء الطلب #${selectedOrder?.order_number}؟ لا يمكن التراجع عن هذا الإجراء.`
-                        : `Are you sure you want to cancel order #${selectedOrder?.order_number}? This action cannot be undone.`}
-                    </p>
-                    {selectedOrder && (
-                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            {language === "ar"
-                              ? "المبلغ الإجمالي:"
-                              : "Total Amount:"}
-                          </span>
-                          <span className="font-semibold text-gray-900 dark:text-white">
-                            $
-                            {parseFloat(selectedOrder.total_price || 0).toFixed(
-                              2
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            {language === "ar" ? "الحالة:" : "Status:"}
-                          </span>
-                          <span
-                            className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(
-                              selectedOrder.order_status
-                            )}`}
-                          >
-                            {selectedOrder.status_display ||
-                              selectedOrder.order_status}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                      onClick={handleCloseCancelModal}
-                      disabled={cancelling}
-                    >
-                      {language === "ar" ? "إلغاء" : "Cancel"}
-                    </button>
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-lg border border-transparent bg-red-600 dark:bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleCancelOrder}
-                      disabled={cancelling}
-                    >
-                      {cancelling ? (
-                        <>
-                          <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />
-                          {language === "ar"
-                            ? "جاري الإلغاء..."
-                            : "Cancelling..."}
-                        </>
-                      ) : language === "ar" ? (
-                        "تأكيد الإلغاء"
-                      ) : (
-                        "Confirm Cancellation"
-                      )}
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+     
     </div>
   );
 };

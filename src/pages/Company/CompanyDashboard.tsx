@@ -796,12 +796,12 @@ const CompanyCard: React.FC<{ company: Company; onUpdateImage: (type: 'tax' | 'c
             <img
               src={taxCard}
               alt="Tax Card"
-              className="w-full h-64 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+              className="w-full h-64 object-fill rounded-lg border border-gray-300 dark:border-gray-700"
             />
-            <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
+            {/* <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
               <PencilIcon className="w-5 h-5 text-gray-800 dark:text-gray-100" />
               <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, 'tax')} />
-            </label>
+            </label> */}
           </div>
 
           {/* Commercial Registration */}
@@ -809,12 +809,12 @@ const CompanyCard: React.FC<{ company: Company; onUpdateImage: (type: 'tax' | 'c
             <img
               src={crCard}
               alt="CR Certificate"
-              className="w-full h-64 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
+              className="w-full h-64 object-fill rounded-lg border border-gray-300 dark:border-gray-700"
             />
-            <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
+            {/* <label className="absolute top-2 right-2 bg-white dark:bg-gray-700 p-2 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition">
               <PencilIcon className="w-5 h-5 text-gray-800 dark:text-gray-100" />
               <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageChange(e, 'cr')} />
-            </label>
+            </label> */}
           </div>
         </div>
       </div>
