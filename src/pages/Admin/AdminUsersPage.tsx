@@ -3,7 +3,6 @@ import axiosInstance from "../../utils/axiosInstance";
 import { useLanguage } from "../../contexts/LanguageContext";
 import {
   EyeIcon,
-  TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
   XMarkIcon,
@@ -113,23 +112,6 @@ export default function AdminUsersPage() {
     }
   };
 
-  // const handleDelete = async (id: number) => {
-  //   if (
-  //     !confirm(
-  //       language === "ar"
-  //         ? "هل أنت متأكد من حذف هذا المستخدم؟"
-  //         : "Are you sure you want to delete this user?"
-  //     )
-  //   )
-  //     return;
-
-  //   try {
-  //     await axiosInstance.delete(`/api/auth/admin/users/${id}/`);
-  //     fetchUsers();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   const getRoleDisplayName = (role: string) => {
     const roleMap: { [key: string]: { en: string; ar: string } } = {
@@ -213,7 +195,7 @@ export default function AdminUsersPage() {
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
-                  {language === "ar" ? "البريد" : "Email"}
+                  {language === "ar" ? "البريد الالكتروني" : "Email"}
                 </th>
                 <th
                   className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
@@ -373,7 +355,7 @@ export default function AdminUsersPage() {
                         className="p-1 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 "
                         onClick={() => nanvigate(`/activity/${user.id}`)}
                       >
-                        {language === "ar" ? "نشاط" : "Activity"}
+                        {language === "ar" ? "نشط" : "Activity"}
                       </button>
                     </td>
 
@@ -411,13 +393,7 @@ export default function AdminUsersPage() {
                             <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
                           )}
                         </button>
-                        {/* <button
-                          className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                          onClick={() => handleDelete(user.id)}
-                          title={language === "ar" ? "حذف" : "Delete"}
-                        >
-                          <TrashIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
-                        </button> */}
+                        
                       </div>
                     </td>
                   </tr>

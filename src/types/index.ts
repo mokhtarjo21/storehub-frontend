@@ -65,6 +65,7 @@ export interface Order {
   full_shipping_address: string;
   can_be_cancelled: boolean;
   total_price: number;
+  currency: string;
   order_status: 'pending' | 'processing' | 'shipped' | 'confirmed'| 'delivered' | 'cancelled';
   createdAt: string;
   shippingAddress: Address;

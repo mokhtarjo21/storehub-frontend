@@ -64,7 +64,6 @@ type ProductListItem = {
   updated_at: string;
 };
 
-
 export default function AdminProductsSection() {
   const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
@@ -80,7 +79,6 @@ export default function AdminProductsSection() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ProductListItem | null>(null);
 
-  // fetch list
   const getProducts = async () => {
     setLoading(true);
     try {
@@ -104,7 +102,6 @@ export default function AdminProductsSection() {
     }
   };
 
-  // try fetch categories and brands to populate selects
   const fetchCategoriesAndBrands = async () => {
     try {
       const [cRes, bRes] = await Promise.allSettled([
@@ -172,7 +169,7 @@ export default function AdminProductsSection() {
     });
   };
   return (
-    <div className="min-h-[70vh] p-6 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-1/2">
           <input
@@ -222,32 +219,36 @@ export default function AdminProductsSection() {
             <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
           </button>
         </div>
+
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+      <div
+        dir={language === "ar" ? "rtl" : "ltr"}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700"
+      >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "صورة" : "Image"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "الاسم" : "Name"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "الفئة" : "Category"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "البراند" : "Brand"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "السعر" : "Price"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "المخزون" : "Stock"}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {language === "ar" ? "التحكم" : "Actions"}
                 </th>
               </tr>
@@ -277,6 +278,7 @@ export default function AdminProductsSection() {
                     key={p.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
                   >
+                    {/* Image */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       {p.primary_image ? (
                         <img
@@ -288,20 +290,29 @@ export default function AdminProductsSection() {
                         <PhotoIcon className="w-10 h-10 text-gray-400 dark:text-gray-500" />
                       )}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
+
+                    {/* Name */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-900 dark:text-white font-medium">
                       {language === "ar" ? p.name_ar || p.name : p.name}
                     </td>
 
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {/* Category */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-500 dark:text-gray-400">
                       {p.category_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+
+                    {/* Brand */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-500 dark:text-gray-400">
                       {p.brand_name ?? "—"}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-semibold">
+
+                    {/* Price */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-900 dark:text-white font-semibold">
                       EGP {Number(p.price).toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+
+                    {/* Stock */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-900 dark:text-white">
                       <span
                         className={`px-2 py-1 text-xs font-semibold rounded-full ${
                           p.stock > 10
@@ -314,8 +325,10 @@ export default function AdminProductsSection() {
                         {p.stock}
                       </span>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm">
-                      <div className="flex gap-2">
+
+                    {/* Actions */}
+                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm">
+                      <div className="flex gap-2 rtl:gap-2">
                         <button
                           onClick={() => openEdit(p)}
                           className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"

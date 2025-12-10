@@ -6,7 +6,6 @@ import { Order } from "../../types";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
-import { useFloating } from "@floating-ui/react-dom";
 import ar from "date-fns/locale/ar";
 import enGB from "date-fns/locale/en-GB";
 
@@ -662,18 +661,18 @@ export default function AdminOrdersPage() {
         className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 md:p-6"
       >
         {/* Header Section */}
-          {/* Mobile Filter Counter */}
-          <div className="sm:hidden flex items-center justify-between">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {language === "ar" ? "التصفيات:" : "Filters:"}
-            </span>
-            <div className="flex items-center gap-2">
-              <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
-                {[search, status, startDate].filter(Boolean).length}
-              </div>
-              <ChevronDownIcon className="w-5 h-5 text-gray-400" />
+        {/* Mobile Filter Counter */}
+        <div className="sm:hidden flex items-center justify-between">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {language === "ar" ? "التصفيات:" : "Filters:"}
+          </span>
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+              {[search, status, startDate].filter(Boolean).length}
             </div>
+            <ChevronDownIcon className="w-5 h-5 text-gray-400" />
           </div>
+        </div>
         {/* Filters Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Search Input - Full width on mobile, 1/3 on lg+ */}
@@ -1007,6 +1006,7 @@ export default function AdminOrdersPage() {
                   </tr>
                 ) : (
                   filteredOrders.map((order, index) => {
+                    console.log(order);
                     const statusBadge = getStatusBadge(order.order_status);
                     const StatusIcon = statusBadge.icon;
                     return (
@@ -1235,18 +1235,12 @@ export default function AdminOrdersPage() {
                       {t("orderDetails") ||
                         (language === "ar" ? "تفاصيل الطلب" : "Order Details")}
                       <span className="text-indigo-600 dark:text-indigo-400 ml-1 sm:ml-2">
-                        #{selectedOrder.order_number}
+                        {selectedOrder.order_number}
                       </span>
                     </h3>
                     <div className="flex items-center gap-1 sm:gap-2 mt-1 flex-wrap">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {selectedOrder.status_display ||
-                          selectedOrder.order_status}
-                      </span>
-                      <span className="text-xs text-gray-400">•</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {selectedOrder.payment_status_display ||
-                          selectedOrder.payment_status}
+                        {t(`${selectedOrder.order_status}`)}
                       </span>
                     </div>
                   </div>
@@ -1284,34 +1278,37 @@ export default function AdminOrdersPage() {
               <div className="flex flex-col sm:gap-6 sm:px-6 p-4 sm:py-5 overflow-y-auto flex-1 min-h-0">
                 {/* Left - Tabs & main content */}
                 <div className="lg:col-span-2 w-full min-w-0">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 sm:gap-4">
-                    <nav className="flex items-center gap-1 sm:gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1 border border-gray-200 dark:border-gray-700 w-full sm:w-auto overflow-x-auto">
+                  <div
+                    className={`flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3 sm:gap-4 ${
+                      language === "ar" ? "rtl" : "ltr"
+                    }`}
+                  >
+                    <nav
+                      className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-lg p-1 border border-gray-200 dark:border-gray-700
+               w-full sm:w-auto gap-1 sm:gap-2 flex-wrap"
+                    >
                       <TabButton
                         active={activeTab === "overview"}
                         onClick={() => setActiveTab("overview")}
+                        className="flex-1 sm:flex-none text-center"
                       >
-                        <span className="whitespace-nowrap">
-                          {t("overview") ||
-                            (language === "ar" ? "نظرة عامة" : "Overview")}
-                        </span>
+                        {t("overview")}
                       </TabButton>
+
                       <TabButton
                         active={activeTab === "items"}
                         onClick={() => setActiveTab("items")}
+                        className="flex-1 sm:flex-none text-center"
                       >
-                        <span className="whitespace-nowrap">
-                          {t("orderItems") ||
-                            (language === "ar" ? "المنتجات" : "Items")}
-                        </span>
+                        {t("orderItems")}
                       </TabButton>
+
                       <TabButton
                         active={activeTab === "timeline"}
                         onClick={() => setActiveTab("timeline")}
+                        className="flex-1 sm:flex-none text-center"
                       >
-                        <span className="whitespace-nowrap">
-                          {t("orderTimeline") ||
-                            (language === "ar" ? "الجدول الزمني" : "Timeline")}
-                        </span>
+                        {t("orderTimeline")}
                       </TabButton>
                     </nav>
                   </div>
@@ -1323,49 +1320,32 @@ export default function AdminOrdersPage() {
                         {/* Order Summary Card */}
                         <div className="xl:col-span-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700">
                           <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
-                            {t("orderSummary") ||
-                              (language === "ar"
-                                ? "ملخص الطلب"
-                                : "Order Summary")}
+                            {t("orders.orderSummary")}
                           </h5>
                           <dl className="text-sm space-y-2 sm:space-y-3">
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                              <dt>
-                                {t("subtotal") ||
-                                  (language === "ar"
-                                    ? "المجموع الفرعي"
-                                    : "Subtotal")}
-                              </dt>
+                              <dt>{t("orders.subtotal")}</dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
                                 {selectedOrder.subtotal ?? "0.00"}{" "}
                                 {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                              <dt>
-                                {t("taxAmount") ||
-                                  (language === "ar" ? "الضريبة" : "Tax")}
-                              </dt>
+                              <dt>{t("orders.tax")}</dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
                                 {selectedOrder.tax_amount ?? "0.00"}{" "}
                                 {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                              <dt>
-                                {t("shippingAmount") ||
-                                  (language === "ar" ? "الشحن" : "Shipping")}
-                              </dt>
+                              <dt>{t("orders.shippingCost")}</dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
                                 {selectedOrder.shipping_amount ?? "0.00"}{" "}
                                 {selectedOrder.currency || "EGP"}
                               </dd>
                             </div>
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                              <dt>
-                                {t("discountAmount") ||
-                                  (language === "ar" ? "الخصم" : "Discount")}
-                              </dt>
+                              <dt>{t("orders.discount")}</dt>
                               <dd className="font-medium text-gray-900 dark:text-white">
                                 {selectedOrder.discount_amount ?? "0.00"}{" "}
                                 {selectedOrder.currency || "EGP"}
@@ -1373,8 +1353,7 @@ export default function AdminOrdersPage() {
                             </div>
                             <div className="flex justify-between pt-2 sm:pt-3 border-t border-gray-300 dark:border-gray-600 mt-2 sm:mt-3">
                               <dt className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg">
-                                {t("total") ||
-                                  (language === "ar" ? "المجموع" : "Total")}
+                                {t("total")}
                               </dt>
                               <dd className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">
                                 {selectedOrder.total_price}{" "}
@@ -1389,20 +1368,14 @@ export default function AdminOrdersPage() {
                           <div className="flex flex-col 2xl:flex-row gap-4 sm:gap-5">
                             <div className="flex-1 min-w-0">
                               <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
-                                {t("customerInformation") ||
-                                  (language === "ar"
-                                    ? "معلومات العميل"
-                                    : "Customer Information")}
+                                {t("customerInformation")}
                               </h5>
 
                               <div className="mt-3 space-y-3 sm:space-y-4">
                                 {/* Name */}
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                   <label className="block text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium w-full sm:w-48 flex-shrink-0">
-                                    {t("customerName") ||
-                                      (language === "ar"
-                                        ? "اسم العميل"
-                                        : "Customer Name")}
+                                    {t("customerName")}
                                   </label>
                                   <div className="flex-1 text-sm sm:text-base text-gray-900 dark:text-gray-200 py-2">
                                     {selectedOrder.shipping_name || "—"}
@@ -1413,10 +1386,7 @@ export default function AdminOrdersPage() {
                                 {selectedOrder.shipping_email && (
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                     <label className="block text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium w-full sm:w-48 flex-shrink-0">
-                                      {t("email") ||
-                                        (language === "ar"
-                                          ? "البريد الإلكتروني"
-                                          : "Email")}
+                                      {t("email")}
                                     </label>
                                     <div className="flex-1 text-sm sm:text-base text-gray-900 dark:text-gray-200 py-2">
                                       {selectedOrder.shipping_email}
@@ -1428,10 +1398,7 @@ export default function AdminOrdersPage() {
                                 {selectedOrder.shipping_phone && (
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                     <label className="block text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium w-full sm:w-48 flex-shrink-0">
-                                      {t("phone") ||
-                                        (language === "ar"
-                                          ? "الهاتف"
-                                          : "Phone")}
+                                      {t("phone")}
                                     </label>
                                     <div className="flex-1 text-sm sm:text-base text-gray-900 dark:text-gray-200 py-2">
                                       {selectedOrder.shipping_phone}
@@ -1442,10 +1409,7 @@ export default function AdminOrdersPage() {
                                 {/* Address */}
                                 <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
                                   <label className="block text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium w-full sm:w-48 flex-shrink-0 pt-2">
-                                    {t("shippingAddress") ||
-                                      (language === "ar"
-                                        ? "عنوان الشحن"
-                                        : "Shipping Address")}
+                                    {t("shippingAddress")}
                                   </label>
                                   <div className="flex-1 text-sm sm:text-base text-gray-900 dark:text-gray-200 whitespace-pre-line py-2">
                                     {selectedOrder.full_shipping_address || "—"}
@@ -1474,25 +1438,21 @@ export default function AdminOrdersPage() {
                                   "/placeholder.png"
                                 }
                                 alt={it.item_name}
-                                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700 mx-auto sm:mx-0"
+                                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md object-fil flex-shrink-0 border border-gray-200 dark:border-gray-700 mx-auto sm:mx-0"
                               />
                               <div className="flex-1 min-w-0 w-full sm:w-auto">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 sm:gap-4">
                                   <div className="flex-1 min-w-0">
                                     <div className="font-medium text-gray-900 dark:text-white text-base sm:text-lg md:text-xl truncate">
-                                      {it.item_name}
-                                    </div>
-                                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                      {it.item_sku || it.sku || ""}
+                                      {language === "ar"
+                                        ? it.item_name_ar
+                                        : it.item_name}
+                                      {console.log(it)}
                                     </div>
                                   </div>
                                   <div className="flex items-center justify-between md:flex-col md:items-end gap-2 md:gap-1">
                                     <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                                      {t("quantity") ||
-                                        (language === "ar"
-                                          ? "الكمية"
-                                          : "Quantity")}
-                                      :{" "}
+                                      {t("quantity")}:{" "}
                                       <span className="font-medium text-gray-900 dark:text-white">
                                         {it.quantity}
                                       </span>
@@ -1522,10 +1482,7 @@ export default function AdminOrdersPage() {
                           ))
                         ) : (
                           <div className="text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center py-8 sm:py-12">
-                            {t("noItems") ||
-                              (language === "ar"
-                                ? "لا توجد منتجات"
-                                : "No items")}
+                            {t("noItems")}
                           </div>
                         )}
                       </div>
@@ -1555,17 +1512,16 @@ export default function AdminOrdersPage() {
                                 </div>
                                 <div className="flex-1 min-w-0 pb-4 sm:pb-6 md:pb-0">
                                   <div className="font-medium text-sm sm:text-base md:text-lg text-gray-900 dark:text-white">
-                                    {step.label}
+                                    {t(`orders.timeline.${step.status}`)}
                                   </div>
                                   <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
                                     {step.timestamp
                                       ? new Date(step.timestamp).toLocaleString(
                                           locale
                                         )
-                                      : t("notCompleted") ||
-                                        (language === "ar"
-                                          ? "لم يكتمل"
-                                          : "Not completed")}
+                                      : language === "ar"
+                                      ? "لم يكتمل"
+                                      : "Not completed"}
                                   </div>
                                 </div>
                               </div>
@@ -1573,10 +1529,9 @@ export default function AdminOrdersPage() {
                           </div>
                         ) : (
                           <div className="text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center py-8 sm:py-12 w-full">
-                            {t("noTimeline") ||
-                              (language === "ar"
-                                ? "لا يوجد جدول زمني"
-                                : "No timeline available")}
+                            {language === "ar"
+                              ? "لا يوجد جدول زمني"
+                              : "No timeline available"}
                           </div>
                         )}
                       </div>
@@ -1603,10 +1558,9 @@ export default function AdminOrdersPage() {
                       <div className="flex flex-col 2xl:flex-row gap-4 sm:gap-5">
                         <div className="flex-1 min-w-0">
                           <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
-                            {t("cotation") ||
-                              (language === "ar"
-                                ? "تفاصيل العرص السعري"
-                                : "Cotation Details")}
+                            {language === "ar"
+                              ? "تفاصيل العرص السعري"
+                              : "Cotation Details"}
                             : {selectedOrder.order_number}
                           </h5>
 
@@ -1649,7 +1603,7 @@ export default function AdminOrdersPage() {
                                   {language === "ar" ? "جنية" : "EGP"}
                                 </option>
                                 <option value="USD">
-                                  {language === "ar" ? "دولا" : "USD"}
+                                  {language === "ar" ? "دولار" : "USD"}
                                 </option>
                               </select>
                             </div>
@@ -1710,23 +1664,12 @@ export default function AdminOrdersPage() {
                         <div className="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between gap-3 sm:gap-4 mb-4">
                           <div className="flex-1 sm:flex-none">
                             <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                              {t("currentStatus") ||
-                                (language === "ar"
-                                  ? "الحالة الحالية"
-                                  : "Current Status")}
+                              {language === "ar"
+                                ? "الحالة الحالية"
+                                : "Current Status"}
                             </div>
                             <div className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white mt-1">
-                              {selectedOrder.status_display ||
-                                selectedOrder.order_status}
-                            </div>
-                          </div>
-                          <div className="text-left sm:text-right lg:text-left flex-1 sm:flex-none">
-                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                              {t("orderNumber") ||
-                                (language === "ar" ? "رقم الطلب" : "Order #")}
-                            </div>
-                            <div className="font-semibold text-sm sm:text-base text-gray-900 dark:text-white mt-1">
-                              #{selectedOrder.order_number}
+                              {t(`${selectedOrder.order_status}`)}
                             </div>
                           </div>
                         </div>
@@ -1762,17 +1705,15 @@ export default function AdminOrdersPage() {
                               disabled={updating}
                               className="w-full px-3 py-2 rounded-md bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              {t("cancelOrder") ||
-                                (language === "ar"
-                                  ? "إلغاء الطلب"
-                                  : "Cancel Order")}
+                              {language === "ar"
+                                ? "إلغاء الطلب"
+                                : "Cancel Order"}
                             </button>
                           ) : (
                             <div className="w-full px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-center text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600">
-                              {t("cannotCancel") ||
-                                (language === "ar"
-                                  ? "لا يمكن إلغاء هذا الطلب"
-                                  : "Cannot cancel this order")}
+                              {language === "ar"
+                                ? "لا يمكن إلغاء هذا الطلب"
+                                : "Cannot cancel this order"}
                             </div>
                           )}
                         </div>
@@ -1781,26 +1722,21 @@ export default function AdminOrdersPage() {
                       {/* Payment Transactions Card */}
                       <div className="bg-white dark:bg-gray-800 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-700">
                         <div className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-3">
-                          {t("paymentInformation") ||
-                            (language === "ar"
-                              ? "معلومات الدفع"
-                              : "Payment Information")}
+                          {language === "ar"
+                            ? "معلومات الدفع"
+                            : "Payment Information"}
                         </div>
                         <div className="mt-2">
                           <div className="text-sm font-medium text-gray-900 dark:text-white break-words">
-                            {selectedOrder.payment_method_display ||
-                              selectedOrder.payment_method ||
-                              "—"}
+                            {t(`checkout.${selectedOrder.payment_method}`)}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                            {t("paymentStatus") ||
-                              (language === "ar"
-                                ? "حالة الدفع"
-                                : "Payment Status")}
+                            {language === "ar"
+                              ? "حالة الدفع"
+                              : "Payment Status"}
                             :{" "}
                             <span className="font-medium text-gray-700 dark:text-gray-200">
-                              {selectedOrder.payment_status_display ||
-                                selectedOrder.payment_status}
+                              {t(`${selectedOrder.order_status}`)}
                             </span>
                           </div>
                         </div>
@@ -1808,10 +1744,9 @@ export default function AdminOrdersPage() {
                         {/* Payment Status Control */}
                         <div className="mt-4">
                           <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">
-                            {t("updatePaymentStatus") ||
-                              (language === "ar"
-                                ? "تحديث حالة الدفع"
-                                : "Update Payment Status")}
+                            {language === "ar"
+                              ? "تحديث حالة الدفع"
+                              : "Update Payment Status"}
                           </label>
 
                           <select
@@ -1840,41 +1775,6 @@ export default function AdminOrdersPage() {
                             </option>
                           </select>
                         </div>
-                        {Array.isArray(selectedOrder.payment_transactions) &&
-                          selectedOrder.payment_transactions.length > 0 && (
-                            <div className="mt-3 space-y-2">
-                              {selectedOrder.payment_transactions.map((tx) => (
-                                <div
-                                  key={tx.id}
-                                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-2 rounded-md bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
-                                >
-                                  <div className="text-xs flex-1 min-w-0">
-                                    <div className="font-medium text-gray-900 dark:text-white truncate">
-                                      {tx.transaction_type_display ||
-                                        tx.transaction_type}
-                                    </div>
-                                    <div className="text-gray-500 dark:text-gray-400 mt-1">
-                                      {tx.transaction_status_display ||
-                                        tx.transaction_status}
-                                    </div>
-                                  </div>
-                                  <div className="text-left sm:text-right text-xs flex-shrink-0">
-                                    <div className="font-semibold text-gray-900 dark:text-white">
-                                      {tx.amount}{" "}
-                                      {selectedOrder.currency || "EGP"}
-                                    </div>
-                                    <div className="text-gray-500 dark:text-gray-400 mt-1 text-[10px] sm:text-xs">
-                                      {tx.created_at
-                                        ? new Date(
-                                            tx.created_at
-                                          ).toLocaleString(locale)
-                                        : ""}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
                       </div>
                     </div>
                     <button

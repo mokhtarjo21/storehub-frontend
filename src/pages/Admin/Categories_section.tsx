@@ -135,7 +135,7 @@ export default function AdminCategoriesSection() {
 
   return (
     <div
-      className="min-h-[70vh] p-4 sm:p-6 bg-gray-50 dark:bg-gray-900"
+      className="min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900"
       dir={language === "ar" ? "rtl" : "ltr"}
     >
       {/* Header Section */}
@@ -157,12 +157,6 @@ export default function AdminCategoriesSection() {
           >
             <PlusCircleIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>{language === "ar" ? "إضافة فئة" : "Add category"}</span>
-          </button>
-          <button
-            onClick={loadCategories}
-            className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm sm:text-base"
-          >
-            {language === "ar" ? "تحديث" : "Refresh"}
           </button>
         </div>
       </div>
@@ -193,12 +187,6 @@ export default function AdminCategoriesSection() {
  text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                 >
                   {language === "ar" ? "الوصف" : "Description"}
-                </th>
-                <th
-                  className="px-4 py-3 text-left rtl:text-right
- text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  {language === "ar" ? "الترتيب" : "Sort order"}
                 </th>
                 <th
                   className="px-4 py-3 text-left rtl:text-right
@@ -280,11 +268,6 @@ export default function AdminCategoriesSection() {
                             "—"
                           : category.description || "—"}
                       </p>
-                    </td>
-
-                    {/* Sort Order */}
-                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                      {category.sort_order ?? "—"}
                     </td>
 
                     {/* Product Count */}
@@ -404,7 +387,6 @@ function CategoryForm({
       if (description) formData.append("description", description);
       if (descriptionAr) formData.append("description_ar", descriptionAr);
       if (slug) formData.append("slug", slug);
-      if (sortOrder !== "") formData.append("sort_order", String(sortOrder));
       formData.append("is_active", String(Number(isActive)));
       if (imageFile) formData.append("image", imageFile);
 
@@ -597,49 +579,6 @@ function CategoryForm({
                             : "Enter description in Arabic"
                         }
                         dir={language === "ar" ? "rtl" : "ltr"}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Slug and Sort Order */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div
-                      className={language === "ar" ? "text-right" : "text-left"}
-                    >
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {language === "ar" ? "المسار (Slug)" : "Slug"}
-                      </label>
-                      <input
-                        value={slug}
-                        onChange={(e) => setSlug(e.target.value)}
-                        className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          language === "ar" ? "text-right" : "text-left"
-                        }`}
-                        placeholder={
-                          language === "ar" ? "مسار الفئة" : "Category slug"
-                        }
-                        dir="ltr" // Slug always LTR
-                      />
-                    </div>
-                    <div
-                      className={language === "ar" ? "text-right" : "text-left"}
-                    >
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {language === "ar" ? "ترتيب العرض" : "Sort order"}
-                      </label>
-                      <input
-                        type="number"
-                        value={sortOrder as number | string}
-                        onChange={(e) =>
-                          setSortOrder(
-                            e.target.value === "" ? "" : Number(e.target.value)
-                          )
-                        }
-                        className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          language === "ar" ? "text-right" : "text-left"
-                        }`}
-                        placeholder="0"
-                        dir="ltr" // Numbers always LTR
                       />
                     </div>
                   </div>

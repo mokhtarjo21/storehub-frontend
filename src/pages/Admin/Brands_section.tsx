@@ -57,7 +57,6 @@ export default function AdminBrandsSection() {
 
   useEffect(() => {
     loadBrands();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredBrands = useMemo(() => {
@@ -129,7 +128,7 @@ export default function AdminBrandsSection() {
   };
 
   return (
-    <div className="min-h-[70vh] p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
       {/* Header Section */}
       <div
         className={`flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 ${
@@ -162,12 +161,6 @@ export default function AdminBrandsSection() {
             <span>
               {language === "ar" ? "إضافة علامة تجارية" : "Add Brand"}
             </span>
-          </button>
-          <button
-            onClick={loadBrands}
-            className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm sm:text-base"
-          >
-            {language === "ar" ? "تحديث" : "Refresh"}
           </button>
         </div>
       </div>

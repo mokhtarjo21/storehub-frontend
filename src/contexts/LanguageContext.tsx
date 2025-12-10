@@ -21,6 +21,7 @@ const translations = {
     customerName: "Customer Name",
     shippingAddress: "Shipping Address",
     phone: "Phone",
+    email: "Email",
 
     manageStatus: "Manage Status",
     changeStatus: "Change Order Status",
@@ -32,7 +33,7 @@ const translations = {
     paymentStatus: "Payment Status",
 
     orderItems: "Order Items",
-
+    overview: "Overview",
     orderTimeline: "Order Timeline",
 
     rawData: "Raw JSON Data",
@@ -147,7 +148,7 @@ const translations = {
     "checkout.postalCode": "Postal Code *",
     "checkout.notes": "Order notes (optional)",
     "checkout.payment": "Payment Method",
-    "checkout.cod": "Cash on Delivery (Full)",
+    "checkout.cod": "Cash on Delivery ",
     "checkout.codDesc": "Pay full amount on delivery.",
     "checkout.split": "Split Payment (Deposit + Final)",
     "checkout.splitDesc":
@@ -184,7 +185,7 @@ const translations = {
     "services.duration.custom": "Custom Duration",
 
     // Orders
-    "Pending": "Pending",
+    Pending: "Pending",
     "orders.title": "Order Details",
     "orders.notFound": "Order not found",
     "orders.cancel": "Cancel Order",
@@ -243,6 +244,16 @@ const translations = {
     "apiStatus.connected": "Django API Connected",
     "apiStatus.disconnected": "Django API Disconnected - Start backend server",
     "apiStatus.commandPrompt": "Run:",
+
+    // status
+    pending: "Pending",
+    confirmed: "Confirmed",
+    processing: "Processing",
+    preparing: "Preparing",
+    shipped: "Shipped",
+    delivered: "Delivered",
+    cancelled: "Cancelled",
+
     // Home
     "home.stats.customers": "Happy Customers",
     "home.stats.products": "Products Available",
@@ -370,7 +381,7 @@ const translations = {
     "auth.role.affiliate": "Sales By Commission",
     "auth.companyName": "Company Name",
     "orders.timeline.payment_paid": "Payment Paid",
-    "cannotCancel": "This order cannot be cancelled",
+    cannotCancel: "This order cannot be cancelled",
     "auth.register.companyName": "Company Name",
     "auth.register.companyName.placeholder": "Enter company name",
     "auth.register.companyEmail": "Company Email",
@@ -390,7 +401,7 @@ const translations = {
     "auth.register.email.placeholder": "Enter your email",
     "auth.register.password.placeholder": "Create a password",
     "auth.register.haveAccount": "Already have an account?",
-    "companyEmailOnly":
+    companyEmailOnly:
       "Personal emails like Gmail are not allowed. Please use your company email.",
 
     "auth.register.phoneRequired": "Phone number is required",
@@ -407,7 +418,7 @@ const translations = {
     "auth.forgotPassword.sentTo": "We have sent a password reset code to",
     "auth.forgotPassword.enterCode": "Enter Reset Code",
     "auth.forgotPassword.codeSent": "Code has been sent ",
-    "pricing":"Price not yet",
+    pricing: "Price not yet",
     "auth.resetPassword.title": "Reset Password",
     "auth.resetPassword.subtitle": "Enter the reset code",
     "auth.resetPassword.newPassword": "New Password",
@@ -429,6 +440,9 @@ const translations = {
     "auth.login.forgotPassword": "Forgot Password?",
     "auth.login.dontHaveAccount": "Don't have an account?",
     "auth.login.noAccount": "Don't have an account?",
+
+    quantity: "Quantity",
+    noItems: "No Items",
   },
   ar: {
     orderDetails: "تفاصيل الطلب",
@@ -442,6 +456,7 @@ const translations = {
     customerName: "اسم العميل",
     shippingAddress: "عنوان الشحن",
     phone: "رقم الهاتف",
+    email: "البريد الإلكتروني",
 
     manageStatus: "إدارة الحالة",
     changeStatus: "تغيير حالة الطلب",
@@ -453,7 +468,7 @@ const translations = {
     paymentStatus: "حالة الدفع",
 
     orderItems: "المنتجات داخل الطلب",
-
+    overview: "نظرة عامة",
     orderTimeline: "سجل حالة الطلب",
 
     rawData: "البيانات الخام",
@@ -488,7 +503,7 @@ const translations = {
     "nav.logout": "تسجيل خروج",
     "nav.login": "تسجيل دخول",
     "nav.register": "إنشاء حساب",
-    "pricing" :"لم يسعر بعد",
+    pricing: "لم يسعر بعد",
     // Common
     "common.loading": "جارٍ التحميل...",
     "common.save": "حفظ",
@@ -569,7 +584,7 @@ const translations = {
     "checkout.postalCode": "الرمز البريدي *",
     "checkout.notes": "ملاحظات الطلب (اختياري)",
     "checkout.payment": "طريقة الدفع",
-    "checkout.cod": "الدفع عند الاستلام (كامل)",
+    "checkout.cod": "الدفع عند الاستلام",
     "checkout.codDesc": "ادفع المبلغ الكامل عند الاستلام.",
     "checkout.split": "الدفع المقسم (عربون + نهائي)",
     "checkout.splitDesc":
@@ -604,16 +619,16 @@ const translations = {
     "services.duration.2_weeks": "أسبوعان",
     "services.duration.1_month": "شهر واحد",
     "services.duration.custom": "مدة مخصصة",
-    "paid":"مدفوع",
+    paid: "مدفوع",
     // Orders
-    "pending": "قيد المراجعة",
-    "shipped": "تم الشحن",
-    "delivered": "تم التسليم",
-    "cancelled": "تم الغاء",
-    "confirmed": "تم التاكيد",
-    "processing": "جاري المعالجة",
-    "preparing": "جاري التحضير",
-    "refunded": "تم التراجع",
+    pending: "قيد المراجعة",
+    shipped: "تم الشحن",
+    delivered: "تم التسليم",
+    cancelled: "تم الغاء",
+    confirmed: "تم التاكيد",
+    processing: "جاري المعالجة",
+    preparing: "جاري التحضير",
+    refunded: "تم التراجع",
     "orders.title": "تفاصيل الطلب",
     "orders.notFound": "الطلب غير موجود",
     "orders.cancel": "إلغاء الطلب",
@@ -637,8 +652,8 @@ const translations = {
     "orders.carrier": "شركة الشحن",
     "orders.orderSummary": "ملخص الطلب",
     "orders.subtotal": "المجموع الفرعي",
+    "orders.shippingCost": "تكلفة الشحن",
     "orders.tax": "الضريبة",
-    "Cancelled": "ملغي",
     "orders.shipping": "الشحن",
     "orders.free": "مجاني",
     "orders.discount": "الخصم",
@@ -675,6 +690,14 @@ const translations = {
       "تم فقد الاتصال بـ Django API - يرجى تشغيل الخادم",
     "apiStatus.commandPrompt": "شغّل الأمر:",
 
+    // status
+    pending: "قيد الانتظار",
+    confirmed: "تم التأكيد",
+    processing: "جاري المراجعة",
+    preparing: "جاري التجهيز",
+    shipped: "تم الشحن",
+    delivered: "تم التسليم",
+    cancelled: "تم الالغاء",
     // Home
     "home.stats.customers": "عملاء سعداء",
     "home.stats.products": "منتج متاح",
@@ -856,6 +879,9 @@ const translations = {
     "auth.login.forgotPassword": "هل نسيت كلمة المرور؟",
     "auth.login.dontHaveAccount": "ليس لديك حساب؟",
     "auth.login.noAccount": "ليس لديك حساب؟",
+
+    quantity: "كمية",
+    noItems: "لا يوجد عناصر",
   },
 };
 
