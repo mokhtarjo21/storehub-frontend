@@ -8,7 +8,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { apiRequest, handleApiResponse, getAuthHeaders } from "../utils/api";
 
-const API_BASE_URL = "http://72.60.181.116:8000/api";
+const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Checkout page: converts current user's cart into an order by calling
 // POST /api/orders/ (adjust endpoint if your backend differs)
