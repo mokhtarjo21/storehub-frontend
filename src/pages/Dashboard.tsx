@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 
 import {
   ShoppingBagIcon,
-  CurrencyDollarIcon,
   CalendarDaysIcon,
   TruckIcon,
   ClockIcon,

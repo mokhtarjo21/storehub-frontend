@@ -94,17 +94,20 @@ export default function AdminUsersPage() {
     if (
       !confirm(
         language === "ar"
-          ? `هل تريد ${user.is_verified ? "تعطيل" : "تفعيل"} هذا المستخدم؟`
+          ? `هل تريد ${user.is_active ? "تعطيل" : "تفعيل"} هذا المستخدم؟`
           : `Are you sure you want to ${
-              user.is_verified ? "disable" : "enable"
+              user.is_active ? "Disenable" : "Enable"
             } this user?`
       )
     )
       return;
 
     try {
-      await axiosInstance.patch(`/api/auth/admin/users/${user.id}/`, {
-        is_active: !user.is_verified,
+      
+      
+      await axiosInstance.post(`/api/auth/users/${user.id}/configurations/update/`, {
+       "is_active": user.is_active ? "false" : "true",
+        
       });
       fetchUsers();
     } catch (error) {
@@ -378,7 +381,7 @@ export default function AdminUsersPage() {
                         </button>
                         <button
                           className={`p-1.5 rounded transition-colors ${
-                            user.is_verified
+                            user.is_active
                               ? "bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50"
                               : "bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50"
                           }`}
@@ -387,7 +390,7 @@ export default function AdminUsersPage() {
                             language === "ar" ? "تفعيل/تعطيل" : "Enable/Disable"
                           }
                         >
-                          {user.is_verified ? (
+                          {user.is_active ? (
                             <XCircleIcon className="w-4 h-4 text-red-700 dark:text-red-400" />
                           ) : (
                             <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
