@@ -9,7 +9,7 @@ import ServiceFormModal from "../components/ServiceFormModal";
 import { useNavigate } from "react-router-dom";
 import RelatedServices from "../components/RelatedServices";
 
-const API_BASE_URL = "http://192.168.1.7:8000/api";
+const API_BASE_URL = "http://72.60.181.116:8000/api";
 
 const ServiceDetails: React.FC = () => {
   const { slug } = useParams();

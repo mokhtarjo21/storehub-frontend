@@ -32,7 +32,7 @@ const Notifications: React.FC = () => {
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      let url = "http://192.168.1.7:8000/api/auth/notifications/";
+      let url = "http://72.60.181.116:8000/api/auth/notifications/";
       const params = new URLSearchParams();
 
       if (filter !== "all") {
@@ -98,7 +98,7 @@ const Notifications: React.FC = () => {
   const markAsRead = async (notificationId: string) => {
     try {
       const response = await fetch(
-        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/read/`,
+        `http://72.60.181.116:8000/api/auth/notifications/${notificationId}/read/`,
         {
           method: "POST",
           headers: {
@@ -134,7 +134,7 @@ const Notifications: React.FC = () => {
   const markAllAsRead = async () => {
     try {
       const response = await fetch(
-        "http://192.168.1.7:8000/api/auth/notifications/mark-all-read/",
+        "http://72.60.181.116:8000/api/auth/notifications/mark-all-read/",
         {
           method: "POST",
           headers: {
@@ -166,7 +166,7 @@ const Notifications: React.FC = () => {
   const deleteNotification = async (notificationId: string) => {
     try {
       const response = await fetch(
-        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/delete/`,
+        `http://72.60.181.116:8000/api/auth/notifications/${notificationId}/delete/`,
         {
           method: "DELETE",
           headers: {
@@ -202,7 +202,7 @@ const Notifications: React.FC = () => {
 
     try {
       const response = await fetch(
-        "http://192.168.1.7:8000/api/auth/notifications/delete-all/",
+        "http://72.60.181.116:8000/api/auth/notifications/delete-all/",
         {
           method: "DELETE",
           headers: {

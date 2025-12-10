@@ -12,7 +12,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ slug }) => {
   const { language } = useLanguage();
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const base = "http://192.168.1.7:8000";
+  const base = "http://72.60.181.116:8000";
 
   useEffect(() => {
     const loadRelated = async () => {

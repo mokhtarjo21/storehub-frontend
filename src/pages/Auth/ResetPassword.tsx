@@ -66,7 +66,7 @@ const ResetPassword: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "http://192.168.1.7:8000/api/auth/reset-password/",
+        "http://72.60.181.116:8000/api/auth/reset-password/",
         {
           method: "POST",
           headers: {

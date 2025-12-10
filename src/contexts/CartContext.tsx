@@ -22,7 +22,7 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-const API_BASE = "http://192.168.1.7:8000/api/products/cart";
+const API_BASE = "http://72.60.181.116:8000/api/products/cart";
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
