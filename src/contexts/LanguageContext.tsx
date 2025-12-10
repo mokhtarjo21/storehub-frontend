@@ -184,6 +184,7 @@ const translations = {
     "services.duration.custom": "Custom Duration",
 
     // Orders
+    "Pending": "Pending",
     "orders.title": "Order Details",
     "orders.notFound": "Order not found",
     "orders.cancel": "Cancel Order",
@@ -365,6 +366,7 @@ const translations = {
     "auth.role.individual": "Individual",
     "auth.role.company_admin": "Company",
     "auth.role.company_staff": "Company Staff",
+    "auth.role.super_admin": "Super Admin",
     "auth.role.affiliate": "Sales By Commission",
     "auth.companyName": "Company Name",
     "orders.timeline.payment_paid": "Payment Paid",
@@ -796,6 +798,7 @@ const translations = {
     "auth.role.individual": "فردي",
     "auth.role.company_admin": "مدير شركة",
     "auth.role.company_staff": "موظف شركة",
+    "auth.role.super_admin": "مدير عام",
     "auth.role.affiliate": "مسوق",
     "auth.companyName": "اسم الشركة",
     "auth.register.companyName": "اسم الشركة",

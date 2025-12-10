@@ -37,7 +37,7 @@ const COLORS = {
 };
 
 const AdminDashboard: React.FC = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const isArabic = language === "ar";
   const [filters, setFilters] = useState({ startDate: null, endDate: null });
 
@@ -180,10 +180,18 @@ const AdminDashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 sm:mb-8 px-2 sm:px-0"
         >
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+          <h1
+            className={`text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white ${
+              language === "ar" ? "text-right" : "text-left"
+            }`}
+          >
             {language === "ar" ? "لوحة تحكم المسؤول" : "Admin Dashboard"}
           </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300 text-center sm:text-left">
+          <p
+            className={`mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300 ${
+              language === "ar" ? "text-right" : "text-left"
+            }`}
+          >
             {language === "ar"
               ? "إدارة المنصة ومراقبة المقاييس الرئيسية"
               : "Manage your platform and monitor key metrics"}
@@ -227,13 +235,14 @@ const AdminDashboard: React.FC = () => {
                   placeholderText={isArabic ? "اختر الفترة" : "Select period"}
                 />
               </div>
+
               {/* Filter Buttons */}
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {filterButtons.map((btn) => (
                   <button
                     key={btn.key}
                     onClick={() => handlePresetFilter(btn.key)}
-                    className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors "
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors "
                   >
                     {btn.label}
                   </button>
@@ -332,9 +341,6 @@ const AdminDashboard: React.FC = () => {
                   <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1">
                     {stat.value}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {stat.change} {stat.changeLabel}
-                  </p>
                 </div>
               </div>
             </motion.div>
@@ -403,7 +409,7 @@ const AdminDashboard: React.FC = () => {
             )}
           </motion.div>
 
-          {/* User Distribution */}
+          {/* User Distribution - Pie with custom legend */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -413,46 +419,82 @@ const AdminDashboard: React.FC = () => {
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
               {language === "ar" ? "توزيع المستخدمين" : "Users by Role"}
             </h3>
+
             {usersData?.users_by_role?.length ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={usersData.users_by_role}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    stroke="#fff"
-                    strokeWidth={1}
-                    labelLine={false}
-                    dataKey="count"
-                    label={({ role, percent }) =>
-                      percent > 0.06
-                        ? language === "ar"
-                          ? `${(percent * 100).toFixed(0)}% - ${role}`
-                          : `${role} ${(percent * 100).toFixed(0)}%`
-                        : ""
-                    }
-                  >
-                    {usersData.users_by_role.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={Object.values(COLORS)[index % 5]}
+              <>
+                <div className="w-full h-48 sm:h-72 md:h-48 lg:h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={usersData.users_by_role}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius="80%"
+                        stroke="#fff"
+                        strokeWidth={1}
+                        dataKey="count"
+                      >
+                        {usersData.users_by_role.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={
+                              Object.values(COLORS)[
+                                index % Object.keys(COLORS).length
+                              ]
+                            }
+                          />
+                        ))}
+                      </Pie>
+
+                      <Tooltip
+                        formatter={(value, name, props) => {
+                          const role = props.payload.role;
+                          const percent = (
+                            (value /
+                              usersData.users_by_role.reduce(
+                                (acc, u) => acc + u.count,
+                                0
+                              )) *
+                            100
+                          ).toFixed(0);
+                          return [value, t(`auth.role.${role}`)];
+                        }}
+                        contentStyle={{
+                          backgroundColor: "#44B3E1",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "white",
+                        }}
                       />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgb(31 41 55)",
-                      border: "none",
-                      borderRadius: "8px",
-                      color: "white",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Custom Legend */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 mt-8">
+                  {usersData.users_by_role.map((entry, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <span
+                        className="w-4 h-4 rounded-sm"
+                        style={{
+                          backgroundColor:
+                            Object.values(COLORS)[
+                              index % Object.keys(COLORS).length
+                            ],
+                        }}
+                      ></span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {t(`auth.role.${entry.role}`)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <div className="h-48 sm:h-64 flex items-center justify-center text-sm text-gray-500">
-                No user data available
+                {language === "ar"
+                  ? "لا توجد بيانات للمستخدمين"
+                  : "No user data available"}
               </div>
             )}
           </motion.div>
@@ -582,7 +624,7 @@ const AdminDashboard: React.FC = () => {
                             : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                         }`}
                       >
-                        {user.role}
+                        {t(`auth.role.${user.role}`)}
                       </span>
                     </div>
                   </div>
@@ -619,12 +661,9 @@ const AdminDashboard: React.FC = () => {
                           {company.name}
                         </p>
                         <span className="flex-shrink-0 px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                          Pending
+                          {t(`pending`)}
                         </span>
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {company.industry}
-                      </p>
                     </div>
                   ))
               ) : (

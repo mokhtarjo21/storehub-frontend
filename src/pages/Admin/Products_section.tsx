@@ -10,25 +10,6 @@ import {
 import toast from "react-hot-toast";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-/**
- * AdminProductsSection.tsx
- * Single-file React component (TypeScript) for Admin Product Management
- * - lists products
- * - search + basic filters (category, brand)
- * - create / update (modal form) with image upload
- * - delete with confirmation
- *
- * Notes:
- * - Tailwind CSS is used for styling (project already uses Tailwind)
- * - It expects the following backend endpoints (as provided):
- *    GET  /api/admin/products/               -> list products (returns array or {results})
- *    POST /api/admin/products/create/        -> create product (multipart/form-data)
- *    PUT  /api/admin/products/<id>/update/   -> update product (multipart/form-data)
- *    DELETE /api/admin/products/<id>/delete/ -> delete product
- * - It also attempts to fetch categories and brands from /api/categories/ and /api/brands/
- *   if those endpoints exist, they will populate the selects. If they don't exist, selects
- *   fall back to text inputs for category_id / brand_id.
- */
 
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
@@ -83,8 +64,6 @@ type ProductListItem = {
   updated_at: string;
 };
 
-// const API_BASE = '/api/admin/products/' // list
-// const CREATE_ENDPOINT = '/api/admin/products/create/'
 
 export default function AdminProductsSection() {
   const { language } = useLanguage();
@@ -150,14 +129,11 @@ export default function AdminProductsSection() {
   useEffect(() => {
     getProducts();
     fetchCategoriesAndBrands();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    // simple debounce for search
     const t = setTimeout(() => getProducts(), 400);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, categoryFilter, brandFilter]);
 
   const handleDelete = async (id: number | string) => {
@@ -187,7 +163,6 @@ export default function AdminProductsSection() {
   };
 
   const onFormSaved = (saved: ProductListItem) => {
-    // if editing, replace, else prepend
     setShowForm(false);
     setEditing(null);
     setProducts((prev) => {
@@ -381,11 +356,6 @@ export default function AdminProductsSection() {
   );
 }
 
-/**
- * ProductForm - handles create & update
- * - expects initial to be ProductListItem or null
- * - posts multipart/form-data to CREATE_ENDPOINT or PUT to update endpoint
- */
 function ProductForm({
   onClose,
   onSaved,
