@@ -228,12 +228,12 @@ const AdminDashboard: React.FC = () => {
                 />
               </div>
               {/* Filter Buttons */}
-              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {filterButtons.map((btn) => (
                   <button
                     key={btn.key}
                     onClick={() => handlePresetFilter(btn.key)}
-                    className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors whitespace-nowrap"
+                    className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors "
                   >
                     {btn.label}
                   </button>

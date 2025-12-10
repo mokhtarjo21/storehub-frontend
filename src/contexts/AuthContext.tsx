@@ -217,7 +217,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
         return true;
       } else {
-        logout();
+       
         return false;
       }
     } catch (error) {
