@@ -1,4 +1,3 @@
-// AdminCompaniesPage.tsx
 import { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useLanguage } from "../../contexts/LanguageContext";
