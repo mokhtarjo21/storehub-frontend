@@ -103,20 +103,12 @@ export default function AdminCompaniesPage() {
 
   const toggleActive = async (company: Company) => {
     try {
-      if (
-        company.approval_status === "rejected" ||
-        company.approval_status === "pending"
-      ) {
+      
         await axiosInstance.post(
           `/api/auth/admin/companies/${company.id}/approve/`,
           { action: "approve" }
         );
-      } else {
-        await axiosInstance.post(
-          `/api/auth/admin/companies/${company.id}/approve/`,
-          { action: "reject", reason: rejectReason }
-        );
-      }
+      
       fetchCompanies();
     } catch (error) {
       console.error(error);
@@ -142,6 +134,12 @@ export default function AdminCompaniesPage() {
         ar: "مقبول",
         color:
           "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200",
+      },
+      suspended: {
+        en: "Suspended",
+        ar: "معلق",
+        color:
+          "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200",
       },
       rejected: {
         en: "Rejected",
@@ -212,6 +210,9 @@ export default function AdminCompaniesPage() {
           </option>
           <option value="rejected">
             {language === "ar" ? "مرفوض" : "Rejected"}
+          </option>
+          <option value="suspended">
+            {language === "ar" ? "معلق" : "Suspended"}
           </option>
         </select>
       </div>
@@ -359,13 +360,22 @@ export default function AdminCompaniesPage() {
                                 setCompanyToReject(company);
                                 setIsRejectModalOpen(true);
                               }}
-                              title={language === "ar" ? "رفض" : "Reject"}
+                              title={language === "ar" ? "تعليق" : "suspended"}
                             >
                               <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 dark:text-yellow-400" />
                             </button>
                           )}
 
                           {company.approval_status === "rejected" && (
+                            <button
+                              className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex-shrink-0"
+                              onClick={() => toggleActive(company)}
+                              title={language === "ar" ? "قبول" : "Approve"}
+                            >
+                              <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-700 dark:text-green-400" />
+                            </button>
+                          )}
+                          {company.approval_status === "suspended" && (
                             <button
                               className="p-1.5 sm:p-2 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex-shrink-0"
                               onClick={() => toggleActive(company)}
@@ -608,14 +618,27 @@ export default function AdminCompaniesPage() {
                 language === "ar" ? "text-right" : "text-left"
               }`}
             >
-              {language === "ar" ? "رفض الشركة" : "Reject Company"}
+              {companyToReject?.approval_status === "approved"
+                ? language === "ar"
+                  ? "تعليق الشركة"
+                  : "Suspend Company"
+                : language === "ar"
+                ? "رفض الشركة"
+                : "Reject Company"}
+              
             </h2>
             <label
               className={`block text-gray-600 dark:text-gray-300 mb-2 ${
                 language === "ar" ? "text-right" : "text-left"
               }`}
             >
-              {language === "ar" ? "سبب الرفض:" : "Reason for rejection:"}
+             {companyToReject?.approval_status === "approved"
+                ? language === "ar"
+                  ? "يرجى تقديم سبب تعليق الشركة:"
+                  : "Please provide a reason for suspending the company:"
+                : language === "ar"
+                ? "يرجى تقديم سبب رفض الشركة:"
+                : "Please provide a reason for rejecting the company:"}
             </label>
             <textarea
               className={`w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 min-h-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
@@ -624,9 +647,14 @@ export default function AdminCompaniesPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder={
-                language === "ar"
-                  ? "اكتب سبب الرفض..."
-                  : "Write the rejection reason..."
+                companyToReject?.approval_status === "approved"
+                  ? language === "ar"
+                    ? "سبب التعليق..."
+                    : "Reason for suspension..."
+                  : language === "ar"
+                  ? "سبب الرفض..."
+                  : "Reason for rejection..."
+                
               }
               dir={language === "ar" ? "rtl" : "ltr"}
             />
@@ -649,34 +677,54 @@ export default function AdminCompaniesPage() {
                 onClick={async () => {
                   if (!rejectReason.trim()) {
                     alert(
-                      language === "ar"
-                        ? "الرجاء إدخال سبب الرفض"
-                        : "Please enter a rejection reason"
+                      companyToReject?.approval_status === "approved"
+                        ? language === "ar"
+                          ? "يرجى تقديم سبب التعليق."
+                          : "Please provide a reason for suspension."
+                        : language === "ar"
+                        ? "يرجى تقديم سبب الرفض."
+                        : "Please provide a reason for rejection."
                     );
                     return;
                   }
                   try {
-                    await axiosInstance.post(
-                      `/api/auth/admin/companies/${companyToReject?.id}/approve/`,
-                      {
-                        action: "reject",
-                        reason: rejectReason,
+                     if (companyToReject?.approval_status === "approved"){
+                        await axiosInstance.post(
+                          `/api/auth/admin/companies/${companyToReject.id}/approve/`,
+                          { action: "suspended", reason: rejectReason }
+                        );
+                      } else
+                        {
+                        await axiosInstance.post(
+                          `/api/auth/admin/companies/${companyToReject?.id}/approve/`,
+                          { action: "reject", reason: rejectReason }
+                        );
                       }
-                    );
+                    
                     setIsRejectModalOpen(false);
                     setRejectReason("");
                     fetchCompanies();
                   } catch (error) {
                     console.error(error);
                     alert(
-                      language === "ar"
+                      companyToReject?.approval_status === "approved"
+                        ? language === "ar"
+                          ? "فشل في تعليق الشركة"
+                          : "Failed to suspend company"
+                        : language === "ar"
                         ? "فشل في رفض الشركة"
                         : "Failed to reject company"
                     );
                   }
                 }}
               >
-                {language === "ar" ? "تأكيد الرفض" : "Confirm Reject"}
+                {companyToReject?.approval_status === "approved"
+                  ? language === "ar"
+                    ? "تعليق"
+                    : "Suspend"
+                  : language === "ar"
+                  ? "رفض"
+                  : "Reject"}
               </button>
             </div>
           </div>
