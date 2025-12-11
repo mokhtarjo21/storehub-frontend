@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
     });
     if (user.role === "company_admin") {
       navigation.push({
-        name: "Company",
+        name: t("companyDashboard"),
         href: "/company",
         icon: BuildingStorefrontIcon,
       });

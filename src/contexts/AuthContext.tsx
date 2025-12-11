@@ -36,7 +36,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = "http://192.168.1.7:8000/api";
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
@@ -112,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login/`, {
+      const response = await fetch(`/api/auth/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -173,7 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const refreshToken = localStorage.getItem("refresh_token");
       if (refreshToken) {
-        await fetch(`${API_BASE_URL}/auth/logout/`, {
+        await fetch(`/api/auth/logout/`, {
           method: "POST",
           headers: getAuthHeaders(),
           body: JSON.stringify({ refresh_token: refreshToken }),
@@ -193,7 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("No access token available");
-      const response = await fetch(`${API_BASE_URL}/auth/me/`, {
+      const response = await fetch(`/api/auth/me/`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -257,7 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         formData.append("affiliate_reason", userData.affiliateReason);
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/register/`, {
+      const response = await fetch(`/api/auth/register/`, {
         method: "POST",
         body: formData,
       });
@@ -278,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/auth/notifications/?page=${num}`,
+        `/api/auth/notifications/?page=${num}`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -305,7 +304,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const url = new URL(`${API_BASE_URL}/products/`);
+      const url = new URL(`/api/products/`, window.location.origin);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           if (value !== "" && value !== null && value !== undefined) {
@@ -335,7 +334,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchProduct = async (id: string | number): Promise<any> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${id}/`, {
+      const response = await fetch(`/api/products/${id}/`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -356,7 +355,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${API_BASE_URL}/products/`, {
+      const response = await fetch(`/api/products/`, {
         method: "POST",
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
@@ -387,7 +386,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const token = localStorage.getItem("access_token");
 
       const response = await fetch(
-        `${API_BASE_URL}/products/admin/products/${id}/update/`,
+        `/api/products/admin/products/${id}/update/`,
         {
           method: "PATCH",
           headers: {
@@ -415,7 +414,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/products/admin/products/${id}/delete/`,
+        `/api/products/admin/products/${id}/delete/`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
@@ -436,7 +435,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchcategories = async (): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/categories/`, {
+      const response = await fetch(`/api/products/categories/`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -454,7 +453,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchbrands = async (): Promise<any[]> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/products/brands/`, {
+      const response = await fetch(`/api/products/brands/`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -479,7 +478,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/?search=${search}&page=${page}&status=${status}&start_date=${
+        `/api/orders/admin/orders/?search=${search}&page=${page}&status=${status}&start_date=${
           start ? start.toISOString() : ""
         }&end_date=${end ? end.toISOString() : ""}`,
         {
@@ -501,7 +500,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const myorders = async (page: any) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/?page=${page}`, {
+      const response = await fetch(`/api/orders/?page=${page}`, {
         method: "GET",
         headers: getAuthHeaders(),
       });
@@ -525,7 +524,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log(updates);
 
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/${order_number}/update-status/`,
+        `/api/orders/admin/orders/${order_number}/update-status/`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -550,7 +549,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/${order_number}/cancel/`,
+        `/api/orders/${order_number}/cancel/`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -573,7 +572,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/admin/orders/${order_number}/`,
+        `/api/orders/admin/orders/${order_number}/`,
         {
           method: "GET",
           headers: getAuthHeaders(),
@@ -595,7 +594,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/products/${productSlug}/related/`,
+        `/api/products/${productSlug}/related/`,
         {
           method: "GET",
           headers: getAuthHeaders(),

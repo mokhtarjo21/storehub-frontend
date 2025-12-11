@@ -12,7 +12,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ slug }) => {
   const { language } = useLanguage();
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const base = "http://192.168.1.7:8000";
+ 
 
   useEffect(() => {
     const loadRelated = async () => {
@@ -64,7 +64,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ slug }) => {
               <div className="aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden">
                 <img
                   src={
-                    s.image.startsWith("http") ? s.image : `${base}${s.image}`
+                    s.image.startsWith("http") ? s.image : `${s.image}`
                   }
                   alt={language === "ar" ? s.title_ar || s.title : s.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://192.168.1.7:8000/api";
+const API_BASE_URL = "/api";
 
 // Helper function to get auth headers
 export const getAuthHeaders = (isFormData = false) => {

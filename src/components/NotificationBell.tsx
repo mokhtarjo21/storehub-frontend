@@ -32,7 +32,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   const fetchNotifications = useCallback(async () => {
     try {
       const response = await fetch(
-        "http://192.168.1.7:8000/api/auth/notifications/?limit=5",
+        "/api/auth/notifications/?limit=5",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   const fetchUnreadCount = useCallback(async () => {
     try {
       const response = await fetch(
-        "http://192.168.1.7:8000/api/auth/notifications/unread-count/",
+        "/api/auth/notifications/unread-count/",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -85,7 +85,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/read/`,
+        `/api/auth/notifications/${notificationId}/read/`,
         {
           method: "POST",
           headers: {
@@ -131,7 +131,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://192.168.1.7:8000/api/auth/notifications/${notificationId}/delete/`,
+        `/api/auth/notifications/${notificationId}/delete/`,
         {
           method: "DELETE",
           headers: {

@@ -58,7 +58,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ className = '', autoFocus = false
       setLoading(true);
       try {
         const response = await fetch(
-          `http://192.168.1.7:8000/api/products/autocomplete/?q=${encodeURIComponent(query)}`
+          `/api/products/autocomplete/?q=${encodeURIComponent(query)}`
         );
 
         if (response.ok) {
