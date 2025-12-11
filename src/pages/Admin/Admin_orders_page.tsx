@@ -1006,7 +1006,6 @@ export default function AdminOrdersPage() {
                   </tr>
                 ) : (
                   filteredOrders.map((order, index) => {
-                    console.log(order);
                     const statusBadge = getStatusBadge(order.order_status);
                     const StatusIcon = statusBadge.icon;
                     return (
@@ -1462,7 +1461,7 @@ export default function AdminOrdersPage() {
                                       {language === "ar"
                                         ? it.item_name_ar
                                         : it.item_name}
-                                      {console.log(it)}
+                                     
                                     </div>
                                   </div>
                                   <div className="flex items-center justify-between md:flex-col md:items-end gap-2 md:gap-1">
