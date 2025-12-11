@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
 import {
   ShoppingBagIcon,
   CalendarDaysIcon,
@@ -10,7 +9,6 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   EyeIcon,
-
 } from "@heroicons/react/24/outline";
 import {
   BarChart,
@@ -28,13 +26,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useApi } from "../hooks/useApi";
 
-
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("orders");
- 
 
   // Fetch user orders
   const {
@@ -49,8 +45,6 @@ const Dashboard: React.FC = () => {
     : Array.isArray(ordersData?.results)
     ? ordersData.results
     : [];
-
-  
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -88,10 +82,6 @@ const Dashboard: React.FC = () => {
     navigate(`/orders/${orderNumber}`);
   };
 
- 
-  
-
- 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -101,47 +91,8 @@ const Dashboard: React.FC = () => {
           className="mb-8"
         >
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("dashboard.title")}
+            {t("dashboard.welcome")}, {user?.name}
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
-            {t("dashboard.welcome")}, {user?.name}!
-          </p>
-        </motion.div>
-
-        {/* Tab Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8">
-              {/* <button
-                onClick={() => setActiveTab("overview")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "overview"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
-              >
-                {t("dashboard.overview") ||
-                  (language === "ar" ? "نظرة عامة" : "Overview")}
-              </button> */}
-              <button
-                onClick={() => setActiveTab("orders")}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "orders"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
-              >
-                {t("dashboard.myOrders") ||
-                  (language === "ar" ? "طلباتي" : "My Orders")}{" "}
-                ({orders.length})
-              </button>
-            </nav>
-          </div>
         </motion.div>
         {activeTab === "overview" && (
           <>
@@ -228,8 +179,14 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={monthlyOrders}>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                      <XAxis dataKey="month" className="text-gray-600 dark:text-gray-300" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        className="opacity-30"
+                      />
+                      <XAxis
+                        dataKey="month"
+                        className="text-gray-600 dark:text-gray-300"
+                      />
                       <YAxis className="text-gray-600 dark:text-gray-300" />
                       <Tooltip
                         contentStyle={{
@@ -292,7 +249,7 @@ const Dashboard: React.FC = () => {
             className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
           >
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-[#155F82] dark:text-[#44B3E1]">
                 {t("dashboard.myOrders")}
               </h3>
             </div>
@@ -310,6 +267,16 @@ const Dashboard: React.FC = () => {
                 <p className="mt-2 text-gray-500 dark:text-gray-400">
                   {t("dashboard.startShopping")}
                 </p>
+
+                <div className="mt-10 flex justify-center">
+                  <button
+                    onClick={() => navigate("/products")}
+                    className="px-8 py-3 rounded-xl font-semibold text-lg bg-[#155F82] text-white shadow-lg 
+                   hover:bg-[#155F82]/90 hover:scale-105 transition-all duration-300"
+                  >
+                    {t("home.hero.cta")}
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -435,8 +402,6 @@ const Dashboard: React.FC = () => {
           </motion.div>
         )}
       </div>
-
-     
     </div>
   );
 };

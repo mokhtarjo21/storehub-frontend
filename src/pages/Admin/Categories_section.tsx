@@ -24,7 +24,8 @@ type CategoryItem = {
   product_count?: number;
 };
 
-const API_BASE_URL = "/api";
+const apiBase = import.meta.env.VITE_API_BASE;
+const API_BASE_URL = apiBase + "/api";
 
 export default function AdminCategoriesSection() {
   const { language } = useLanguage();

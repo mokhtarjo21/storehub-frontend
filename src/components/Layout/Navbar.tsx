@@ -11,8 +11,6 @@ import {
   GlobeAltIcon,
   HomeIcon,
   CubeIcon,
-  WrenchScrewdriverIcon,
-  ChartBarSquareIcon,
   ShieldCheckIcon,
   BuildingStorefrontIcon,
   UserGroupIcon,
@@ -38,9 +36,9 @@ const Navbar: React.FC = () => {
 
   if (user) {
     navigation.push({
-      name: t("nav.dashboard"),
+      name: t("nav.orders"),
       href: "/dashboard",
-      icon: ChartBarSquareIcon,
+      icon: ShoppingCartIcon,
     });
     if (user.role === "company_admin") {
       navigation.push({
@@ -139,8 +137,8 @@ const Navbar: React.FC = () => {
                 {user ? (
                   <>
                     {/* Cart */}
-                    <Link
-                      to="/cart"
+                    <button
+                      onClick={() => navigate("/cart")}
                       className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                     >
                       <ShoppingCartIcon className="h-5 w-5" />
@@ -149,7 +147,7 @@ const Navbar: React.FC = () => {
                           {itemCount}
                         </span>
                       )}
-                    </Link>
+                    </button>
 
                     {/* Notifications */}
                     <NotificationBell />
@@ -158,10 +156,17 @@ const Navbar: React.FC = () => {
                     <Menu as="div" className="relative ml-3">
                       <div>
                         <Menu.Button className="flex rounded-full bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
-                          <span className="sr-only">Open user menu</span>
-                          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
-                            <UserIcon className="h-5 w-5 text-white" />
-                          </div>
+                          {user?.avatar ? (
+                            <img
+                              src={user.avatar}
+                              alt="Profile"
+                              className="h-8 w-8 rounded-full object-fill"
+                            />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
+                              <UserIcon className="h-5 w-5 text-white" />
+                            </div>
+                          )}
                         </Menu.Button>
                       </div>
                       <Transition
@@ -269,19 +274,23 @@ const Navbar: React.FC = () => {
               })}
 
               {/* Theme & Language */}
-              <Disclosure.Button
+              <button
                 onClick={toggleTheme}
-                className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all
+             text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 {theme === "light" ? (
                   <MoonIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
                 ) : (
                   <SunIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
                 )}
+
                 <span className="text-sm text-gray-600 dark:text-gray-300">
-                  {theme === "light" ? "Dark Mode" : "Light Mode"}
+                  {theme === "light"
+                    ? t("nav.theme.dark")
+                    : t("nav.theme.light")}
                 </span>
-              </Disclosure.Button>
+              </button>
 
               <Disclosure.Button
                 onClick={() => setLanguage(language === "en" ? "ar" : "en")}
@@ -304,7 +313,7 @@ const Navbar: React.FC = () => {
                   >
                     <ShoppingCartIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
                     <span className="text-sm text-gray-600 dark:text-gray-300">
-                      Cart
+                      {t("nav.cart")}
                       {itemCount > 0 && (
                         <span className="ml-2 inline-block h-4 w-4 rounded-full bg-blue-500 text-xs text-white text-center">
                           {itemCount}
@@ -314,23 +323,39 @@ const Navbar: React.FC = () => {
                   </Disclosure.Button>
 
                   {/* Notifications */}
-                  <Disclosure.Button className="flex items-center w-full rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 relative">
+                  <Disclosure.Button
+                    onClick={() => navigate("/notifications")}
+                    className="flex items-center w-full rounded-lg text-base font-medium transition-all 
+             text-gray-700 dark:text-gray-200 
+             hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
                     <NotificationBell showBadge={true} />
-                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                      Notifications
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {t("nav.notifications")}
                     </span>
                   </Disclosure.Button>
 
-                  {/* Profile & Logout */}
+                  {/* Profile */}
                   <Disclosure.Button
                     as="button"
                     onClick={() => navigate("/profile")}
-                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="flex items-center w-full p-2 rounded-lg text-base font-medium transition-all 
+             text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <UserIcon className="h-5 w-5 mr-2" />
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt="Profile"
+                        className="h-8 w-8 rounded-full object-fill mr-2"
+                      />
+                    ) : (
+                      <UserIcon className="h-5 w-5 mr-2" />
+                    )}
+
                     <span>{t("nav.profile")}</span>
                   </Disclosure.Button>
 
+                  {/* Logout */}
                   <Disclosure.Button
                     as="button"
                     onClick={handleLogout}

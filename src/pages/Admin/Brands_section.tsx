@@ -21,8 +21,8 @@ type BrandItem = {
   is_active: boolean;
   created_at?: string;
 };
-
-const API_BASE_URL = "/api";
+const apiBase = import.meta.env.VITE_API_BASE;
+const API_BASE_URL = apiBase + "/api";
 
 export default function AdminBrandsSection() {
   const { language } = useLanguage();

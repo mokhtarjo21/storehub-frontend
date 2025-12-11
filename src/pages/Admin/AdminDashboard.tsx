@@ -526,7 +526,9 @@ const AdminDashboard: React.FC = () => {
               </ResponsiveContainer>
             ) : (
               <div className="h-48 sm:h-64 flex items-center justify-center text-sm text-gray-500">
-                No category data available
+                {language === "ar"
+                  ? "لا توجد بيانات للفئات"
+                  : "No category  data available"}
               </div>
             )}
           </motion.div>

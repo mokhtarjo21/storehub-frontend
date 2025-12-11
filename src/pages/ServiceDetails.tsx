@@ -8,9 +8,18 @@ import toast from "react-hot-toast";
 import ServiceFormModal from "../components/ServiceFormModal";
 import { useNavigate } from "react-router-dom";
 import RelatedServices from "../components/RelatedServices";
+const apiBase = process.env.REACT_APP_API_BASE;
 
 const API_BASE_URL = "/api";
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * ServiceDetails page
+ * This page displays the service details and a form to request the service.
+ * It fetches the service by slug and displays the service details.
+ * It also handles the request service form submission and adds the service to the user's cart.
+ * @param slug The service slug
+/*******  035656c8-a1e0-499e-8606-daba73e9a8d1  *******/
 const ServiceDetails: React.FC = () => {
   const { slug } = useParams();
   const { t, language } = useLanguage();

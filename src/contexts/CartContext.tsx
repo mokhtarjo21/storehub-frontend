@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product } from "../types";
 import toast from "react-hot-toast";
-
+const apiBase = import.meta.env.VITE_API_BASE;
 interface CartItem {
   id: string;
   product: Product;
@@ -22,14 +22,14 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-const API_BASE = "/api/products/cart";
+const API_BASE = apiBase + "/api/products/cart";
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const token = localStorage.getItem("access_token");
   const [loading, setLoading] = useState(true);
-
   // Fetch cart from API on mount
   useEffect(() => {
     fetchCart();
@@ -43,8 +43,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       const data = await res.json();
       setItems(data.items || []);
-     
-      
     } finally {
       setLoading(false);
     }
@@ -67,17 +65,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!res.ok) {
         const errData = await res.json();
-        
+
         throw new Error(errData.message || "Failed to add item");
       }
 
       await fetchCart();
       toast.success("Product added to cart");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add item" );
+      toast.error(err instanceof Error ? err.message : "Failed to add item");
     }
   };
-
 
   const removeItem = async (itemId: string) => {
     try {
@@ -111,7 +108,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const data = await res.json();
 
-     
       setItems((prev) =>
         prev.map((item) =>
           item.id === itemId ? { ...item, quantity: data.quantity } : item
@@ -140,8 +136,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const total = items.reduce((sum, item) => {
-    const rawPrice =
-      item.product?.price  ??  0;
+    const rawPrice = item.product?.price ?? 0;
     const price = Number(rawPrice) || 0;
     const qty = Number(item.quantity) || 1;
 
@@ -156,7 +151,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         items,
         setItems,
         addItem,
-     
+
         removeItem,
         updateQuantity,
         clearCart,

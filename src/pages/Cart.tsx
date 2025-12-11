@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   TrashIcon,
   PlusIcon,
@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useCart } from "../contexts/CartContext";
 
 const Cart: React.FC = () => {
-  const { t ,language} = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const [usePoints, setUsePoints] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -24,9 +24,7 @@ const Cart: React.FC = () => {
   const navigate = useNavigate();
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
-  
-  
-  
+
   const pointsDiscount = usePoints
     ? Math.min(user?.points || 0, total * 0.1)
     : 0;
@@ -37,7 +35,7 @@ const Cart: React.FC = () => {
     newQuantity: number,
     maxStock: number
   ) => {
-    const quantityToSet = Math.max(1, Math.min(newQuantity, maxStock)); // لا يقل عن 1 ولا يزيد عن stock
+    const quantityToSet = Math.max(1, Math.min(newQuantity, maxStock)); 
 
     try {
       await updateQuantity(itemId, quantityToSet);
@@ -70,7 +68,6 @@ const Cart: React.FC = () => {
 
   const handleCheckout = () => {
     navigate("/checkout");
-    
   };
 
   if (items.length === 0) {
@@ -88,13 +85,16 @@ const Cart: React.FC = () => {
             <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
               {t("cart.empty.subtitle")}
             </p>
-            <Link
-              to="/products"
-              className="mt-8 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-            >
-              {t("cart.empty.cta")}
-            </Link>
           </motion.div>
+        </div>
+        <div className="mt-10 flex justify-center">
+          <button
+            onClick={() => navigate("/products")}
+            className="px-8 py-3 rounded-xl font-semibold text-lg bg-[#155F82] text-white shadow-lg 
+                   hover:bg-[#155F82]/90 hover:scale-105 transition-all duration-300"
+          >
+            {t("home.hero.cta")}
+          </button>
         </div>
       </div>
     );
@@ -142,7 +142,6 @@ const Cart: React.FC = () => {
                       <img
                         src={
                           item.product?.image ||
-                          
                           "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                         }
                         alt={item.product?.name || "Item Image"}

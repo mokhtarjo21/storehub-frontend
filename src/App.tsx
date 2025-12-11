@@ -14,7 +14,7 @@ import Cart from "./pages/Cart";
 import CompanyDashboard from "./pages/Company/CompanyDashboard";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Orders";
 import AdminCompaniesPage from "./pages/Admin/AdminCompany";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";

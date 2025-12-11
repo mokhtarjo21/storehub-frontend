@@ -7,8 +7,8 @@ import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { apiRequest, handleApiResponse, getAuthHeaders } from "../utils/api";
-
-const API_BASE_URL = "/api";
+const apiBase = import.meta.env.VITE_API_BASE;
+const API_BASE_URL = apiBase + "/api";
 
 // Checkout page: converts current user's cart into an order by calling
 // POST /api/orders/ (adjust endpoint if your backend differs)
@@ -35,7 +35,6 @@ export default function Checkout(): JSX.Element {
   const [shippingPostalCode, setShippingPostalCode] = useState("");
   const [shippingCountry, setShippingCountry] = useState("");
   const [notes, setNotes] = useState("");
-  
 
   useEffect(() => {
     // If the user has a default shipping address in profile, you can populate here.
@@ -123,7 +122,7 @@ export default function Checkout(): JSX.Element {
         shipping_country: shippingCountry,
         notes: notes || "",
         payment_method: paymentMethod,
-        items: orderItems // Add items array to payload
+        items: orderItems, // Add items array to payload
       };
 
       const response = await apiRequest("/orders/", {
@@ -147,8 +146,10 @@ export default function Checkout(): JSX.Element {
 
           if (!actualItemId) return;
 
-          const itemType = item.item_type || (item.product ? "product" : item.service ? "service" : "product");
-          
+          const itemType =
+            item.item_type ||
+            (item.product ? "product" : item.service ? "service" : "product");
+
           // Only update stock for products (services typically don't have stock)
           if (itemType === "product" && item.product) {
             const quantity = item.quantity || 1;
@@ -168,13 +169,21 @@ export default function Checkout(): JSX.Element {
               if (productResponse.ok) {
                 const productData = await productResponse.json();
                 const formData = new FormData();
-                
+
                 // Preserve all existing product data and update stock
                 Object.keys(productData).forEach((key) => {
-                  if (key !== "id" && key !== "image" && key !== "images" && key !== "primary_image") {
+                  if (
+                    key !== "id" &&
+                    key !== "image" &&
+                    key !== "images" &&
+                    key !== "primary_image"
+                  ) {
                     if (key === "stock") {
                       formData.append(key, String(newStock));
-                    } else if (productData[key] !== null && productData[key] !== undefined) {
+                    } else if (
+                      productData[key] !== null &&
+                      productData[key] !== undefined
+                    ) {
                       formData.append(key, String(productData[key]));
                     }
                   }
@@ -189,11 +198,12 @@ export default function Checkout(): JSX.Element {
                     body: formData,
                   }
                 );
-
-                
               }
             } catch (stockError) {
-              console.error(`Failed to update stock for product ${actualItemId}:`, stockError);
+              console.error(
+                `Failed to update stock for product ${actualItemId}:`,
+                stockError
+              );
               // Don't fail the order if stock update fails
             }
           }
@@ -381,19 +391,20 @@ export default function Checkout(): JSX.Element {
                 <span className="text-gray-600 dark:text-gray-400">
                   {t("cart.subtotal") || "Subtotal"}
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">${total.toFixed(2)}</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  ${total.toFixed(2)}
+                </span>
               </div>
 
-
-          
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
                   {t("orders.tax") || "Subtotal"}
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">${(total*0.1).toFixed(2)}</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  ${(total * 0.1).toFixed(2)}
+                </span>
               </div>
-                
-                
+
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
                   {t("cart.shipping") || "Shipping"}
@@ -404,8 +415,12 @@ export default function Checkout(): JSX.Element {
               </div>
 
               <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-gray-700 pt-3">
-                <span className="text-gray-900 dark:text-white">{t("common.total") || "Total"}</span>
-                <span className="text-gray-900 dark:text-white">${(finalTotal*1.1).toFixed(2)}</span>
+                <span className="text-gray-900 dark:text-white">
+                  {t("common.total") || "Total"}
+                </span>
+                <span className="text-gray-900 dark:text-white">
+                  ${(finalTotal * 1.1).toFixed(2)}
+                </span>
               </div>
             </div>
 

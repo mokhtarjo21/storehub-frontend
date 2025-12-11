@@ -1,4 +1,5 @@
-const API_BASE_URL = "/api";
+const apiBase = import.meta.env.VITE_API_BASE;
+const API_BASE_URL = apiBase + "/api";
 
 // Helper function to get auth headers
 export const getAuthHeaders = (isFormData = false) => {
@@ -52,7 +53,10 @@ export const refreshToken = async () => {
 };
 
 // API wrapper with automatic token refresh
-export const apiRequest = async (url: string, options: RequestInit & { isFormData?: boolean } = {}) => {
+export const apiRequest = async (
+  url: string,
+  options: RequestInit & { isFormData?: boolean } = {}
+) => {
   const { isFormData, ...fetchOptions } = options;
 
   try {
@@ -141,10 +145,10 @@ export const updateAvatar = async (userData: any) => {
   const token = localStorage.getItem("access_token");
   const response = await fetch(`${API_BASE_URL}/auth/avatar/`, {
     method: "PATCH",
-     headers: {
-      "Authorization":`Bearer ${token}`
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-    body: userData
+    body: userData,
   });
   return handleApiResponse(response);
 };
