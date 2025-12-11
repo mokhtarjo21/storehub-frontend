@@ -15,7 +15,6 @@ const MyOrders: React.FC = () => {
   const getOrders = async (page: number) => {
     try {
       const response = await myorders(page);
-      console.log("API RESPONSE: ", response);
       const { results, count, next, previous } = response;
 
       if (Array.isArray(results)) {

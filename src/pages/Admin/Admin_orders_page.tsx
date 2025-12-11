@@ -1006,7 +1006,6 @@ export default function AdminOrdersPage() {
                   </tr>
                 ) : (
                   filteredOrders.map((order, index) => {
-                    console.log(order);
                     const statusBadge = getStatusBadge(order.order_status);
                     const StatusIcon = statusBadge.icon;
                     return (
@@ -1318,11 +1317,10 @@ export default function AdminOrdersPage() {
                     {activeTab === "overview" && (
                       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
                         {/* Order Summary Card */}
-                       
+
                         <div className="xl:col-span-1 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700">
                           <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
                             {t("orders.orderSummary")}
-                            
                           </h5>
                           <dl className="text-sm space-y-2 sm:space-y-3">
                             <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -1375,8 +1373,7 @@ export default function AdminOrdersPage() {
 
                               <div className="mt-3 space-y-3 sm:space-y-4">
                                 {selectedOrder.company_name && (
-                              
-                             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                     <label className="block text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium w-full sm:w-48 flex-shrink-0">
                                       {t("auth.register.companyName")}
                                     </label>
@@ -1384,8 +1381,7 @@ export default function AdminOrdersPage() {
                                       {selectedOrder.company_name}
                                     </div>
                                   </div>
-                            )}
-
+                                )}
 
                                 {/* Name */}
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -1408,7 +1404,7 @@ export default function AdminOrdersPage() {
                                     </div>
                                   </div>
                                 )}
-                                 
+
                                 {/* Phone */}
                                 {selectedOrder.shipping_phone && (
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -1462,7 +1458,6 @@ export default function AdminOrdersPage() {
                                       {language === "ar"
                                         ? it.item_name_ar
                                         : it.item_name}
-                                      {console.log(it)}
                                     </div>
                                   </div>
                                   <div className="flex items-center justify-between md:flex-col md:items-end gap-2 md:gap-1">
