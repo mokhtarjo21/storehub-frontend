@@ -80,6 +80,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const savedUser = localStorage.getItem("user");
+console.log("API BASE = ", import.meta.env.VITE_API_BASE);
+
     if (token && savedUser) {
       try {
         const userData = JSON.parse(savedUser);
@@ -520,6 +522,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   ): Promise<any[]> => {
     setIsLoading(true);
     try {
+      console.log(updates);
+
       const response = await fetch(
         `${API_BASE}/orders/admin/orders/${order_number}/update-status/`,
         {
