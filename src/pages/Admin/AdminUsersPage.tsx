@@ -34,6 +34,7 @@ interface Company {
 
 interface User {
   id: number;
+  is_active: boolean;
   full_name: string;
   email: string;
   phone: string;
@@ -103,12 +104,9 @@ export default function AdminUsersPage() {
       return;
 
     try {
-      
-      
-      await axiosInstance.post(`/api/auth/users/${user.id}/configurations/update/`, {
-       "is_active": user.is_active ? "false" : "true",
-        
-      });
+     
+    
+      await axiosInstance.post(`/api/auth/users/${user.id}/configurations/update/`);
       fetchUsers();
     } catch (error) {
       console.error(error);

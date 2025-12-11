@@ -116,3 +116,50 @@ export interface PointsTransaction {
   descriptionAr: string;
   createdAt: string;
 }
+
+export interface Company {
+  id: number;
+  name: string;
+  registration_number: string;
+  industry: string;
+  website?: string;
+  description?: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  phone: string;
+  email: string;
+  approval_status: "pending" | "approved" | "rejected" | "suspended";
+  approved_at?: string;
+  rejection_reason?: string;
+  admin_name: string;
+  admin_email: string;
+  employee_count: number;
+  created_at: string;
+  updated_at: string;
+  tax_card_image?: string;
+  commercial_registration_image?: string;
+}
+
+export interface Employee {
+  id: number;
+  employee_id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  position: string;
+  department: string;
+  hire_date: string;
+  salary?: number;
+  status: "active" | "inactive" | "pending" | "suspended";
+  can_manage_orders: boolean;
+  can_view_reports: boolean;
+  can_manage_inventory: boolean;
+  can_manage_customers: boolean;
+  user_email?: string;
+  created_at: string;
+  updated_at: string;
+}

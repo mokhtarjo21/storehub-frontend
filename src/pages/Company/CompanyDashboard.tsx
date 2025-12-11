@@ -14,54 +14,7 @@ import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { apiRequest, handleApiResponse } from "../../utils/api";
 import toast from "react-hot-toast";
-
-interface Company {
-  id: number;
-  name: string;
-  registration_number: string;
-  industry: string;
-  website?: string;
-  description?: string;
-  address_line1: string;
-  address_line2?: string;
-  city: string;
-  state: string;
-  postal_code: string;
-  country: string;
-  phone: string;
-  email: string;
-  approval_status: "pending" | "approved" | "rejected" | "suspended";
-  approved_at?: string;
-  rejection_reason?: string;
-  admin_name: string;
-  admin_email: string;
-  employee_count: number;
-  created_at: string;
-  updated_at: string;
-  tax_card_image?: string;
-  commercial_registration_image?: string;
-}
-
-interface Employee {
-  id: number;
-  employee_id: string;
-  full_name: string;
-  email: string;
-  phone?: string;
-  position: string;
-  department: string;
-  hire_date: string;
-  salary?: number;
-  status: "active" | "inactive" | "pending" | "suspended";
-  can_manage_orders: boolean;
-  can_view_reports: boolean;
-  can_manage_inventory: boolean;
-  can_manage_customers: boolean;
-  user_email?: string;
-  created_at: string;
-  updated_at: string;
-}
-
+import { Company,Employee } from "../../types";
 const CompanyDashboard: React.FC = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
@@ -336,13 +289,7 @@ const CompanyDashboard: React.FC = () => {
                   >
                     {language === "ar" ? "الحالة" : "Status"}
                   </th>
-                  <th
-                    className={`px-6 py-3 text-xs font-medium uppercase tracking-wider
-  ${language === "ar" ? "text-right" : "text-left"}`}
-                  >
-                    {language === "ar" ? "الصلاحيات" : "Permissions"}
-                  </th>
-                  <th
+                                   <th
                     className={`px-6 py-3 text-xs font-medium uppercase tracking-wider
   ${language === "ar" ? "text-right" : "text-left"}`}
                   >
@@ -383,41 +330,7 @@ const CompanyDashboard: React.FC = () => {
                         {employee.status}
                       </span>
                     </td>
-                    <td
-                      className={`px-6 py-4 whitespace-nowrap 
-  ${language === "ar" ? "text-right" : "text-left"}`}
-                    >
-                      <div className="space-y-1">
-                        {employee.can_manage_orders && (
-                          <div>
-                            {language === "ar"
-                              ? "ادارة الطلبات"
-                              : "Manage Orders"}
-                          </div>
-                        )}
-                        {employee.can_view_reports && (
-                          <div>
-                            {language === "ar"
-                              ? "عرض التقارير"
-                              : "View Reports"}
-                          </div>
-                        )}
-                        {employee.can_manage_inventory && (
-                          <div>
-                            {language === "ar"
-                              ? "ادارة المخزن"
-                              : "Manage Inventory"}
-                          </div>
-                        )}
-                        {employee.can_manage_customers && (
-                          <div>
-                            {language === "ar"
-                              ? "ادارة العملاء"
-                              : "Manage Customers"}
-                          </div>
-                        )}
-                      </div>
-                    </td>
+                    
                     <td
                       className={`px-6 py-4 whitespace-nowrap 
   ${language === "ar" ? "text-right" : "text-left"}`}
@@ -605,82 +518,7 @@ const CompanyDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {language === "ar" ? "الصلاحيات" : "Permissions"}
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={newEmployee.can_manage_orders}
-                        onChange={(e) =>
-                          setNewEmployee({
-                            ...newEmployee,
-                            can_manage_orders: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar" ? "ادارة الطلبات" : "Manage Orders"}
-                      </span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={newEmployee.can_view_reports}
-                        onChange={(e) =>
-                          setNewEmployee({
-                            ...newEmployee,
-                            can_view_reports: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar" ? "اظهار الرسوم" : "View Reports"}
-                      </span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={newEmployee.can_manage_inventory}
-                        onChange={(e) =>
-                          setNewEmployee({
-                            ...newEmployee,
-                            can_manage_inventory: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar"
-                          ? "ادارة المخزن"
-                          : "Manage Inventory"}
-                      </span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={newEmployee.can_manage_customers}
-                        onChange={(e) =>
-                          setNewEmployee({
-                            ...newEmployee,
-                            can_manage_customers: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar"
-                          ? "ادارة العملاء"
-                          : "Manage Customers"}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
+                
                 <div className="flex justify-end space-x-3 pt-4 gap-2">
                   <button
                     type="button"
@@ -858,90 +696,7 @@ const CompanyDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Permissions */}
-                <div className={language === "ar" ? "rtl" : "ltr"}>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {language === "ar" ? "الصلاحيات" : "Permissions"}
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                    {/* Manage Orders */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingEmployee.can_manage_orders}
-                        onChange={(e) =>
-                          setEditingEmployee({
-                            ...editingEmployee,
-                            can_manage_orders: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar" ? "ادارة الطلبات" : "Manage Orders"}
-                      </span>
-                    </label>
-
-                    {/* View Reports */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingEmployee.can_view_reports}
-                        onChange={(e) =>
-                          setEditingEmployee({
-                            ...editingEmployee,
-                            can_view_reports: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar" ? "عرض التقارير" : "View Reports"}
-                      </span>
-                    </label>
-
-                    {/* Manage Inventory */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingEmployee.can_manage_inventory}
-                        onChange={(e) =>
-                          setEditingEmployee({
-                            ...editingEmployee,
-                            can_manage_inventory: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar"
-                          ? "ادارة المخزن"
-                          : "Manage Inventory"}
-                      </span>
-                    </label>
-
-                    {/* Manage Customers */}
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingEmployee.can_manage_customers}
-                        onChange={(e) =>
-                          setEditingEmployee({
-                            ...editingEmployee,
-                            can_manage_customers: e.target.checked,
-                          })
-                        }
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {language === "ar"
-                          ? "ادارة الزبائن"
-                          : "Manage Customers"}
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
+               
                 <div className="flex justify-end space-x-3 pt-4 gap-2">
                   <button
                     type="button"
@@ -976,6 +731,7 @@ const CompanyCard: React.FC<{
   const [taxCard, setTaxCard] = useState(company.tax_card_image);
   const [crCard, setCrCard] = useState(company.commercial_registration_image);
   const { t, language } = useLanguage();
+  const { user } = useAuth();
   const handleImageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     type: "tax" | "cr"
@@ -1046,12 +802,8 @@ const CompanyCard: React.FC<{
             {language === "ar" ? "العنوان" : "Address"}
           </h3>
           <p className="text-gray-900 dark:text-white">
-            {company.address_line1}
-            {company.address_line2 ? `, ${company.address_line2}` : ""}
-            {company.city ? `, ${company.city}` : ""}
-            {company.state ? `, ${company.state}` : ""}
-            {company.country ? `, ${company.country}` : ""}
-          </p>
+            {user.address || "—"}
+             </p>
         </div>
       </div>
 
