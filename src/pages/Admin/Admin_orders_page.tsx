@@ -661,19 +661,6 @@ export default function AdminOrdersPage() {
         className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5 md:p-6"
       >
         {/* Header Section */}
-        {/* Mobile Filter Counter */}
-        <div className="sm:hidden flex items-center justify-between">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {language === "ar" ? "التصفيات:" : "Filters:"}
-          </span>
-          <div className="flex items-center gap-2">
-            <div className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
-              {[search, status, startDate].filter(Boolean).length}
-            </div>
-            <ChevronDownIcon className="w-5 h-5 text-gray-400" />
-          </div>
-        </div>
-        {/* Filters Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Search Input - Full width on mobile, 1/3 on lg+ */}
           <div className="lg:col-span-1">
@@ -887,7 +874,11 @@ export default function AdminOrdersPage() {
                 </button>
               </div>
             )}
-
+          </div>
+        )}
+        {/* Clear All - One button for mobile and desktop */}
+        {(search || status || startDate || endDate) && (
+          <div className="flex justify-end mt-6 border-t pt-4 border-gray-100 dark:border-gray-700">
             <button
               onClick={() => {
                 setSearch("");
@@ -895,7 +886,9 @@ export default function AdminOrdersPage() {
                 setStartDate(null);
                 setEndDate(null);
               }}
-              className="ml-auto text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium flex items-center gap-2 px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              className="text-sm text-red-600 dark:text-red-400 hover:text-red-800 
+                 dark:hover:text-red-300 font-medium flex items-center gap-2 
+                 px-3 py-2 bg-red-50 dark:bg-red-900/20 rounded-lg transition-colors"
             >
               <XMarkIcon className="w-4 h-4" />
               {language === "ar" ? "مسح الكل" : "Clear All"}

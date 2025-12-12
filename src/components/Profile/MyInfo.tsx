@@ -24,7 +24,7 @@ const profileSchema = yup.object({
 type ProfileFormData = yup.InferType<typeof profileSchema>;
 
 const MyInfo: React.FC = () => {
-  const { user ,checkApiConnection} = useAuth();
+  const { user, checkApiConnection } = useAuth();
   const { t, language } = useLanguage();
   const isRTL = language === "ar";
 
@@ -49,7 +49,7 @@ const MyInfo: React.FC = () => {
         company_name: data.companyName,
       });
       toast.success("Profile updated successfully!");
-      checkApiConnection()
+      checkApiConnection();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to update profile";
@@ -94,7 +94,8 @@ const MyInfo: React.FC = () => {
               <input
                 {...profileForm.register("email")}
                 type="email"
-                className="w-full pl-10 rtl:pl-3 rtl:pr-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                readOnly
+                className="w-full pl-10 rtl:pl-3 rtl:pr-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white cursor-not-allowed"
               />
             </div>
             {profileForm.formState.errors.email && (
