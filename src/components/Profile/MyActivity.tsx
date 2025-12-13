@@ -88,7 +88,6 @@ const MyActivity: React.FC = () => {
       </div>
     );
   }
-console.log(data);
 
   // --- ERROR ---
   if (error) {
