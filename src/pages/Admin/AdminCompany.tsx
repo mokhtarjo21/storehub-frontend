@@ -91,10 +91,12 @@ export default function AdminCompaniesPage() {
       const res = await axiosInstance.get("/api/auth/admin/companies/", {
         params,
       });
-      setCompanies(res.data.results);
-      setTotalPages(Math.ceil(res.data.count / perPage));
+      setCompanies(res.data?.results || []);
+      setTotalPages(Math.ceil((res.data?.count || 0) / perPage));
     } catch (error) {
       console.error(error);
+      setCompanies([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -102,12 +104,11 @@ export default function AdminCompaniesPage() {
 
   const toggleActive = async (company: Company) => {
     try {
-      
-        await axiosInstance.post(
-          `/api/auth/admin/companies/${company.id}/approve/`,
-          { action: "approve" }
-        );
-      
+      await axiosInstance.post(
+        `/api/auth/admin/companies/${company.id}/approve/`,
+        { action: "approve" }
+      );
+
       fetchCompanies();
     } catch (error) {
       console.error(error);
@@ -264,7 +265,7 @@ export default function AdminCompaniesPage() {
                     </div>
                   </td>
                 </tr>
-              ) : companies.length === 0 ? (
+              ) : !companies || companies.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -274,7 +275,7 @@ export default function AdminCompaniesPage() {
                   </td>
                 </tr>
               ) : (
-                companies.map((company) => {
+                (companies || []).map((company) => {
                   const statusInfo = getStatusDisplay(company.approval_status);
                   return (
                     <tr
@@ -624,14 +625,13 @@ export default function AdminCompaniesPage() {
                 : language === "ar"
                 ? "رفض الشركة"
                 : "Reject Company"}
-              
             </h2>
             <label
               className={`block text-gray-600 dark:text-gray-300 mb-2 ${
                 language === "ar" ? "text-right" : "text-left"
               }`}
             >
-             {companyToReject?.approval_status === "approved"
+              {companyToReject?.approval_status === "approved"
                 ? language === "ar"
                   ? "يرجى تقديم سبب تعليق الشركة:"
                   : "Please provide a reason for suspending the company:"
@@ -653,7 +653,6 @@ export default function AdminCompaniesPage() {
                   : language === "ar"
                   ? "سبب الرفض..."
                   : "Reason for rejection..."
-                
               }
               dir={language === "ar" ? "rtl" : "ltr"}
             />
@@ -687,19 +686,18 @@ export default function AdminCompaniesPage() {
                     return;
                   }
                   try {
-                     if (companyToReject?.approval_status === "approved"){
-                        await axiosInstance.post(
-                          `/api/auth/admin/companies/${companyToReject.id}/approve/`,
-                          { action: "suspended", reason: rejectReason }
-                        );
-                      } else
-                        {
-                        await axiosInstance.post(
-                          `/api/auth/admin/companies/${companyToReject?.id}/approve/`,
-                          { action: "reject", reason: rejectReason }
-                        );
-                      }
-                    
+                    if (companyToReject?.approval_status === "approved") {
+                      await axiosInstance.post(
+                        `/api/auth/admin/companies/${companyToReject.id}/approve/`,
+                        { action: "suspended", reason: rejectReason }
+                      );
+                    } else {
+                      await axiosInstance.post(
+                        `/api/auth/admin/companies/${companyToReject?.id}/approve/`,
+                        { action: "reject", reason: rejectReason }
+                      );
+                    }
+
                     setIsRejectModalOpen(false);
                     setRejectReason("");
                     fetchCompanies();

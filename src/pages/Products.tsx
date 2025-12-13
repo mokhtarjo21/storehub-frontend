@@ -19,7 +19,7 @@ const Products: React.FC = () => {
   const { t, language } = useLanguage();
   const { addItem, items } = useCart();
   const { user, fetchProducts, fetchcategories, fetchbrands } = useAuth();
-const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -78,35 +78,43 @@ const [isSubmitting, setIsSubmitting] = useState(false);
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => getProducts(), 400);
+    const timer = setTimeout(() => getProducts(), 800);
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, selectedBrand, currentPage]);
 
   const sendOrderWithRetry = async (data: any, retries = 3) => {
-  try {
-    await apiRequest("/orders/", {
-      method: "post",
-      body: JSON.stringify({
-        phone: data.phone,
-        notes: data.details,
-        slug: formProduct?.slug,
-        currency: formProduct?.currency,
-      }),
-    });
-    toast.success(language === "ar" ? "تم إرسال الطلب بنجاح" : "Order sent successfully");
-    setFormProduct(null);
-  } catch (err: any) {
-    if (err.message.includes("throttled") && retries > 0) {
-      const waitTime = parseInt(err.message.match(/\d+/)?.[0] ?? "1");
-      toast(language === "ar" ? `تم تجاوز الحد، سيتم إعادة المحاولة بعد ${waitTime} ثانية` : `Rate limit exceeded, retrying in ${waitTime} seconds`);
-      await new Promise((r) => setTimeout(r, (waitTime + 1) * 1000));
-      return sendOrderWithRetry(data, retries - 1);
-    } else {
-      console.error(err);
-      toast.error(language === "ar" ? "فشل في إرسال الطلب" : "Failed to send order");
+    try {
+      await apiRequest("/orders/", {
+        method: "post",
+        body: JSON.stringify({
+          phone: data.phone,
+          notes: data.details,
+          slug: formProduct?.slug,
+          currency: formProduct?.currency,
+        }),
+      });
+      toast.success(
+        language === "ar" ? "تم إرسال الطلب بنجاح" : "Order sent successfully"
+      );
+      setFormProduct(null);
+    } catch (err: any) {
+      if (err.message.includes("throttled") && retries > 0) {
+        const waitTime = parseInt(err.message.match(/\d+/)?.[0] ?? "1");
+        toast(
+          language === "ar"
+            ? `تم تجاوز الحد، سيتم إعادة المحاولة بعد ${waitTime} ثانية`
+            : `Rate limit exceeded, retrying in ${waitTime} seconds`
+        );
+        await new Promise((r) => setTimeout(r, (waitTime + 1) * 1000));
+        return sendOrderWithRetry(data, retries - 1);
+      } else {
+        console.error(err);
+        toast.error(
+          language === "ar" ? "فشل في إرسال الطلب" : "Failed to send order"
+        );
+      }
     }
-  }
-};
+  };
 
   // -------- Product Card --------
   const ProductCard: React.FC<{ product: any }> = ({ product }) => {
@@ -426,18 +434,18 @@ const [isSubmitting, setIsSubmitting] = useState(false);
       {/* Customer Form Modal */}
       {formProduct && (
         <CustomerFormModal
-  open={!!formProduct}
-  onClose={() => setFormProduct(null)}
-  onSubmit={async (data) => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await sendOrderWithRetry(data, 3);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }}
-/>
+          open={!!formProduct}
+          onClose={() => setFormProduct(null)}
+          onSubmit={async (data) => {
+            if (isSubmitting) return;
+            setIsSubmitting(true);
+            try {
+              await sendOrderWithRetry(data, 3);
+            } finally {
+              setIsSubmitting(false);
+            }
+          }}
+        />
       )}
     </div>
   );

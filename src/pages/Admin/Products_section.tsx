@@ -219,7 +219,6 @@ export default function AdminProductsSection() {
             <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
           </button>
         </div>
-
       </div>
 
       <div
@@ -292,7 +291,7 @@ export default function AdminProductsSection() {
                     </td>
 
                     {/* Name */}
-                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-900 dark:text-white font-medium">
+                    <td className="px-4 py-3  text-start text-sm text-gray-900 dark:text-white">
                       {language === "ar" ? p.name_ar || p.name : p.name}
                     </td>
 

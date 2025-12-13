@@ -31,18 +31,24 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await fetch(
-        "/api/auth/notifications/?limit=5",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("/api/auth/notifications/?limit=5", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.results || data);
+        const contentType = response.headers.get("content-type");
+        if (contentType?.includes("application/json")) {
+          try {
+            const data = await response.json();
+            setNotifications(data.results || data);
+          } catch (error) {
+            console.error("Failed to parse notifications JSON:", error);
+          }
+        } else {
+          console.warn("Notifications response is not JSON");
+        }
       }
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -51,18 +57,24 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const response = await fetch(
-        "/api/auth/notifications/unread-count/",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("/api/auth/notifications/unread-count/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
-        const data = await response.json();
-        setUnreadCount(data.unread_count);
+        const contentType = response.headers.get("content-type");
+        if (contentType?.includes("application/json")) {
+          try {
+            const data = await response.json();
+            setUnreadCount(data.unread_count || 0);
+          } catch (error) {
+            console.error("Failed to parse unread count JSON:", error);
+          }
+        } else {
+          console.warn("Unread count response is not JSON");
+        }
       }
     } catch (error) {
       console.error("Failed to fetch unread count:", error);

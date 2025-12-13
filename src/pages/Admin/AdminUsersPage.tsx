@@ -77,10 +77,12 @@ export default function AdminUsersPage() {
         role: roleFilter,
       };
       const res = await axiosInstance.get("/api/auth/admin/users/", { params });
-      setUsers(res.data.results);
-      setTotalPages(Math.ceil(res.data.count / pageSize));
+      setUsers(res.data?.results || []);
+      setTotalPages(Math.ceil((res.data?.count || 0) / pageSize));
     } catch (error) {
       console.error(error);
+      setUsers([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -104,15 +106,14 @@ export default function AdminUsersPage() {
       return;
 
     try {
-     
-    
-      await axiosInstance.post(`/api/auth/users/${user.id}/configurations/update/`);
+      await axiosInstance.post(
+        `/api/auth/users/${user.id}/configurations/update/`
+      );
       fetchUsers();
     } catch (error) {
       console.error(error);
     }
   };
-
 
   const getRoleDisplayName = (role: string) => {
     const roleMap: { [key: string]: { en: string; ar: string } } = {
@@ -255,7 +256,7 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : !users || users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={8}
@@ -265,7 +266,7 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                (users || []).map((user) => (
                   <tr
                     key={user.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
@@ -394,7 +395,6 @@ export default function AdminUsersPage() {
                             <CheckCircleIcon className="w-4 h-4 text-green-700 dark:text-green-400" />
                           )}
                         </button>
-                        
                       </div>
                     </td>
                   </tr>
@@ -481,7 +481,7 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                   </tr>
-                ) : users.length === 0 ? (
+                ) : !users || users.length === 0 ? (
                   <tr>
                     <td
                       colSpan={8}
