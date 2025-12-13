@@ -6,6 +6,7 @@ import { CreditCardIcon } from "@heroicons/react/24/outline";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useActivityTracker } from "../hooks/useActivityTracker";
 import { apiRequest, handleApiResponse, getAuthHeaders } from "../utils/api";
 const apiBase = import.meta.env.VITE_API_BASE;
 const API_BASE_URL = apiBase + "/api";
@@ -18,7 +19,7 @@ export default function Checkout(): JSX.Element {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { items, total, fetchCart, clearCart } = useCart();
-
+  const { trackCheckout } = useActivityTracker();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "split">("cod");
 
@@ -132,7 +133,7 @@ export default function Checkout(): JSX.Element {
 
       // Handle response
       const order = await handleApiResponse(response);
-
+      trackCheckout(finalTotal, items.length);
       // Update stock for products after successful order creation
       // Note: This should ideally be handled by the backend, but we do it here as a fallback
       try {

@@ -29,7 +29,7 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
-  const { trackProductClick, trackAddToCart } = useActivityTracker();
+  const { trackProductClick, trackAddToCart,trackSearch } = useActivityTracker();
   const [formProduct, setFormProduct] = useState<any | null>(null); // product with toform
 
   // Fetch products
@@ -42,6 +42,7 @@ const Products: React.FC = () => {
       if (selectedBrand) params.brand = selectedBrand;
 
       const productsData = await fetchProducts(params);
+       trackSearch(searchTerm, productsData.count);
       setProducts(productsData.results ?? productsData);
     } catch (err) {
       console.error(err);

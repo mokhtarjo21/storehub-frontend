@@ -15,6 +15,7 @@ import {
   BuildingStorefrontIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import { useActivityTracker } from "../../hooks/useActivityTracker";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -28,7 +29,7 @@ const Navbar: React.FC = () => {
   const { itemCount } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
-
+  const { trackPageView } = useActivityTracker();
   const navigation = [
     { name: t("nav.home"), href: "/", icon: HomeIcon },
     { name: t("nav.products"), href: "/products", icon: CubeIcon },
@@ -65,6 +66,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    trackPageView("/");
     navigate("/");
   };
 
@@ -85,6 +87,7 @@ const Navbar: React.FC = () => {
                       if (location.pathname === "/") {
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       } else {
+                        trackPageView("/");
                         navigate("/");
                       }
                     }}
@@ -99,7 +102,8 @@ const Navbar: React.FC = () => {
                   {navigation.map((item) => (
                     <button
                       key={item.name}
-                      onClick={() => navigate(item.href)}
+                      onClick={() =>{ navigate(item.href) 
+                        trackPageView(item.href)}}
                       className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
                         location.pathname === item.href
                           ? "border-[#44B3E1] text-[#44B3E1] dark:text-[#44B3E1]"
@@ -138,7 +142,8 @@ const Navbar: React.FC = () => {
                   <>
                     {/* Cart */}
                     <button
-                      onClick={() => navigate("/cart")}
+                      onClick={() => {navigate("/cart") 
+                        trackPageView("/cart")}}
                       className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                     >
                       <ShoppingCartIcon className="h-5 w-5" />
@@ -182,7 +187,9 @@ const Navbar: React.FC = () => {
                           <Menu.Item>
                             {({ active }) => (
                               <button
-                                onClick={() => navigate("/profile")}
+
+                                onClick={() => {navigate("/profile") 
+                                  trackPageView("/profile")}}
                                 className={`block w-full text-left px-4 py-2 text-sm ${
                                   active ? "bg-gray-100 dark:bg-gray-700" : ""
                                 } text-gray-700 dark:text-gray-200`}

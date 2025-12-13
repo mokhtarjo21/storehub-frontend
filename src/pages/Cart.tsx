@@ -12,7 +12,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import { useCart } from "../contexts/CartContext";
-
+import { useActivityTracker } from "../hooks/useActivityTracker";
 const Cart: React.FC = () => {
   const { t, language } = useLanguage();
   const { user } = useAuth();
@@ -24,7 +24,7 @@ const Cart: React.FC = () => {
   const navigate = useNavigate();
   const hasServices = items.some((item: any) => item.item_type === "service");
   const hasProducts = items.some((item: any) => item.item_type === "product");
-
+  const {  trackRemoveFromCart } = useActivityTracker();
   const pointsDiscount = usePoints
     ? Math.min(user?.points || 0, total * 0.1)
     : 0;
@@ -49,6 +49,7 @@ const Cart: React.FC = () => {
   const itemRemove = async (itemId: string) => {
     try {
       await removeItem(itemId);
+      await trackRemoveFromCart(itemId, "Item", "product");
       fetchCart();
 
       toast.success("Item removed from cart");

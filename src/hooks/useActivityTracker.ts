@@ -22,8 +22,9 @@ interface ActivityData {
   target?: string;
   metadata?: Record<string, any>;
 }
+const API_BASE_URL =
+  (import.meta.env?.VITE_API_BASE || "http://192.168.1.7:8000") + "/api/auth";
 
-const API_BASE_URL = "/api/auth";
 
 let sessionId: string | null = null;
 

@@ -8,29 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-interface Company {
-  id: number;
-  name: string;
-  industry: string;
-  website: string | null;
-  description: string | null;
-  address_line1: string;
-  address_line2: string | null;
-  city: string;
-  state: string;
-  postal_code: string;
-  country: string;
-  phone: string;
-  email: string;
-  approval_status: string;
-  approved_at: string | null;
-  rejection_reason: string | null;
-  admin_name: string;
-  admin_email: string;
-  employee_count: number;
-  tax_card_image: string;
-  commercial_registration_image: string;
-}
+import {Company} from "../../types/index"
 
 interface User {
   id: number;
