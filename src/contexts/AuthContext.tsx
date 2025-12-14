@@ -237,7 +237,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
         localStorage.setItem("user", JSON.stringify(data.user));
-
+        await fetchCart()
         // Set user state
         const userData = data.user;
         setUser({
@@ -277,12 +277,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const refreshToken = localStorage.getItem("refresh_token");
       if (!refreshToken) throw new Error("No refresh token available");
 
-      await fetchCart();
+      ;
       await checkApiConnection();
     } catch (error) {
       console.error("Token refresh error:", error);
     }
-  }, [fetchCart, checkApiConnection]);
+  }, [ checkApiConnection]);
 
   const logout = useCallback(async () => {
     try {
