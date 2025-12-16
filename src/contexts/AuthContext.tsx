@@ -237,7 +237,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
         localStorage.setItem("user", JSON.stringify(data.user));
-        await fetchCart()
+        await fetchCart();
         // Set user state
         const userData = data.user;
         setUser({
@@ -277,12 +277,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const refreshToken = localStorage.getItem("refresh_token");
       if (!refreshToken) throw new Error("No refresh token available");
 
-      ;
       await checkApiConnection();
     } catch (error) {
       console.error("Token refresh error:", error);
     }
-  }, [ checkApiConnection]);
+  }, [checkApiConnection]);
 
   const logout = useCallback(async () => {
     try {
@@ -560,43 +559,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     []
   );
 
-  const fetchcategories = useCallback(async (): Promise<any[]> => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_BASE}/products/categories/`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleApiResponse(response);
-      return data;
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch products"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const fetchcategories = useCallback(
+    async (params?: { page?: number; page_size?: number; search?: string }) => {
+      setIsLoading(true);
+      try {
+        const query = new URLSearchParams();
 
-  const fetchbrands = useCallback(async (): Promise<any[]> => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_BASE}/products/brands/`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleApiResponse(response);
-      return data;
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to fetch products"
-      );
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        if (params?.page) query.append("page", params.page.toString());
+        if (params?.page_size)
+          query.append("page_size", params.page_size.toString());
+        if (params?.search) query.append("search", params.search);
+
+        const response = await fetch(
+          `${API_BASE}/products/categories/?${query.toString()}`,
+          {
+            method: "GET",
+            headers: getAuthHeaders(),
+          }
+        );
+
+        const data = await handleApiResponse(response);
+        return data;
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to fetch categories"
+        );
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  const fetchbrands = useCallback(
+    async (params?: { page?: number; page_size?: number; search?: string }) => {
+      setIsLoading(true);
+      try {
+        const query = new URLSearchParams();
+
+        if (params?.page) query.append("page", params.page.toString());
+        if (params?.page_size)
+          query.append("page_size", params.page_size.toString());
+        if (params?.search) query.append("search", params.search);
+
+        const response = await fetch(
+          `${API_BASE}/products/brands/?${query.toString()}`,
+          {
+            method: "GET",
+            headers: getAuthHeaders(),
+          }
+        );
+
+        const data = await handleApiResponse(response);
+        return data;
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to fetch brands"
+        );
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
   const fetchorders = useCallback(
     async (
       search: any,

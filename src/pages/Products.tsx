@@ -28,22 +28,32 @@ const Products: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | number>("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(12);
-  const { trackProductClick, trackAddToCart,trackSearch } = useActivityTracker();
-  const [formProduct, setFormProduct] = useState<any | null>(null); // product with toform
-
+  const { trackProductClick, trackAddToCart, trackSearch } =
+    useActivityTracker();
+  const [formProduct, setFormProduct] = useState<any | null>(null); 
+  const [pageSize, setPageSize] = useState(8);
+  const [totalPages, setTotalPages] = useState(1);
   // Fetch products
   const getProducts = async () => {
     setLoading(true);
     try {
       const params: any = { page: currentPage, page_size: pageSize };
+
       if (searchTerm) params.search = searchTerm;
       if (selectedCategory) params.category = selectedCategory;
       if (selectedBrand) params.brand = selectedBrand;
 
       const productsData = await fetchProducts(params);
-       trackSearch(searchTerm, productsData.count);
+
+      trackSearch(searchTerm, productsData.count);
+
+      // المنتجات
       setProducts(productsData.results ?? productsData);
+
+      // ✅ حساب عدد الصفحات
+      if (productsData.count) {
+        setTotalPages(Math.ceil(productsData.count / pageSize));
+      }
     } catch (err) {
       console.error(err);
       toast.error(
@@ -413,23 +423,34 @@ const Products: React.FC = () => {
         </motion.div>
 
         {/* Pagination */}
-        {products.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <p className="text-lg text-gray-500 dark:text-gray-400">
-              {loading
-                ? language === "ar"
-                  ? "جاري تحميل المنتجات..."
-                  : "Loading products..."
-                : language === "ar"
-                ? "لم يتم العثور على منتجات"
-                : "No products found"}
-            </p>
-          </motion.div>
-        )}
+        <div
+          className={`flex items-center gap-6 justify-center mt-4 ${
+            language === "ar" ? "text-right" : "text-left"
+          }`}
+        >
+          <div className="flex gap-2">
+            <button
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+            >
+              {language === "ar" ? "السابق" : "Previous"}
+            </button>
+            {/* Page Info */}
+            <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+              {language === "ar"
+                ? `الصفحة ${currentPage} من ${totalPages}`
+                : `Page ${currentPage} of ${totalPages}`}
+            </span>
+            <button
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+            >
+              {language === "ar" ? "التالي" : "Next"}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Customer Form Modal */}

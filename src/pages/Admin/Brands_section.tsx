@@ -32,24 +32,23 @@ export default function AdminBrandsSection() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<BrandItem | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [totalPages, setTotalPages] = useState(1);
   const loadBrands = async () => {
     setLoading(true);
     try {
-      const res = await fetchbrands();
-      const data = res.results ?? res.data ?? res;
-      if (Array.isArray(data)) {
-        setBrands(data);
-      } else {
-        setBrands([]);
-      }
+      const res = await fetchbrands({
+        page: currentPage,
+        page_size: pageSize,
+        search: query || undefined,
+      });
+
+      setBrands(res.results ?? []);
+      setTotalPages(Math.ceil(res.count / pageSize));
     } catch (error) {
       console.error(error);
-      toast.error(
-        language === "ar"
-          ? "فشل في جلب العلامات التجارية"
-          : "Failed to load brands"
-      );
+      toast.error("Failed to load brands");
     } finally {
       setLoading(false);
     }
@@ -381,6 +380,35 @@ export default function AdminBrandsSection() {
           initial={editing}
         />
       )}
+      {/* Pagination */}
+      <div
+        className={`flex items-center gap-6 justify-center mt-4 ${
+          language === "ar" ? "text-right" : "text-left"
+        }`}
+      >
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            {language === "ar" ? "السابق" : "Previous"}
+          </button>
+          {/* Page Info */}
+          <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+            {language === "ar"
+              ? `الصفحة ${currentPage} من ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
+          </span>
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            {language === "ar" ? "التالي" : "Next"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

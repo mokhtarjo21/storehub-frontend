@@ -78,20 +78,30 @@ export default function AdminProductsSection() {
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ProductListItem | null>(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [totalPages, setTotalPages] = useState(1);
   const getProducts = async () => {
     setLoading(true);
     try {
-      const params: any = {};
+      const params: any = {
+        page: currentPage,
+        page_size: pageSize,
+      };
+
       if (query) params.search = query;
       if (categoryFilter) params.category = categoryFilter;
       if (brandFilter) params.brand = brandFilter;
 
       const res = await fetchProducts(params);
 
-      // backend might return {results: [...]} or plain array
       const data = res.results ?? res;
       setProducts(Array.isArray(data) ? data : []);
+
+      // ✅ حساب عدد الصفحات
+      if (res.count) {
+        setTotalPages(Math.ceil(res.count / pageSize));
+      }
     } catch (err: any) {
       console.error("fetchProducts error", err);
       toast.error(
@@ -131,7 +141,7 @@ export default function AdminProductsSection() {
   useEffect(() => {
     const t = setTimeout(() => getProducts(), 400);
     return () => clearTimeout(t);
-  }, [query, categoryFilter, brandFilter]);
+  }, [query, categoryFilter, brandFilter, currentPage]);
 
   const handleDelete = async (id: number | string) => {
     if (
@@ -174,7 +184,10 @@ export default function AdminProductsSection() {
         <div className="flex flex-col sm:flex-row gap-2 w-full md:w-1/2">
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder={
               language === "ar" ? "ابحث عن منتج..." : "Search products..."
             }
@@ -182,7 +195,7 @@ export default function AdminProductsSection() {
           />
           <select
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            onChange={(e) => {setCategoryFilter(e.target.value); setCurrentPage(1);}}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
@@ -196,7 +209,7 @@ export default function AdminProductsSection() {
           </select>
           <select
             value={brandFilter}
-            onChange={(e) => setBrandFilter(e.target.value)}
+            onChange={(e) => {setBrandFilter(e.target.value); setCurrentPage(1);}}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
@@ -364,6 +377,35 @@ export default function AdminProductsSection() {
           brands={brands}
         />
       )}
+      {/* Pagination */}
+      <div
+        className={`flex items-center gap-6 justify-center mt-4 ${
+          language === "ar" ? "text-right" : "text-left"
+        }`}
+      >
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            {language === "ar" ? "السابق" : "Previous"}
+          </button>
+          {/* Page Info */}
+          <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+            {language === "ar"
+              ? `الصفحة ${currentPage} من ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
+          </span>
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            {language === "ar" ? "التالي" : "Next"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -391,14 +433,14 @@ function ProductForm({
   const [descriptionAr, setDescriptionAr] = useState(
     initial?.description_ar ?? ""
   );
-  const [price, setPrice] = useState(initial?.price ?? "");
+  const [price, setPrice] = useState(initial?.price ?? 0);
   const [comparePrice, setComparePrice] = useState<number | "">(
-    initial?.compare_price ?? ""
+    initial?.compare_price ?? 0
   );
   const [costPrice, setCostPrice] = useState<number | "">(
-    initial?.cost_price ?? ""
+    initial?.cost_price ?? 0
   );
-  const [stock, setStock] = useState(initial?.stock ?? "");
+  const [stock, setStock] = useState(initial?.stock ?? 0);
   const [lowStockThreshold, setLowStockThreshold] = useState(
     initial?.low_stock_threshold ?? 10
   );

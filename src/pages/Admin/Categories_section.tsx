@@ -35,17 +35,20 @@ export default function AdminCategoriesSection() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<CategoryItem | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
+  const [totalPages, setTotalPages] = useState(1);
   const loadCategories = async () => {
     setLoading(true);
     try {
-      const res = await fetchcategories();
-      const data = res.results ?? res.data ?? res;
-      if (Array.isArray(data)) {
-        setCategories(data);
-      } else {
-        setCategories([]);
-      }
+      const res = await fetchcategories({
+        page: currentPage,
+        page_size: pageSize,
+        search: query || undefined,
+      });
+
+      setCategories(res.results ?? []);
+      setTotalPages(Math.max(1, Math.ceil(res.count / pageSize)));
     } catch (error) {
       console.error(error);
       toast.error(
@@ -58,23 +61,23 @@ export default function AdminCategoriesSection() {
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [currentPage, query]);
 
-  const filtered = useMemo(() => {
-    if (!query.trim()) return categories;
-    const q = query.toLowerCase();
-    return categories.filter((category) => {
-      const text = [
-        category.name,
-        category.name_ar || "",
-        category.description || "",
-        category.description_ar || "",
-      ]
-        .join(" ")
-        .toLowerCase();
-      return text.includes(q);
-    });
-  }, [categories, query]);
+  // const filtered = useMemo(() => {
+  //   if (!query.trim()) return categories;
+  //   const q = query.toLowerCase();
+  //   return categories.filter((category) => {
+  //     const text = [
+  //       category.name,
+  //       category.name_ar || "",
+  //       category.description || "",
+  //       category.description_ar || "",
+  //     ]
+  //       .join(" ")
+  //       .toLowerCase();
+  //     return text.includes(q);
+  //   });
+  // }, [categories, query]);
 
   const openCreate = () => {
     setEditing(null);
@@ -144,7 +147,10 @@ export default function AdminCategoriesSection() {
         <div className="flex gap-3 w-full lg:w-1/2">
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder={
               language === "ar" ? "ابحث عن فئة..." : "Search categories..."
             }
@@ -221,7 +227,7 @@ export default function AdminCategoriesSection() {
                       : "Loading categories"}
                   </td>
                 </tr>
-              ) : filtered.length === 0 ? (
+              ) : categories.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
@@ -231,7 +237,7 @@ export default function AdminCategoriesSection() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((category) => (
+                categories.map((category) => (
                   <tr
                     key={category.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150"
@@ -332,6 +338,35 @@ export default function AdminCategoriesSection() {
           initial={editing}
         />
       )}
+      {/* Pagination */}
+      <div
+        className={`flex items-center gap-6 justify-center mt-4 ${
+          language === "ar" ? "text-right" : "text-left"
+        }`}
+      >
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => p - 1)}
+          >
+            {language === "ar" ? "السابق" : "Previous"}
+          </button>
+          {/* Page Info */}
+          <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+            {language === "ar"
+              ? `الصفحة ${currentPage} من ${totalPages}`
+              : `Page ${currentPage} of ${totalPages}`}
+          </span>
+          <button
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => p + 1)}
+          >
+            {language === "ar" ? "التالي" : "Next"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
