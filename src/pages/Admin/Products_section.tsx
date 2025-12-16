@@ -132,11 +132,9 @@ export default function AdminProductsSection() {
       console.warn("categories/brands fetch failed", e);
     }
   };
-
-  useEffect(() => {
-    getProducts();
-    fetchCategoriesAndBrands();
-  }, []);
+useEffect(() => {
+  fetchCategoriesAndBrands();
+}, []);
 
   useEffect(() => {
     const t = setTimeout(() => getProducts(), 400);
