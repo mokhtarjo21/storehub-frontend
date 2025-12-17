@@ -93,7 +93,7 @@ const Navbar: React.FC = () => {
                     }}
                     className="text-3xl font-bold bg-gradient-to-r from-[#155F82] via-[#44B3E1] to-[#155F82] bg-clip-text text-transparent drop-shadow"
                   >
-                    StoreHub
+                    Stackhubs Store
                   </button>
                 </div>
 

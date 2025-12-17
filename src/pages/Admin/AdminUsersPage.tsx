@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(24);
   const [loading, setLoading] = useState(false);
   const perPage = 10;
   const [totalPages, setTotalPages] = useState(1);

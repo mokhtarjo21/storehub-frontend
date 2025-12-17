@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -10,6 +10,7 @@ import RelatedProducts from "../components/RelatedProducts";
 import CustomerFormModal from "../components/FormCart";
 import { apiRequest } from "../utils/api";
 import { useActivityTracker } from "../hooks/useActivityTracker";
+import { useAuth } from "../contexts/AuthContext";
 // ---------- Helper Component ----------
 const InfoItem = ({ label, value }: any) => (
   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -87,7 +88,8 @@ const ProductDetail: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const { trackProductView } = useActivityTracker();
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
-
+  const { user } = useAuth();
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -121,6 +123,10 @@ const ProductDetail: React.FC = () => {
   const maxQuantity = product.stock - alreadyInCart;
   trackProductView(slug, product.name);
   const handleAddToCart = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     if (!product) return;
     if (maxQuantity <= 0) {
       toast.error(
@@ -164,12 +170,19 @@ const ProductDetail: React.FC = () => {
 
   const handleCartClick = () => {
     if (product.product_role === "tocart") {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
       handleAddToCart();
     } else if (product.product_role === "toform") {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
       setFormOpen(true);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10">
@@ -272,7 +285,6 @@ const ProductDetail: React.FC = () => {
                         {language === "ar"
                           ? "الكمية المتوفرة"
                           : "In Stock"}{" "}
-                        
                       </span>
                     </>
                   ) : (
@@ -463,20 +475,22 @@ const ProductDetail: React.FC = () => {
         </div>
 
         {/* Customer Form Modal */}
-       
+
         <CustomerFormModal
           open={formOpen}
-    onClose={() => setFormOpen(false)}
-    onSubmit={(data) => {
-      
-
-             apiRequest("/orders/", {
+          onClose={() => setFormOpen(false)}
+          onSubmit={(data) => {
+            apiRequest("/orders/", {
               method: "post",
-              
-              body: JSON.stringify({"phone":data.phone,"notes":data.details,"slug":product.slug,"currency":product.currency}),
+              body: JSON.stringify({
+                phone: data.phone,
+                notes: data.details,
+                slug: product.slug,
+                currency: product.currency,
+              }),
             });
-      setFormOpen(false);
-    }}
+            setFormOpen(false);
+          }}
         />
       </div>
     </div>

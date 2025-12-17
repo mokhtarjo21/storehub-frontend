@@ -79,7 +79,7 @@ export default function AdminProductsSection() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<ProductListItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   const getProducts = async () => {
     setLoading(true);
@@ -195,7 +195,10 @@ export default function AdminProductsSection() {
           />
           <select
             value={categoryFilter}
-            onChange={(e) => {setCategoryFilter(e.target.value); setCurrentPage(1);}}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
@@ -209,7 +212,10 @@ export default function AdminProductsSection() {
           </select>
           <select
             value={brandFilter}
-            onChange={(e) => {setBrandFilter(e.target.value); setCurrentPage(1);}}
+            onChange={(e) => {
+              setBrandFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">
@@ -320,7 +326,7 @@ export default function AdminProductsSection() {
 
                     {/* Price */}
                     <td className="px-4 py-3 whitespace-nowrap text-start text-sm text-gray-900 dark:text-white font-semibold">
-                      EGP {Number(p.price).toFixed(2)}
+                      {p.currency} {Number(p.price).toFixed(2)}
                     </td>
 
                     {/* Stock */}
@@ -425,6 +431,8 @@ function ProductForm({
 }) {
   const { language } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
+  const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
+  const MAX_FILE_SIZE_MB = 5;
 
   // form state
   const [name, setName] = useState(initial?.name ?? "");
@@ -476,6 +484,8 @@ function ProductForm({
     initial?.specifications ?? []
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+
   // إضافة صف جديد
   const addSpec = () =>
     setSpecifications([
@@ -483,9 +493,30 @@ function ProductForm({
       { name: "", value: "", id: 0, name_ar: "", value_ar: "", sort_order: 0 },
     ]);
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null;
-    setImageFile(f);
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+      setImageError(
+        `الملف غير صالح. الامتدادات المسموحة: ${ALLOWED_EXTENSIONS.join(", ")}`
+      );
+      setImageFile(null);
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setImageError(
+        `حجم الملف كبير جدًا. الحجم الأقصى: ${MAX_FILE_SIZE_MB} MB`
+      );
+      setImageFile(null);
+      return;
+    }
+
+    setImageError(null); // كل شيء صحيح
+    setImageFile(file);
   };
+
   // تحديث صف
   const updateSpec = (
     index: number,
@@ -542,7 +573,30 @@ function ProductForm({
 
   const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
-    setImageFiles(files);
+
+    const validFiles: File[] = [];
+    for (const file of files) {
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+        toast.error(
+          `Invalid file type: ${file.name}. Allowed: ${ALLOWED_EXTENSIONS.join(
+            ", "
+          )}`
+        );
+        continue;
+      }
+
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(
+          `File too large: ${file.name}. Max size: ${MAX_FILE_SIZE_MB} MB`
+        );
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) setImageFiles(validFiles);
   };
 
   const submit = async (e?: React.FormEvent) => {
@@ -994,6 +1048,12 @@ function ProductForm({
                   {language === "ar" ? "تم اختيار الملف:" : "Selected file:"}{" "}
                   {imageFile.name}
                 </span>
+              )}
+              {imageError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {imageError}. الامتدادات المسموحة: jpg, png. الحجم الأقصى:{" "}
+                  {MAX_FILE_SIZE_MB}MB
+                </p>
               )}
             </div>
 

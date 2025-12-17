@@ -33,7 +33,7 @@ export default function AdminBrandsSection() {
   const [editing, setEditing] = useState<BrandItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   const loadBrands = async () => {
     setLoading(true);

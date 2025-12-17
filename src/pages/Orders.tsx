@@ -319,6 +319,7 @@ const Dashboard: React.FC = () => {
                                 </span>
                               </button>
                             </div>
+                            
 
                             <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                               <span>
@@ -383,8 +384,12 @@ const Dashboard: React.FC = () => {
                       <div className="flex flex-col sm:items-end gap-3 flex-shrink-0">
                         <div className="flex flex-col items-end gap-2">
                           <p className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">
-                            ${parseFloat(order.total_price || 0).toFixed(2)}
+                            {order.currency}
+                            {parseFloat(
+                              order.total_price || 0
+                            ).toLocaleString()}
                           </p>
+
                           <span
                             className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(
                               order.order_status

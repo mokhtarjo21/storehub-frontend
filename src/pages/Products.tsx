@@ -5,7 +5,7 @@ import {
   ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import { apiRequest } from "../utils/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -30,8 +30,8 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { trackProductClick, trackAddToCart, trackSearch } =
     useActivityTracker();
-  const [formProduct, setFormProduct] = useState<any | null>(null); 
-  const [pageSize, setPageSize] = useState(8);
+  const [formProduct, setFormProduct] = useState<any | null>(null);
+  const [pageSize, setPageSize] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   // Fetch products
   const getProducts = async () => {
@@ -102,6 +102,7 @@ const Products: React.FC = () => {
           notes: data.details,
           slug: formProduct?.slug,
           currency: formProduct?.currency,
+          product_role: formProduct?.product_role,
         }),
       });
       toast.success(
@@ -134,14 +135,10 @@ const Products: React.FC = () => {
       (i: any) => i?.product?.id?.toString() === product.id.toString()
     );
     const maxQuantity = product.stock - (existingItem?.quantity || 0);
-
+    const navigate = useNavigate();
     const handleAddToCart = () => {
       if (!user) {
-        toast.error(
-          language === "ar"
-            ? "يرجى تسجيل الدخول لإضافة منتجات"
-            : "Please log in to add products"
-        );
+        navigate("/login");
         return;
       }
       if (maxQuantity <= 0) {
@@ -176,7 +173,13 @@ const Products: React.FC = () => {
 
     const handleCartClick = () => {
       if (product.product_role === "tocart") handleAddToCart();
-      else if (product.product_role === "toform") setFormProduct(product);
+      else if (product.product_role === "toform") {
+        if (!user) {
+          navigate("/login");
+          return;
+        }
+        setFormProduct(product);
+      }
     };
 
     return (
@@ -299,7 +302,13 @@ const Products: React.FC = () => {
                   ? product.stock > 0
                     ? t("products.addToCart")
                     : t("products.outOfStock")
-                  : t("services.requestService")}
+                  : product.product_type === "product"
+                  ? language === "ar"
+                    ? "طلب منتج"
+                    : "Request Product"
+                  : language === "ar"
+                  ? "طلب خدمة"
+                  : "Request Service"}
               </button>
             </div>
 
@@ -458,15 +467,13 @@ const Products: React.FC = () => {
         <CustomerFormModal
           open={!!formProduct}
           onClose={() => setFormProduct(null)}
-          onSubmit={async (data) => {
-            if (isSubmitting) return;
-            setIsSubmitting(true);
-            try {
-              await sendOrderWithRetry(data, 3);
-            } finally {
-              setIsSubmitting(false);
-            }
-          }}
+          itemName={
+            language === "ar"
+              ? formProduct?.name_ar || formProduct?.name
+              : formProduct?.name
+          }
+          itemType={formProduct?.product_type}
+          onSubmit={sendOrderWithRetry}
         />
       )}
     </div>

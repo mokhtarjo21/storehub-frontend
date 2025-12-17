@@ -27,7 +27,6 @@ import MyInfo from "../components/Profile/MyInfo";
 import MyOrders from "../components/Profile/MyOrders";
 import MyNotifications from "../components/Profile/MyNotifications";
 
-
 const passwordSchema = yup.object({
   currentPassword: yup.string().required("Current password is required"),
   newPassword: yup
@@ -43,7 +42,7 @@ const passwordSchema = yup.object({
 type PasswordFormData = yup.InferType<typeof passwordSchema>;
 
 const Profile: React.FC = () => {
-  const { user,checkApiConnection } = useAuth();
+  const { user, checkApiConnection } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("info");
@@ -55,7 +54,6 @@ const Profile: React.FC = () => {
     push: false,
     sms: false,
   });
-
 
   const isRTL = language === "ar";
 
@@ -100,7 +98,7 @@ const Profile: React.FC = () => {
     { id: "info", icon: UserIcon },
     { id: "orders", icon: ShoppingBagIcon },
     { id: "notifications", icon: BellIcon },
-    
+
     { id: "security", icon: KeyIcon },
     { id: "preferences", icon: GlobeAltIcon },
   ];
@@ -113,35 +111,34 @@ const Profile: React.FC = () => {
     additionalTabs.push({ id: "affiliate", icon: ChartBarIcon });
   }
 
-  
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file) {
-    setImageFile(file);
-    const previewUrl = URL.createObjectURL(file);
-    setImagePreview(previewUrl); // Show a preview of the selected image
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl); // Show a preview of the selected image
 
-    try {
-      // Add sleep function to delay execution
-      await sleep(3000); // 3000ms = 3 seconds
+      try {
+        // Add sleep function to delay execution
+        await sleep(3000); // 3000ms = 3 seconds
 
-      // Prepare FormData with the image file and other user data
-      const formData = new FormData();
-      formData.append("avatar", file);  // Appending the image file (use 'file' instead of 'imageFile')
+        // Prepare FormData with the image file and other user data
+        const formData = new FormData();
+        formData.append("avatar", file); // Appending the image file (use 'file' instead of 'imageFile')
 
-      // Pass the formData directly to the updateAvatar function
-      await updateAvatar(formData);
-      await checkApiConnection()
-      toast.success("Profile updated successfully!");
-    } catch (error) {
-      toast.error(t("profile.imageUpdateFailed"));
+        // Pass the formData directly to the updateAvatar function
+        await updateAvatar(formData);
+        await checkApiConnection();
+        toast.success("Profile updated successfully!");
+      } catch (error) {
+        toast.error(t("profile.imageUpdateFailed"));
+      }
     }
-  }
-};
+  };
 
-// Sleep function to introduce delay
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
+  // Sleep function to introduce delay
+  const sleep = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
 
   const tabs = [...baseTabs, ...additionalTabs];
 
@@ -183,16 +180,29 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
               {/* Avatar */}
               <div className={"text-center mb-6"}>
                 <div className="relative inline-block">
-                  <div className="w-20 h-20 lg:w-24 lg:h-24 bg-blue-500 rounded-full flex items-center justify-center">
-                    <img
-                      src={imagePreview || user?.avatar || "/default-avatar.png"} // Show preview or default image
-                      alt="Profile"
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  </div>
+                  {user?.avatar ? (
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 bg-blue-500 rounded-full flex items-center justify-center">
+                      <img
+                        src={
+                          imagePreview || user?.avatar || "/default-avatar.png"
+                        }
+                        alt="Profile"
+                        className="w-full h-full rounded-full object-fill"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-20 w-20 rounded-full bg-blue-500 flex items-center justify-center">
+                      <UserIcon className="h-10 w-10 text-white" />
+                    </div>
+                  )}
+
                   <button
-                    onClick={() => document.getElementById("fileInput")?.click()}
-                    className={`absolute bottom-0 ${isRTL ? "left-0" : "right-0"} bg-white dark:bg-gray-700 rounded-full p-1 lg:p-2 shadow-lg border border-gray-200 dark:border-gray-600`}
+                    onClick={() =>
+                      document.getElementById("fileInput")?.click()
+                    }
+                    className={`absolute bottom-0 ${
+                      isRTL ? "left-0" : "right-0"
+                    } bg-white dark:bg-gray-700 rounded-full p-1 lg:p-2 shadow-lg border border-gray-200 dark:border-gray-600`}
                   >
                     <CameraIcon className="w-3 h-3 lg:w-4 lg:h-4 text-gray-600 dark:text-gray-300" />
                   </button>
@@ -205,10 +215,9 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
                     className="hidden"
                   />
                 </div>
-                  <div className="p-4 lg:p-6">
-                {/* Add a button to trigger the image upload */}
-                
-              </div>
+                <div className="p-4 lg:p-6">
+                  {/* Add a button to trigger the image upload */}
+                </div>
                 <h3 className="mt-3 lg:mt-4 text-base lg:text-lg font-medium text-gray-900 dark:text-white">
                   {user?.full_name}
                 </h3>
@@ -266,8 +275,6 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
             className="lg:col-span-3"
           >
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[500px]">
-              
-             
               {/* My Info Tab */}
               {activeTab === "info" && <MyInfo />}
 
@@ -296,8 +303,6 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
                   <MyNotifications />
                 </div>
               )}
-
-              
 
               {/* Security Tab */}
               {activeTab === "security" && (

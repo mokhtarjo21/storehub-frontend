@@ -30,6 +30,8 @@ import AccountSuspended from "./pages/AccountSuspended";
 import AccountUnderReview from "./pages/AccountUnderReview";
 import ScrollToTop from "./components/ScrollToTop";
 import Checkout from "./pages/checkout";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 function App() {
   return (
@@ -50,7 +52,8 @@ function App() {
                     <Route index element={<Home />} />
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
-                    
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
                     <Route path="cart" element={<Cart />} />
                     <Route path="login" element={<Login />} />
                     <Route path="register" element={<Register />} />
@@ -107,7 +110,7 @@ function App() {
                     <Route
                       path="activity/:id"
                       element={
-                         <ProtectedRoute requiredRole="super_admin">
+                        <ProtectedRoute requiredRole="super_admin">
                           <MyActivity />
                         </ProtectedRoute>
                       }
@@ -136,11 +139,14 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    <Route path="admin/companies" element={
-                      <ProtectedRoute requiredRole="super_admin">
-                        <AdminCompaniesPage />
-                      </ProtectedRoute>
-                    } />
+                    <Route
+                      path="admin/companies"
+                      element={
+                        <ProtectedRoute requiredRole="super_admin">
+                          <AdminCompaniesPage />
+                        </ProtectedRoute>
+                      }
+                    />
                     <Route
                       path="admin/users"
                       element={
@@ -148,7 +154,7 @@ function App() {
                           <AdminUsersPage />
                         </ProtectedRoute>
                       }
-                    />  
+                    />
 
                     <Route
                       path="admin"

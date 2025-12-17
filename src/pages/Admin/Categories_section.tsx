@@ -36,7 +36,7 @@ export default function AdminCategoriesSection() {
   const [editing, setEditing] = useState<CategoryItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   const loadCategories = async () => {
     setLoading(true);

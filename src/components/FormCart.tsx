@@ -7,16 +7,19 @@ import { useAuth } from "../contexts/AuthContext";
 type CustomerFormModalProps = {
   open: boolean;
   onClose: () => void;
- onSubmit: (data: { phone: string; details: string }) => { phone: string; details: string };
-
+  onSubmit: (data: { phone: string; details: string }) => void;
+  itemName: string; 
+  itemType: "product" | "service"; 
 };
 
 const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
   open,
   onClose,
   onSubmit,
+  itemName,
+  itemType,
 }) => {
-  const {user}=useAuth()
+  const { user } = useAuth();
   const { language } = useLanguage();
   const [phone, setPhone] = useState(user?.phone || "");
   const [details, setDetails] = useState("");
@@ -56,6 +59,13 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
           {language === "ar" ? "تفاصيل الخدمة" : "Service Details"}
         </h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
+          {language === "ar"
+            ? `هذا ${
+                itemType === "product" ? "المنتج" : "الخدمة"
+              } يتطلب من فريق المبيعات لدينا التواصل معك لإنشاء عرض سعر. يرجى ملء البيانات أدناه بشكل صحيح.`
+            : `This ${itemName} requires our sales team to contact you to generate a quotation. Please fill in the data below correctly.`}
+        </p>
 
         <div className="space-y-4">
           {/* ⭐ حقل تفاصيل الخدمة */}
@@ -71,7 +81,11 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
           />
           <input
             type="tel"
-            placeholder={language === "ar" ? "رقم الهاتف للتواصل" : "Phone Number for Contact"}
+            placeholder={
+              language === "ar"
+                ? "رقم الهاتف للتواصل"
+                : "Phone Number for Contact"
+            }
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

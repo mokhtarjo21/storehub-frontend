@@ -340,8 +340,7 @@ export default function Checkout(): JSX.Element {
               <input
                 value={shippingPostalCode}
                 onChange={(e) => setShippingPostalCode(e.target.value)}
-                placeholder={t("checkout.postalCode") || "Postal Code *"}
-                required
+                placeholder={t("checkout.postalCode") || "Postal Code (optional)"}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
               />
 
@@ -371,10 +370,10 @@ export default function Checkout(): JSX.Element {
                   />
                   <div className="flex-1">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {t("checkout.cod") || "Cash on Delivery (Full)"}
+                      {t("checkout.cod") || "Cash in Advance (Full)"}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {t("checkout.codDesc") || "Pay full amount on delivery."}
+                      {t("checkout.codDesc") || "Full Payment in advance"}
                     </div>
                   </div>
                 </label>

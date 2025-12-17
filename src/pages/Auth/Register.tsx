@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
+import toast from "react-hot-toast";
 
 export const useRegisterSchema = () => {
   const { language } = useLanguage();
@@ -131,11 +132,11 @@ export const useRegisterSchema = () => {
 
 const Register: React.FC = () => {
   const { register: registerUser, isLoading } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
   const schema = useRegisterSchema();
+  const [agree, setAgree] = useState(false);
 
   const {
     register,
@@ -149,6 +150,14 @@ const Register: React.FC = () => {
   const selectedRole = watch("role");
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (!agree) {
+      toast.error(
+        language === "ar"
+          ? "يجب الموافقة على شروط الاستخدام وسياسة الخصوصية"
+          : "You must agree to the Terms & Privacy Policy"
+      );
+      return;
+    }
     try {
       const payload: any = {
         name: data.name,
@@ -435,12 +444,43 @@ const Register: React.FC = () => {
               )}
             </div>
           </div>
+          <div className="flex items-start gap-2">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#155F82] focus:ring-[#155F82]"
+            />
+
+            <label
+              htmlFor="terms"
+              className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
+            >
+              {language === "ar" ? "أوافق على" : "I agree to the"}{" "}
+              <button
+                onClick={() => navigate("/terms")}
+                className="text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {language === "ar" ? "شروط الاستخدام" : "Terms & Conditions"}
+              </button>{" "}
+              {language === "ar" ? "و" : "and"}{" "}
+              <button
+                onClick={() => navigate("/privacy")}
+                className="text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {language === "ar" ? "سياسة الخصوصية" : "Privacy Policy"}
+              </button>
+            </label>
+          </div>
 
           <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || !agree}
+              className="w-full py-3 px-4 rounded-lg text-white text-sm font-medium 
+  bg-gradient-to-r from-[#155F82] to-[#44B3E1] hover:opacity-90 transition
+  disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? t("common.loading") : t("auth.register.title")}
             </button>
