@@ -145,6 +145,8 @@ const Products: React.FC = () => {
         );
         return;
       }
+      
+      
       const quantityToAdd = Math.min(quantity, maxQuantity);
       const cartProduct = {
         id: product.id.toString(),

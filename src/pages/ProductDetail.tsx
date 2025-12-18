@@ -169,17 +169,13 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleCartClick = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     if (product.product_role === "tocart") {
-      if (!user) {
-        navigate("/login");
-        return;
-      }
       handleAddToCart();
     } else if (product.product_role === "toform") {
-      if (!user) {
-        navigate("/login");
-        return;
-      }
       setFormOpen(true);
     }
   };
@@ -369,11 +365,17 @@ const ProductDetail: React.FC = () => {
               >
                 <ShoppingCartIcon className="w-5 h-5" />
                 {product.product_role === "tocart"
-                  ? maxQuantity > 0
+                  ? product.stock > 0
                     ? t("products.addToCart")
                     : t("products.outOfStock")
-                  : t("services.requestService")}
-              </button>
+                  : product.product_type === "product"
+                  ? language === "ar"
+                    ? "طلب منتج"
+                    : "Request Product"
+                  : language === "ar"
+                  ? "طلب خدمة"
+                  : "Request Service"}
+               </button>
             </div>
 
             {/* ---------- Professional Specs Card ---------- */}
