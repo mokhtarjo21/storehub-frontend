@@ -12,15 +12,33 @@ const AdminCategoriesSection = lazy(() => import("./Categories_section"));
 const AdminUsersPage = lazy(() => import("./AdminUsersPage"));
 const AdminCompaniesPage = lazy(() => import("./AdminCompany"));
 
-
 const AdminPanel: React.FC = () => {
   const [searchParams] = useSearchParams();
   const tab = searchParams.get("tab") || "dashboard";
-  
+
   const [activeTab, setActiveTab] = useState(tab);
   const [collapsed, setCollapsed] = useState(false);
   const { language } = useLanguage();
-  
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "products":
+        return <AdminProductsSection />;
+      case "order":
+        return <AdminOrdersPage />;
+      case "brands":
+        return <AdminBrandsSection />;
+      case "categories":
+        return <AdminCategoriesSection />;
+      case "user management":
+        return <AdminUsersPage />;
+      case "Companies management":
+        return <AdminCompaniesPage />;
+      default:
+        return <AdminDashboard />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
       {/* Sidebar */}
@@ -31,12 +49,12 @@ const AdminPanel: React.FC = () => {
         setCollapsed={setCollapsed}
       />
 
-      {/* Overlay for small screens */}
+      {/* Overlay للموبايل */}
       {!collapsed && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 sm:hidden"
           onClick={() => setCollapsed(false)}
-        ></div>
+        />
       )}
 
       {/* Content */}
@@ -53,13 +71,10 @@ const AdminPanel: React.FC = () => {
           }
         `}
       >
-        {activeTab === "dashboard" && <AdminDashboard />}
-        {activeTab === "products" && <AdminProductsSection />}
-        {activeTab === "order" && <AdminOrdersPage />}
-        {activeTab === "brands" && <AdminBrandsSection />}
-        {activeTab === "categories" && <AdminCategoriesSection />}
-        {activeTab === "user management" && <AdminUsersPage />}
-        {activeTab === "Companies management" && <AdminCompaniesPage />}
+        {/* ✅ Suspense */}
+        <Suspense fallback={<div className="text-center py-10">{language==='ar'? 'جاري التحميل ..':"Loading..."}</div>}>
+          {renderContent()}
+        </Suspense>
       </div>
     </div>
   );
