@@ -1,14 +1,18 @@
-import React, { useState } from "react";
-import AdminDashboard from "./AdminDashboard";
-import AdminProductsSection from "./Products_section";
-import AdminOrdersPage from "./Admin_orders_page";
-import AdminBrandsSection from "./Brands_section";
-import AdminCategoriesSection from "./Categories_section";
-import AdminUsersPage from "./AdminUsersPage";
-import AdminCompaniesPage from "./AdminCompany";
+import React, { useState, lazy, Suspense } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
 import AdminSidebar from "./ AdminSidebar";
-import { useSearchParams } from "react-router-dom";
+
+/* ✅ Lazy Imports */
+const AdminDashboard = lazy(() => import("./AdminDashboard"));
+const AdminProductsSection = lazy(() => import("./Products_section"));
+const AdminOrdersPage = lazy(() => import("./Admin_orders_page"));
+const AdminBrandsSection = lazy(() => import("./Brands_section"));
+const AdminCategoriesSection = lazy(() => import("./Categories_section"));
+const AdminUsersPage = lazy(() => import("./AdminUsersPage"));
+const AdminCompaniesPage = lazy(() => import("./AdminCompany"));
+
+
 const AdminPanel: React.FC = () => {
   const [searchParams] = useSearchParams();
   const tab = searchParams.get("tab") || "dashboard";
