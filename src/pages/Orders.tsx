@@ -321,25 +321,25 @@ const Dashboard: React.FC = () => {
                             </div>
                             
 
-                            <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                              <span>
+                            <div className="flex flex-col gap-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                              <div>
                                 {new Date(order.created_at).toLocaleDateString(
                                   language === "ar" ? "ar-EG" : "en-GB"
                                 )}
-                              </span>
-                              
-                              <span>•</span>
-                              <span>
+                              </div>
+                              <div>
                                 {order.items_count || order.items?.length || 0}{" "}
-                                {t("dashboard.items") ||
-                                  (language === "ar" ? "عنصر" : "items")}
-                              </span>
-                              {order.items ?.map((item: any, index: number) => (
-                                <span key={index}>
-                                  {item.quantity} x {item.name}
-                                </span>
-                              ))}
+                                {t("dashboard.items") || (language === "ar" ? "عنصر" : "items")}
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                {order.items?.map((item: any, index: number) => (
+                                  <div key={index}>
+                                    {item.quantity} x {item.item_name} = {item.unit_price}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
+
                           </div>
                         </div>
 

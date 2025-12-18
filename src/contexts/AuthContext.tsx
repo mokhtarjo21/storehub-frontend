@@ -408,7 +408,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const response = await fetch(url.toString(), {
           method: "GET",
-          headers: getAuthHeaders(),
+          
         });
 
         const data = await handleApiResponse(response);

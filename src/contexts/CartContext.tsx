@@ -38,6 +38,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchCart = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${API_BASE}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });

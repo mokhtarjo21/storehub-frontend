@@ -61,8 +61,8 @@ export default function Checkout(): JSX.Element {
       !shippingAddress1 ||
       !shippingCity ||
       !shippingState ||
-      !shippingCountry ||
-      !shippingPostalCode
+      !shippingCountry 
+      
     ) {
       toast.error(
         language === "ar"
@@ -160,7 +160,7 @@ export default function Checkout(): JSX.Element {
             try {
               // Fetch current product data
               const productResponse = await fetch(
-                `${API_BASE_URL}/products/${actualItemId}/`,
+                `${API_BASE_URL}/products/${item.slug}/`,
                 {
                   method: "GET",
                   headers: getAuthHeaders(),
