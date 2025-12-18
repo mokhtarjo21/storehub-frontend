@@ -1628,7 +1628,13 @@ export default function AdminOrdersPage() {
                             />
                           </div>
 
-                          <div className="mb-4">
+                         
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+                 <div className="mb-4">
                             <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                               {language === "ar"
                                 ? "ملاحظات داخلية"
@@ -1651,11 +1657,6 @@ export default function AdminOrdersPage() {
                               }
                             ></textarea>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
 
                 {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
