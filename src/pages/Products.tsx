@@ -137,10 +137,6 @@ const Products: React.FC = () => {
     const maxQuantity = product.stock - (existingItem?.quantity || 0);
     const navigate = useNavigate();
     const handleAddToCart = () => {
-      if (!user) {
-        navigate("/login");
-        return;
-      }
       if (maxQuantity <= 0) {
         toast.error(
           language === "ar"
@@ -172,12 +168,12 @@ const Products: React.FC = () => {
     };
 
     const handleCartClick = () => {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
       if (product.product_role === "tocart") handleAddToCart();
       else if (product.product_role === "toform") {
-        if (!user) {
-          navigate("/login");
-          return;
-        }
         setFormProduct(product);
       }
     };
@@ -288,15 +284,15 @@ const Products: React.FC = () => {
                 onClick={handleCartClick}
                 disabled={product.product_role === "tocart" && maxQuantity <= 0}
                 className={`flex items-center gap-2 rounded-lg font-semibold transition-all whitespace-nowrap
-    w-full md:w-auto justify-center
-    ${
-      product.product_role === "tocart"
-        ? maxQuantity <= 0
-          ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed px-4 py-2"
-          : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white px-4 py-2"
-        : "bg-[#44B3E1]/80 hover:bg-[#44B3E1]/90 text-white text-sm px-2 py-2"
-    }`}
-              >
+                    w-full md:w-auto justify-center
+                    ${
+                      product.product_role === "tocart"
+                        ? maxQuantity <= 0
+                          ? "bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed px-4 py-2"
+                          : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white px-4 py-2"
+                        : "bg-[#44B3E1]/80 hover:bg-[#44B3E1]/90 text-white text-sm px-2 py-2"
+                    }`}
+                              >
                 <ShoppingCartIcon className="w-5 h-5" />
                 {product.product_role === "tocart"
                   ? product.stock > 0

@@ -550,7 +550,7 @@ function ProductForm({
           setBarcode(data.barcode ?? "");
           setWeight(data.weight ?? "");
           setDimensions(data.dimensions ?? "");
-          setProductType(data.product_type ?? "network-device");
+          setProductType(data.product_type ?? "product");
           setIsActive(data.is_active ?? true);
           setIsFeatured(data.is_featured ?? false);
           setIsDigital(data.is_digital ?? false);
@@ -893,14 +893,12 @@ function ProductForm({
                 }`}
                 dir={language === "ar" ? "rtl" : "ltr"}
               >
-                <option value="network-device">
-                  {language === "ar" ? "جهاز شبكات" : "Network Device"}
+                <option value="product">
+                  {language === "ar" ? "منتج" : "Product"}
                 </option>
-                <option value="software-license">
-                  {language === "ar" ? "ترخيص برمجي" : "Software License"}
-                </option>
-                <option value="installation-service">
-                  {language === "ar" ? "خدمة تركيب" : "Installation Service"}
+               
+                <option value="service">
+                  {language === "ar" ? "خدمة " : " Service"}
                 </option>
               </select>
             </div>
