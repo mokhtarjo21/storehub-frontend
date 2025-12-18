@@ -8,13 +8,15 @@ import AdminUsersPage from "./AdminUsersPage";
 import AdminCompaniesPage from "./AdminCompany";
 import { useLanguage } from "../../contexts/LanguageContext";
 import AdminSidebar from "./ AdminSidebar";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 const AdminPanel: React.FC = () => {
-  const { tab } = useParams<{ tab: string }>();
-  const [activeTab, setActiveTab] = useState(tab||"dashboard");
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || "dashboard";
+  
+  const [activeTab, setActiveTab] = useState(tab);
   const [collapsed, setCollapsed] = useState(false);
   const { language } = useLanguage();
-
+  
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative">
       {/* Sidebar */}
