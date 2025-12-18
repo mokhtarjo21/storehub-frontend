@@ -339,8 +339,12 @@ const Products: React.FC = () => {
                     <>
                       <div className="w-2 h-2 rounded-full bg-green-500"></div>
                       <span className="text-green-600 dark:text-green-400 font-medium">
-                        {language === "ar"
-                          ? "الخدمة متاحة"
+                        {product.product_type === "product"
+                          ? language === "ar"
+                            ? " المنتج متاح"
+                            : "Product Available"
+                          : language === "ar"
+                          ? "متاح للخدمة"
                           : "Service Available"}
                       </span>
                     </>

@@ -327,12 +327,18 @@ const Dashboard: React.FC = () => {
                                   language === "ar" ? "ar-EG" : "en-GB"
                                 )}
                               </span>
+                              
                               <span>•</span>
                               <span>
                                 {order.items_count || order.items?.length || 0}{" "}
                                 {t("dashboard.items") ||
                                   (language === "ar" ? "عنصر" : "items")}
                               </span>
+                              {order.items ?.map((item: any, index: number) => (
+                                <span key={index}>
+                                  {item.quantity} x {item.name}
+                                </span>
+                              ))}
                             </div>
                           </div>
                         </div>
