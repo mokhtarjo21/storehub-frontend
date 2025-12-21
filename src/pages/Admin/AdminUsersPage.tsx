@@ -8,7 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
-import {Company} from "../../types/index"
+import { Company } from "../../types/index";
 
 interface User {
   id: number;
@@ -164,56 +164,56 @@ export default function AdminUsersPage() {
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الاسم" : "Name"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "البريد الالكتروني" : "Email"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الهاتف" : "Phone"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الصلاحية" : "Role"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "مفعل" : "Verified"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "الشركة" : "Company"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
                   {language === "ar" ? "النشاط" : "Activity"}
                 </th>
                 <th
-                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ${
+                  className={`py-2 px-3 text-xs font-medium text-gray-500 dark:text-gray-300  ${
                     language === "ar" ? "text-right" : "text-left"
                   }`}
                 >
@@ -332,7 +332,7 @@ export default function AdminUsersPage() {
                       }`}
                     >
                       <button
-                        className="p-1 bg-green-100 dark:bg-green-900/30 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 "
+                        className="p-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 "
                         onClick={() => nanvigate(`/activity/${user.id}`)}
                       >
                         {language === "ar" ? "نشط" : "Activity"}
@@ -389,56 +389,56 @@ export default function AdminUsersPage() {
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "الاسم" : "Name"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "البريد" : "Email"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "الهاتف" : "Phone"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "الصلاحية" : "Role"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "مفعل" : "Verified"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "الشركة" : "Company"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
                     {language === "ar" ? "نشاط" : "Activity"}
                   </th>
                   <th
-                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                    className={`py-3 px-4 text-xs font-medium text-gray-500 dark:text-gray-300  tracking-wider ${
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >

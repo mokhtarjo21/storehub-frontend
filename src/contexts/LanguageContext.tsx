@@ -22,6 +22,8 @@ const translations = {
     "shippingAddress": "Shipping Address",
     "phone": "Phone",
     "email": "Email",
+    "role": "Role",
+    "name": "Name",
 
     "manageStatus": "Manage Status",
     "changeStatus": "Change Order Status",
@@ -483,6 +485,8 @@ const translations = {
     "shippingAddress": "عنوان الشحن",
     "phone": "رقم الهاتف",
     "email": "البريد الإلكتروني",
+    "role": "الدور",
+    "name": "الاسم",
 
     "manageStatus": "إدارة الحالة",
     "changeStatus": "تغيير حالة الطلب",

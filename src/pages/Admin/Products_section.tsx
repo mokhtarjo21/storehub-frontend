@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   PlusCircleIcon,
@@ -132,9 +132,9 @@ export default function AdminProductsSection() {
       console.warn("categories/brands fetch failed", e);
     }
   };
-useEffect(() => {
-  fetchCategoriesAndBrands();
-}, []);
+  useEffect(() => {
+    fetchCategoriesAndBrands();
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => getProducts(), 400);
@@ -176,6 +176,7 @@ useEffect(() => {
       return [saved, ...prev];
     });
   };
+
   return (
     <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
@@ -244,27 +245,27 @@ useEffect(() => {
       >
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-700">
+            <thead className="bg-gray-100 dark:bg-gray-300">
               <tr>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "صورة" : "Image"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "الاسم" : "Name"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "الفئة" : "Category"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "البراند" : "Brand"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "السعر" : "Price"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "المخزون" : "Stock"}
                 </th>
-                <th className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900  tracking-wider">
                   {language === "ar" ? "التحكم" : "Actions"}
                 </th>
               </tr>
@@ -661,13 +662,33 @@ function ProductForm({
       setSubmitting(false);
     }
   };
+  const modalRef = useRef(null);
+  /* ================= Esc Key Close ================= */
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
 
+  /* ================= Outside Click Close ================= */
+  const handleOverlayClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      onClose();
+    }
+  };
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4"
+      onClick={handleOverlayClick}
+    >
       <motion.div
+        ref={modalRef}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-xl w-full max-w-4xl max-h-[95vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
@@ -896,7 +917,7 @@ function ProductForm({
                 <option value="product">
                   {language === "ar" ? "منتج" : "Product"}
                 </option>
-               
+
                 <option value="service">
                   {language === "ar" ? "خدمة " : " Service"}
                 </option>

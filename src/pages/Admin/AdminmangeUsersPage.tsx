@@ -5,8 +5,10 @@ import {
   updateAdmin,
   deleteAdmin,
 } from "../../utils/axiosInstance";
-import AdminUserForm from "../../components/CreateandUpdateAdmin";
+import AdminUserForm from "../../components/CreateAndUpdateAdmin";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { PlusCircleIcon, TrashIcon } from "lucide-react";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 export default function AdminMangeUsersPage() {
   const [admins, setAdmins] = useState([]);
@@ -31,57 +33,87 @@ export default function AdminMangeUsersPage() {
     await deleteAdmin(id);
     fetchAdmins();
   };
-
+const getRoleDisplayName = (role) => {
+    switch (role) {
+      case "super":
+        return language === "ar" ? "مشرف فائق" : "Super Admin";
+      case "admin":
+        return language === "ar" ? "مشرف" : "Admin";
+        case "moderator":
+        return language === "ar" ? "مشرف محتوى" : "Moderator";
+      default:
+        return role;
+    }
+  };
   return (
     <div className="p-6" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t("admin_users")}</h1>
+        <h1
+          className={`text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white ${
+            language === "ar" ? "text-right" : "text-left"
+          }`}
+        >
+          {t("admin_users")}
+        </h1>
         <button
           onClick={() => {
             setSelectedAdmin(null);
             setShowForm(true);
           }}
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
         >
-          + {t("add_admin")}
+          <PlusCircleIcon className="w-5 h-5" />
+          {t("add_admin")}
         </button>
       </div>
 
       {loading ? (
         <p>{t("loading")}</p>
       ) : (
-        <div className="overflow-x-auto bg-white shadow rounded">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto rounded-md">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-100 dark:bg-gray-300 ">
               <tr>
-                <th className="p-3 text-left">{t("email")}</th>
-                <th className="p-3">{t("name")}</th>
-                <th className="p-3">{t("role")}</th>
-                <th className="p-3">{t("actions")}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">{t("email")}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">{t("name")}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">{t("role")}</th>
+                <th className="px-4 py-3 text-start text-xs font-medium text-gray-900 tracking-wider">{t("actions")}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {admins.map((admin) => (
-                <tr key={admin.id} className="border-t">
-                  <td className="p-3">{admin.email}</td>
-                  <td className="p-3 text-center">{admin.full_name}</td>
-                  <td className="p-3 text-center">{admin.role_admin}</td>
-                  <td className="p-3 flex justify-center gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedAdmin(admin);
-                        setShowForm(true);
-                      }}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {t("edit")}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(admin.id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      {t("delete")}
-                    </button>
+                <tr
+                  key={admin.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                >
+                  <td className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider">
+                    {admin.email}
+                  </td>
+                  <td className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider">
+                    {admin.full_name}
+                  </td>
+                  <td className="px-4 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-300 tracking-wider">
+                    {/* {admin.role_admin} */}
+                    {getRoleDisplayName(admin.role_admin)}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-start text-sm">
+                    <div className="flex gap-2 rtl:gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedAdmin(admin);
+                          setShowForm(true);
+                        }}
+                        className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"
+                      >
+                        <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(admin.id)}
+                        className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
+                      >
+                        <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
