@@ -5,7 +5,7 @@ import {
   updateAdmin,
   deleteAdmin,
 } from "../../utils/axiosInstance";
-import AdminUserForm from "../../components/CreateAndUpdateAdmin";
+import AdminUserForm from "../../components/CreateandUpdateAdmin";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { PlusCircleIcon, TrashIcon } from "lucide-react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
