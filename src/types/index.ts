@@ -6,6 +6,7 @@ export interface User {
   address: string;
   role: 'individual' | 'company' | 'affiliate' | 'admin';
   avatar?: string;
+  role_admin?: 'super' | 'admin' | 'moderator';
   points: number;
   companyName?: string;
   affiliateCode?: string;

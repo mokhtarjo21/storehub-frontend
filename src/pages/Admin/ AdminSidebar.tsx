@@ -7,6 +7,7 @@ import {
 import { FaTags, FaShoppingCart, FaUsers, FaBuilding } from "react-icons/fa";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface Props {
   activeTab: string;
@@ -14,7 +15,6 @@ interface Props {
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
 }
-
 const AdminSidebar: React.FC<Props> = ({
   activeTab,
   setActiveTab,
@@ -22,8 +22,14 @@ const AdminSidebar: React.FC<Props> = ({
   setCollapsed,
 }) => {
   const { language } = useLanguage();
-
-  const navItems = [
+  const {user} = useAuth();
+  let navItems = [];
+  if(!user){
+    return null;
+  }
+  
+  if(user?.role_admin == "super"){
+   navItems = [
     {
       label: language === "ar" ? "لوحة التحكم" : "Dashboard",
       icon: <MdDashboard />,
@@ -59,8 +65,63 @@ const AdminSidebar: React.FC<Props> = ({
       icon: <FaBuilding />,
       tab: "Companies management",
     },
+    {
+      label: language === "ar" ? "المسؤولين" : "Admin Users",
+      icon: <FaUsers />,
+      tab: "admin users",
+    },
   ];
-
+  }else if (user?.role_admin == 'admin') {
+      navItems = [
+    {
+      label: language === "ar" ? "لوحة التحكم" : "Dashboard",
+      icon: <MdDashboard />,
+      tab: "dashboard",
+    },
+    {
+      label: language === "ar" ? "المنتجات" : "Products",
+      icon: <MdProductionQuantityLimits />,
+      tab: "products",
+    },
+    {
+      label: language === "ar" ? "العلامات التجارية" : "Brands",
+      icon: <FaTags />,
+      tab: "brands",
+    },
+    {
+      label: language === "ar" ? "التصنيفات" : "Categories",
+      icon: <MdCategory />,
+      tab: "categories",
+    },
+    {
+      label: language === "ar" ? "الطلبات" : "Orders",
+      icon: <FaShoppingCart />,
+      tab: "order",
+    },
+    {
+      label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
+      icon: <FaUsers />,
+      tab: "user management",
+    },
+    
+  ];
+  } else {
+      navItems = [
+    {
+      label: language === "ar" ? "لوحة التحكم" : "Dashboard",
+      icon: <MdDashboard />,
+      tab: "dashboard",
+    },
+    
+    {
+      label: language === "ar" ? "الطلبات" : "Orders",
+      icon: <FaShoppingCart />,
+      tab: "order",
+    },
+  ];
+  }
+  console.log(navItems);
+  
   return (
     <div
       className={`

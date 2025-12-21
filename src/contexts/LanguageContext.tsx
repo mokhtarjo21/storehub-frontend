@@ -215,6 +215,8 @@ const translations = {
     "orders.orderSummary": "Order Summary",
     "orders.subtotal": "Subtotal",
     "orders.tax": "Tax",
+    "admin_users": "Admin Users",
+    "delete_confirmation": "Are you sure you want to delete?",
     "orders.shipping": "Shipping",
     "orders.free": "Free",
     "orders.discount": "Discount",
@@ -424,7 +426,9 @@ const translations = {
     "auth.register.phoneRequired": "Phone number is required",
     "auth.register.phoneInvalid": "Invalid  phone number",
     "auth.register.phone.placeholder": "Enter your phone number",
-
+    "moderator": "Moderator",
+    "admin": "Admin",
+    "super": "Super Admin",
     "auth.forgotPassword.title": "Forgot Your Password ?",
     "auth.forgotPassword.subtitle":
       "Enter your email address below and we'll send you code to reset your password.",
@@ -457,11 +461,16 @@ const translations = {
     "auth.login.forgotPassword": "Forgot Password?",
     "auth.login.dontHaveAccount": "Don't have an account?",
     "auth.login.noAccount": "Don't have an account?",
-
+    "edit_admin": "Edit Admin User",
+    "add_admin": "Add New Admin User",
+    
     "quantity": "Quantity",
     "noItems": "No Items",
   },
   ar: {
+    "edit_admin": "تعديل مستخدم المسؤول",
+    "add_admin": "إضافة مسؤول جديد",
+    // Orders
     "orderDetails": "تفاصيل الطلب",
     "orderInformation": "معلومات الطلب",
     "orderNumber": "رقم الطلب",
@@ -479,7 +488,7 @@ const translations = {
     "changeStatus": "تغيير حالة الطلب",
     "saveChanges": "حفظ التعديلات",
     "cancelOrder": "إلغاء الطلب",
-
+    "admin_users": "مسؤولو النظام",
     "paymentInformation": "معلومات الدفع",
     "paymentMethod": "طريقة الدفع",
     "paymentStatus": "حالة الدفع",
@@ -590,7 +599,9 @@ const translations = {
     "cart.checkout": "متابعة الدفع",
     "cart.clear": "إفراغ السلة",
     "common.apply": "تطبيق",
-
+    "moderator": "مشرف",
+    "admin": "مسؤول",
+    "super": "المسؤول الأعلى",
     // Checkout
     "checkout.title": "الدفع",
     "checkout.subtitle": "املأ معلومات الشحن واختر طريقة الدفع.",
