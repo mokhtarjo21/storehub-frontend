@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
@@ -15,7 +15,10 @@ const AdminCompaniesPage = lazy(() => import("./AdminCompany"));
 const AdminMangeUsersPage = lazy(() => import("./AdminMangeUsersPage"));
 
 // تعريف tabs حسب role
-const roleTabs: Record<string, Record<string, React.LazyExoticComponent<any>>> = {
+const roleTabs: Record<
+  string,
+  Record<string, React.LazyExoticComponent<any>>
+> = {
   super: {
     dashboard: AdminDashboard,
     products: AdminProductsSection,
@@ -49,6 +52,11 @@ const AdminPanel: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { language } = useLanguage();
   const { user } = useAuth();
+
+  // تحديث activeTab عندما يتغير query parameter
+  useEffect(() => {
+    setActiveTab(tab);
+  }, [tab]);
 
   // تحديد tabs حسب role
   const userRole = user?.role_admin || "default";
@@ -87,7 +95,13 @@ const AdminPanel: React.FC = () => {
           }
         `}
       >
-        <Suspense fallback={<div className="text-center py-10">{language==='ar'? 'جاري التحميل ..':"Loading..."}</div>}>
+        <Suspense
+          fallback={
+            <div className="text-center py-10">
+              {language === "ar" ? "جاري التحميل .." : "Loading..."}
+            </div>
+          }
+        >
           <ActiveComponent />
         </Suspense>
       </div>

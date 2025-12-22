@@ -459,7 +459,8 @@ function CategoryForm({
       setSubmitting(false);
     }
   };
-
+  const [imageError, setImageError] = useState<string | null>(null);
+  const MAX_FILE_SIZE_MB = 1;
   return (
     <Transition appear show={true} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -637,6 +638,20 @@ function CategoryForm({
                       }`}
                       dir={language === "ar" ? "rtl" : "ltr"}
                     />
+                    <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                      {language === "ar"
+                        ? `أقصى حجم مسموح للصورة: ${MAX_FILE_SIZE_MB}MB`
+                        : `Maximum allowed image size: ${MAX_FILE_SIZE_MB}MB`}
+                    </p>
+
+                    {imageError && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                        {imageError}.{" "}
+                        {language === "ar"
+                          ? `الحجم الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                          : `Max size: ${MAX_FILE_SIZE_MB}MB`}
+                      </p>
+                    )}
                   </div>
 
                   {/* Active Checkbox */}

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MdDashboard,
   MdProductionQuantityLimits,
@@ -21,107 +22,106 @@ const AdminSidebar: React.FC<Props> = ({
   collapsed,
   setCollapsed,
 }) => {
+  const navigate = useNavigate();
   const { language } = useLanguage();
-  const {user} = useAuth();
+  const { user } = useAuth();
   let navItems = [];
-  if(!user){
+  if (!user) {
     return null;
   }
-  
-  if(user?.role_admin == "super"){
-   navItems = [
-    {
-      label: language === "ar" ? "لوحة التحكم" : "Dashboard",
-      icon: <MdDashboard />,
-      tab: "dashboard",
-    },
-    {
-      label: language === "ar" ? "المنتجات" : "Products",
-      icon: <MdProductionQuantityLimits />,
-      tab: "products",
-    },
-    {
-      label: language === "ar" ? "العلامات التجارية" : "Brands",
-      icon: <FaTags />,
-      tab: "brands",
-    },
-    {
-      label: language === "ar" ? "التصنيفات" : "Categories",
-      icon: <MdCategory />,
-      tab: "categories",
-    },
-    {
-      label: language === "ar" ? "الطلبات" : "Orders",
-      icon: <FaShoppingCart />,
-      tab: "order",
-    },
-    {
-      label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
-      icon: <FaUsers />,
-      tab: "user management",
-    },
-    {
-      label: language === "ar" ? "إدارة الشركات" : "Companies manage",
-      icon: <FaBuilding />,
-      tab: "Companies management",
-    },
-    {
-      label: language === "ar" ? "المسؤولين" : "Admin Users",
-      icon: <FaUsers />,
-      tab: "admin users",
-    },
-  ];
-  }else if (user?.role_admin == 'admin') {
-      navItems = [
-    {
-      label: language === "ar" ? "لوحة التحكم" : "Dashboard",
-      icon: <MdDashboard />,
-      tab: "dashboard",
-    },
-    {
-      label: language === "ar" ? "المنتجات" : "Products",
-      icon: <MdProductionQuantityLimits />,
-      tab: "products",
-    },
-    {
-      label: language === "ar" ? "العلامات التجارية" : "Brands",
-      icon: <FaTags />,
-      tab: "brands",
-    },
-    {
-      label: language === "ar" ? "التصنيفات" : "Categories",
-      icon: <MdCategory />,
-      tab: "categories",
-    },
-    {
-      label: language === "ar" ? "الطلبات" : "Orders",
-      icon: <FaShoppingCart />,
-      tab: "order",
-    },
-    {
-      label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
-      icon: <FaUsers />,
-      tab: "user management",
-    },
-    
-  ];
+
+  if (user?.role_admin == "super") {
+    navItems = [
+      {
+        label: language === "ar" ? "لوحة التحكم" : "Dashboard",
+        icon: <MdDashboard />,
+        tab: "dashboard",
+      },
+      {
+        label: language === "ar" ? "المنتجات" : "Products",
+        icon: <MdProductionQuantityLimits />,
+        tab: "products",
+      },
+      {
+        label: language === "ar" ? "العلامات التجارية" : "Brands",
+        icon: <FaTags />,
+        tab: "brands",
+      },
+      {
+        label: language === "ar" ? "التصنيفات" : "Categories",
+        icon: <MdCategory />,
+        tab: "categories",
+      },
+      {
+        label: language === "ar" ? "الطلبات" : "Orders",
+        icon: <FaShoppingCart />,
+        tab: "order",
+      },
+      {
+        label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
+        icon: <FaUsers />,
+        tab: "user management",
+      },
+      {
+        label: language === "ar" ? "إدارة الشركات" : "Companies manage",
+        icon: <FaBuilding />,
+        tab: "Companies management",
+      },
+      {
+        label: language === "ar" ? "المسؤولين" : "Admin Users",
+        icon: <FaUsers />,
+        tab: "admin users",
+      },
+    ];
+  } else if (user?.role_admin == "admin") {
+    navItems = [
+      {
+        label: language === "ar" ? "لوحة التحكم" : "Dashboard",
+        icon: <MdDashboard />,
+        tab: "dashboard",
+      },
+      {
+        label: language === "ar" ? "المنتجات" : "Products",
+        icon: <MdProductionQuantityLimits />,
+        tab: "products",
+      },
+      {
+        label: language === "ar" ? "العلامات التجارية" : "Brands",
+        icon: <FaTags />,
+        tab: "brands",
+      },
+      {
+        label: language === "ar" ? "التصنيفات" : "Categories",
+        icon: <MdCategory />,
+        tab: "categories",
+      },
+      {
+        label: language === "ar" ? "الطلبات" : "Orders",
+        icon: <FaShoppingCart />,
+        tab: "order",
+      },
+      {
+        label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
+        icon: <FaUsers />,
+        tab: "user management",
+      },
+    ];
   } else {
-      navItems = [
-    {
-      label: language === "ar" ? "لوحة التحكم" : "Dashboard",
-      icon: <MdDashboard />,
-      tab: "dashboard",
-    },
-    
-    {
-      label: language === "ar" ? "الطلبات" : "Orders",
-      icon: <FaShoppingCart />,
-      tab: "order",
-    },
-  ];
+    navItems = [
+      {
+        label: language === "ar" ? "لوحة التحكم" : "Dashboard",
+        icon: <MdDashboard />,
+        tab: "dashboard",
+      },
+
+      {
+        label: language === "ar" ? "الطلبات" : "Orders",
+        icon: <FaShoppingCart />,
+        tab: "order",
+      },
+    ];
   }
-  console.log(navItems);
-  
+
   return (
     <div
       className={`
@@ -173,6 +173,7 @@ const AdminSidebar: React.FC<Props> = ({
               <button
                 onClick={() => {
                   setActiveTab(item.tab);
+                  navigate(`?tab=${item.tab}`);
                   if (window.innerWidth < 1024) {
                     setCollapsed(true);
                   }

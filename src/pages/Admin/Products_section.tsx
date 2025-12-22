@@ -431,7 +431,7 @@ function ProductForm({
   const { language } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
-  const MAX_FILE_SIZE_MB = 0.5;
+  const MAX_FILE_SIZE_MB = 2;
 
   // form state
   const [name, setName] = useState(initial?.name ?? "");
@@ -498,15 +498,20 @@ function ProductForm({
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
       setImageError(
-        `الملف غير صالح. الامتدادات المسموحة: ${ALLOWED_EXTENSIONS.join(", ")}`
+        `${
+          language === "ar" ? "نوع الملف غير صالح" : "Invalid file type"
+        } (${ALLOWED_EXTENSIONS.join(", ")})`
       );
+
       setImageFile(null);
       return;
     }
 
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
       setImageError(
-        `حجم الملف كبير جدًا. الحجم الأقصى: ${MAX_FILE_SIZE_MB} MB`
+        `${
+          language === "ar" ? "حجم الملف كبير جدًا" : "File too large"
+        } (${MAX_FILE_SIZE_MB}MB)`
       );
       setImageFile(null);
       return;
@@ -1060,16 +1065,22 @@ function ProductForm({
                 }`}
                 dir={language === "ar" ? "rtl" : "ltr"}
               />
-              {imageFile && (
-                <span className="block mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {language === "ar" ? "تم اختيار الملف:" : "Selected file:"}{" "}
-                  {imageFile.name}
-                </span>
-              )}
+              <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                {language === "ar"
+                  ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
+                      ", "
+                    )}. الحد الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                  : `Allowed types: ${ALLOWED_EXTENSIONS.join(
+                      ", "
+                    )}. Max size: ${MAX_FILE_SIZE_MB}MB`}
+              </p>
+
               {imageError && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                  {imageError}. الامتدادات المسموحة: jpg, png. الحجم الأقصى:{" "}
-                  {MAX_FILE_SIZE_MB}MB
+                  {imageError}.{" "}
+                  {language === "ar"
+                    ? `الحجم الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                    : `Max size: ${MAX_FILE_SIZE_MB}MB`}
                 </p>
               )}
             </div>
@@ -1102,6 +1113,24 @@ function ProductForm({
                     </span>
                   ))}
                 </div>
+              )}
+              <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                {language === "ar"
+                  ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
+                      ", "
+                    )}. الحد الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                  : `Allowed types: ${ALLOWED_EXTENSIONS.join(
+                      ", "
+                    )}. Max size: ${MAX_FILE_SIZE_MB}MB`}
+              </p>
+
+              {imageError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {imageError}.{" "}
+                  {language === "ar"
+                    ? `الحجم الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                    : `Max size: ${MAX_FILE_SIZE_MB}MB`}
+                </p>
               )}
             </div>
           </div>

@@ -148,6 +148,10 @@ const Register: React.FC = () => {
   });
 
   const selectedRole = watch("role");
+  const commercialRegisterFile = watch("commercialRegister");
+  const taxCardFile = watch("taxCard");
+  const MAX_FILE_SIZE_MB = 5;
+  const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const onSubmit = async (data: RegisterFormData) => {
     if (!agree) {
@@ -203,9 +207,6 @@ const Register: React.FC = () => {
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
             {t("auth.register.title")}
           </h2>
-          {/* <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
-            {t("auth.register.subtitle")}
-          </p> */}
         </div>
 
         <motion.form
@@ -267,9 +268,18 @@ const Register: React.FC = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  {...register("commercialRegister")}
+                  {...register("commercialRegister", {
+                    validate: {
+                      fileSize: (files) =>
+                        !files?.[0] || files[0].size <= MAX_FILE_SIZE,
+                    },
+                  })}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 />
+                <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                  {t("maxImageSize")} {MAX_FILE_SIZE_MB} MB
+                </p>
+
                 {errors.commercialRegister && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.commercialRegister.message}
@@ -283,9 +293,18 @@ const Register: React.FC = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  {...register("taxCard")}
+                  {...(register("taxCard"),
+                  {
+                    validate: {
+                      fileSize: (files) =>
+                        !files?.[0] || files[0].size <= MAX_FILE_SIZE,
+                    },
+                  })}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
                 />
+                <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+                  {t("maxImageSize")} {MAX_FILE_SIZE_MB} MB
+                </p>
                 {errors.taxCard && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">
                     {errors.taxCard.message}

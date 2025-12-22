@@ -14,6 +14,7 @@ import {
   ShieldCheckIcon,
   BuildingStorefrontIcon,
   UserGroupIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { useActivityTracker } from "../../hooks/useActivityTracker";
 import { useAuth } from "../../contexts/AuthContext";
@@ -102,8 +103,10 @@ const Navbar: React.FC = () => {
                   {navigation.map((item) => (
                     <button
                       key={item.name}
-                      onClick={() =>{ navigate(item.href) 
-                        trackPageView(item.href)}}
+                      onClick={() => {
+                        navigate(item.href);
+                        trackPageView(item.href);
+                      }}
                       className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
                         location.pathname === item.href
                           ? "border-[#44B3E1] text-[#44B3E1] dark:text-[#44B3E1]"
@@ -142,8 +145,10 @@ const Navbar: React.FC = () => {
                   <>
                     {/* Cart */}
                     <button
-                      onClick={() => {navigate("/cart") 
-                        trackPageView("/cart")}}
+                      onClick={() => {
+                        navigate("/cart");
+                        trackPageView("/cart");
+                      }}
                       className="p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
                     >
                       <ShoppingCartIcon className="h-5 w-5" />
@@ -187,14 +192,49 @@ const Navbar: React.FC = () => {
                           <Menu.Item>
                             {({ active }) => (
                               <button
-
-                                onClick={() => {navigate("/profile") 
-                                  trackPageView("/profile")}}
+                                onClick={() => {
+                                  navigate("/profile");
+                                  trackPageView("/profile");
+                                }}
                                 className={`block w-full text-left px-4 py-2 text-sm ${
                                   active ? "bg-gray-100 dark:bg-gray-700" : ""
                                 } text-gray-700 dark:text-gray-200`}
                               >
                                 {t("nav.profile")}
+                              </button>
+                            )}
+                          </Menu.Item>
+
+                          {/* Terms & Conditions */}
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button
+                                onClick={() => {
+                                  navigate("/terms");
+                                  trackPageView("/terms");
+                                }}
+                                className={`block w-full text-left px-4 py-2 text-sm ${
+                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                } text-gray-700 dark:text-gray-200`}
+                              >
+                                {t("nav.terms")}
+                              </button>
+                            )}
+                          </Menu.Item>
+
+                          {/* Privacy Policy */}
+                          <Menu.Item>
+                            {({ active }) => (
+                              <button
+                                onClick={() => {
+                                  navigate("/privacy");
+                                  trackPageView("/privacy");
+                                }}
+                                className={`block w-full text-left px-4 py-2 text-sm ${
+                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                } text-gray-700 dark:text-gray-200`}
+                              >
+                                {t("nav.privacy")}
                               </button>
                             )}
                           </Menu.Item>
@@ -360,6 +400,36 @@ const Navbar: React.FC = () => {
                     )}
 
                     <span>{t("nav.profile")}</span>
+                  </Disclosure.Button>
+
+                  {/* Terms & Conditions */}
+                  <Disclosure.Button
+                    as="button"
+                    onClick={() => {
+                      navigate("/terms");
+                      trackPageView("/terms");
+                    }}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <DocumentTextIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {t("nav.terms")}
+                    </span>
+                  </Disclosure.Button>
+
+                  {/* Privacy Policy */}
+                  <Disclosure.Button
+                    as="button"
+                    onClick={() => {
+                      navigate("/privacy");
+                      trackPageView("/privacy");
+                    }}
+                    className="flex items-center w-full px-3 py-3 rounded-lg text-base font-medium transition-all text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <ShieldCheckIcon className="h-5 w-5 mr-2 text-gray-600 dark:text-gray-300" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {t("nav.privacy")}
+                    </span>
                   </Disclosure.Button>
 
                   {/* Logout */}

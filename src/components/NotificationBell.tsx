@@ -5,13 +5,13 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
 import { BellIcon, CheckIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
 import { Notification } from "../types";
 import toast from "react-hot-toast";
-
+const API_BASE = import.meta.env?.VITE_API_BASE || "http://192.168.1.7:8000";
 interface NotificationBellProps {
   showBadge?: boolean;
 }
@@ -22,8 +22,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const token = localStorage.getItem("access_token");
-
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
@@ -31,11 +31,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await fetch("/api/auth/notifications/?limit=5", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        API_BASE + "/api/auth/notifications/?limit=5",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const contentType = response.headers.get("content-type");
@@ -57,11 +60,14 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
 
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const response = await fetch("/api/auth/notifications/unread-count/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        API_BASE + "/api/auth/notifications/unread-count/",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const contentType = response.headers.get("content-type");
@@ -97,7 +103,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/auth/notifications/${notificationId}/read/`,
+        API_BASE + `/api/auth/notifications/${notificationId}/read/`,
         {
           method: "POST",
           headers: {
@@ -143,7 +149,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/auth/notifications/${notificationId}/delete/`,
+        API_BASE + `/api/auth/notifications/${notificationId}/delete/`,
         {
           method: "DELETE",
           headers: {
@@ -279,18 +285,52 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
               notifications.map((notification) => (
                 <Menu.Item key={notification.id}>
                   {({ active }) => (
-                    <Link
-                      to={notification.link || "/notifications"}
-                      className={`block border-b border-gray-100 dark:border-gray-700 last:border-0 ${
-                        active ? "bg-gray-50 dark:bg-gray-700" : ""
-                      } ${
-                        !notification.is_read
-                          ? "bg-blue-50 dark:bg-blue-900/10"
-                          : ""
-                      }`}
-                      onClick={() =>
-                        !notification.is_read && markAsRead(notification.id)
-                      }
+                    <button
+                      type="button"
+                      className={`w-full text-left block border-b border-gray-100 dark:border-gray-700
+    ${active ? "bg-gray-50 dark:bg-gray-700" : ""}
+    ${!notification.is_read ? "bg-blue-50 dark:bg-blue-900/10" : ""}
+  `}
+                      onClick={async () => {
+                        if (!notification.is_read) {
+                          await markAsRead(notification.id);
+                        }
+
+                        // ⬅️ مهم جدًا - الذهاب للمكان الدقيق
+                        setTimeout(() => {
+                          const link = notification.link;
+                          const metadata = notification.metadata;
+
+                          // إذا كان هناك رابط مباشر من الـ API، استخدمه
+                          if (link) {
+                            navigate(link);
+                          }
+                          // إذا كان الإشعار عن الطلبات
+                          else if (
+                            notification.notification_type === "order" &&
+                            metadata?.order_number
+                          ) {
+                            navigate(`/orders/${metadata.order_number}`);
+                          }
+                          // إذا كان الإشعار عن المنتجات (للـ admin)
+                          else if (
+                            notification.notification_type === "order" &&
+                            metadata?.product_id
+                          ) {
+                            navigate(`/admin?tab=products`);
+                          }
+                          // إشعارات الأمان والتحذيرات
+                          else if (
+                            notification.notification_type === "security"
+                          ) {
+                            navigate("/profile");
+                          }
+                          // الإشعارات العامة
+                          else {
+                            navigate("/notifications");
+                          }
+                        }, 0);
+                      }}
                     >
                       <div className="p-4">
                         <div className="flex items-start space-x-3">
@@ -355,7 +395,7 @@ const NotificationBell: React.FC<NotificationBellProps> = ({
                           </div>
                         </div>
                       </div>
-                    </Link>
+                    </button>
                   )}
                 </Menu.Item>
               ))

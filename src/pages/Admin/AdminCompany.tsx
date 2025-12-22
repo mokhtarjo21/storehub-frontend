@@ -49,7 +49,7 @@ export default function AdminCompaniesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
-
+  const [openImage, setOpenImage] = useState(null);
   const openCompanyModal = (company: Company) => {
     setSelectedCompany(company);
     setIsModalOpen(true);
@@ -155,6 +155,33 @@ export default function AdminCompaniesPage() {
         color: "bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200",
       }
     );
+  };
+  const handleOpenImage = (url) => {
+    setOpenImage(url);
+  };
+
+  const handleCloseImage = () => {
+    setOpenImage(null);
+  };
+  const handleDownloadImage = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      const fileName = url.split("/").pop() || "image.jpg"; 
+      link.download = fileName;
+      link.click();
+
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert("فشل في تنزيل الصورة.");
+    }
   };
 
   return (
@@ -316,7 +343,7 @@ export default function AdminCompaniesPage() {
                       >
                         <div
                           className={`flex gap-1 sm:gap-2 ${
-                            language === "ar" ? "flex-row-reverse" : "flex-row"
+                            language === "ar" ? "text-right" : "text-left"
                           }`}
                         >
                           <button
@@ -431,9 +458,7 @@ export default function AdminCompaniesPage() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div
-              className={`flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 ${
-                language === "ar" ? "flex-row-reverse" : "flex-row"
-              }`}
+              className={`flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 `}
             >
               <div className="flex items-center gap-3">
                 <BuildingOfficeIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -563,7 +588,10 @@ export default function AdminCompaniesPage() {
                           alt={
                             language === "ar" ? "البطاقة الضريبية" : "Tax Card"
                           }
-                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
+                          onClick={() =>
+                            handleOpenImage(selectedCompany.tax_card_image)
+                          }
                         />
                       </div>
                     )}
@@ -581,7 +609,12 @@ export default function AdminCompaniesPage() {
                               ? "السجل التجاري"
                               : "Commercial Registration"
                           }
-                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
+                          onClick={() =>
+                            handleOpenImage(
+                              selectedCompany.commercial_registration_image
+                            )
+                          }
                         />
                       </div>
                     )}
@@ -592,11 +625,7 @@ export default function AdminCompaniesPage() {
 
             {/* Footer */}
             <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <div
-                className={`flex justify-end ${
-                  language === "ar" ? "flex-row-reverse" : "flex-row"
-                }`}
-              >
+              <div className={`flex justify-end`}>
                 <button
                   className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm"
                   onClick={() => setIsModalOpen(false)}
@@ -605,6 +634,35 @@ export default function AdminCompaniesPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* الصورة المعروضة */}
+      {openImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="relative bg-white dark:bg-gray-900 rounded-lg p-4 max-w-xl w-full">
+            {/* زراغلاق */}
+            <button
+              onClick={handleCloseImage}
+              className="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            >
+              ✕
+            </button>
+
+            {/* الصورة */}
+            <img
+              src={openImage}
+              alt="Preview"
+              className="w-full max-h-[75vh] object-fill rounded"
+            />
+
+            {/* زر التحميل */}
+            <button
+              onClick={() => handleDownloadImage(openImage)}
+              className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              {language === "ar" ? "تنزيل الصورة" : "Download Image"}
+            </button>
           </div>
         </div>
       )}

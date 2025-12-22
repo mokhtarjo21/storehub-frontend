@@ -64,7 +64,6 @@ export default function AdminOrdersPage() {
   const [updating, setUpdating] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { fetchorders, updateorders, fechorder } = useAuth();
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
   const [totalOrders, setTotalOrders] = useState(0);
@@ -1302,6 +1301,13 @@ export default function AdminOrdersPage() {
                       >
                         {t("orderTimeline")}
                       </TabButton>
+                      <TabButton
+                        active={activeTab === "Logs"}
+                        onClick={() => setActiveTab("Logs")}
+                        className="flex-1 sm:flex-none text-center"
+                      >
+                        {t("orderLogs")}
+                      </TabButton>
                     </nav>
                   </div>
 
@@ -1539,6 +1545,37 @@ export default function AdminOrdersPage() {
                         )}
                       </div>
                     )}
+                    {activeTab === "Logs" && (
+                      <div className="space-y-4 sm:space-y-6">
+                        {selectedOrder.logs && selectedOrder.logs.length > 0 ? (
+                          selectedOrder.logs.map((log, idx) => (
+                            <div
+                              key={idx}
+                              className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4"
+                            >
+                              <div className="flex-1 min-w-0 pb-4 sm:pb-6 md:pb-0">
+                                <div className="font-medium text-sm sm:text-base md:text-lg text-gray-900 dark:text-white">
+                                  {log.admin}: {t(`orders.logs.${log.status}`)}
+                                </div>
+                                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
+                                  {log.timestamp
+                                    ? new Date(log.timestamp).toLocaleString(
+                                        locale
+                                      )
+                                    : ""}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center py-8 sm:py-12 w-full">
+                            {language === "ar"
+                              ? "لا يوجد سجلات"
+                              : "No logs available"}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4">
@@ -1563,7 +1600,7 @@ export default function AdminOrdersPage() {
                           <h5 className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-3 sm:mb-4">
                             {language === "ar"
                               ? "تفاصيل العرص السعري"
-                              : "Cotation Details"}
+                              : "Quotation Details"}
                             : {selectedOrder.order_number}
                           </h5>
 
@@ -1627,36 +1664,29 @@ export default function AdminOrdersPage() {
                               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
                             />
                           </div>
-
-                         
                         </div>
                       </div>
                     </div>
                   </>
                 )}
-                 <div className="mb-4">
-                            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                              {language === "ar"
-                                ? "ملاحظات داخلية"
-                                : "Internal Notes"}
-                            </label>
-                            <textarea
-                              value={
-                                editingOrder?.hint_note ??
-                                selectedOrder.hint_note
-                              }
-                              onChange={(e) =>
-                                handleEditField("hint_note", e.target.value)
-                              }
-                              rows={3}
-                              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
-                              placeholder={
-                                language === "ar"
-                                  ? "اكتب ملاحظات الخاصة..."
-                                  : "Write internal notes ..."
-                              }
-                            ></textarea>
-                          </div>
+                <div className="mb-4">
+                  <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {language === "ar" ? "ملاحظات داخلية" : "Internal Notes"}
+                  </label>
+                  <textarea
+                    value={editingOrder?.hint_note ?? selectedOrder.hint_note}
+                    onChange={(e) =>
+                      handleEditField("hint_note", e.target.value)
+                    }
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
+                    placeholder={
+                      language === "ar"
+                        ? "اكتب ملاحظات الخاصة..."
+                        : "Write internal notes ..."
+                    }
+                  ></textarea>
+                </div>
 
                 {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
