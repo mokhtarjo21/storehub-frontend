@@ -61,6 +61,7 @@ const Terms = () => {
             className="text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
           >
             {language === "ar" ? "العودة للرئيسية" : "Back to registration"}
+            
           </button>
         </div>
       </div>
