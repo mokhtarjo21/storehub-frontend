@@ -111,6 +111,8 @@ const OrderDetail: React.FC = () => {
       </div>
     );
   }
+  console.log(order);
+  
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -474,7 +476,22 @@ const OrderDetail: React.FC = () => {
             ))}
           </div>
         </motion.div>
-
+             {order.hint_note && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
+          >
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {
+                (language === "ar" ? "ملاحظات الدفع" : "Payment Notes")}
+            </h3>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 break-words">
+              {order.hint_note}
+            </p>
+          </motion.div>
+        )}
         {/* Order Notes */}
         {order.notes && (
           <motion.div

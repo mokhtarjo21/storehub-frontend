@@ -24,3 +24,12 @@ export const updateAdmin = (id, data) =>
 export const deleteAdmin = (id) =>
   instance.delete(`api/auth/adminusers/${id}/`);
 export default instance;
+
+export const getLogs= (id) =>
+  instance.get(`/api/orders/logs/logs/?order=${id}`);
+
+export const addLogs= (data) =>
+  instance.post(`/api/orders/logs/logs/`,data);
+
+export const deleteLogs= (id) =>
+  instance.delete(`/api/orders/logs/logs/${id}`);

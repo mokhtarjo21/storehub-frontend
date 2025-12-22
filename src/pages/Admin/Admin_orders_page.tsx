@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
 import ar from "date-fns/locale/ar";
 import enGB from "date-fns/locale/en-GB";
-
+import OrderLogs from "./OrderLogs"
 registerLocale("ar", ar);
 registerLocale("en-GB", enGB);
 
@@ -1546,35 +1546,7 @@ export default function AdminOrdersPage() {
                       </div>
                     )}
                     {activeTab === "Logs" && (
-                      <div className="space-y-4 sm:space-y-6">
-                        {selectedOrder.logs && selectedOrder.logs.length > 0 ? (
-                          selectedOrder.logs.map((log, idx) => (
-                            <div
-                              key={idx}
-                              className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4"
-                            >
-                              <div className="flex-1 min-w-0 pb-4 sm:pb-6 md:pb-0">
-                                <div className="font-medium text-sm sm:text-base md:text-lg text-gray-900 dark:text-white">
-                                  {log.admin}: {t(`orders.logs.${log.status}`)}
-                                </div>
-                                <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
-                                  {log.timestamp
-                                    ? new Date(log.timestamp).toLocaleString(
-                                        locale
-                                      )
-                                    : ""}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-sm sm:text-base text-gray-500 dark:text-gray-400 text-center py-8 sm:py-12 w-full">
-                            {language === "ar"
-                              ? "لا يوجد سجلات"
-                              : "No logs available"}
-                          </div>
-                        )}
-                      </div>
+                      <OrderLogs orderId={selectedOrder.id} />
                     )}
                   </div>
                 </div>
@@ -1664,14 +1636,9 @@ export default function AdminOrdersPage() {
                               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
                             />
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-                <div className="mb-4">
+                          <div className="mb-4">
                   <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {language === "ar" ? "ملاحظات داخلية" : "Internal Notes"}
+                    {language === "ar" ? "ملاحظات الدفع" : "Payment Notes"}
                   </label>
                   <textarea
                     value={editingOrder?.hint_note ?? selectedOrder.hint_note}
@@ -1682,12 +1649,20 @@ export default function AdminOrdersPage() {
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none shadow-md"
                     placeholder={
                       language === "ar"
-                        ? "اكتب ملاحظات الخاصة..."
-                        : "Write internal notes ..."
+                        ? "ملاحظات الدفع..."
+                        : "Payment notes ..."
                     }
-                  ></textarea>
+                  >
+
+                  </textarea>
                 </div>
 
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+                
                 {/* Right - Actions column */}
                 <aside className="w-full lg:col-span-2">
                   <div className="sticky top-4">

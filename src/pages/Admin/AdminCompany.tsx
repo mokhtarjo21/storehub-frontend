@@ -38,6 +38,7 @@ export default function AdminCompaniesPage() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [companyToReject, setCompanyToReject] = useState<Company | null>(null);
+  const [zoom, setZoom] = useState(1);
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
@@ -162,22 +163,39 @@ export default function AdminCompaniesPage() {
 
   const handleCloseImage = () => {
     setOpenImage(null);
+    setZoom(1);
   };
-  const handleDownloadImage = async (url: string) => {
+  const handleWheelZoom = (e: React.WheelEvent<HTMLImageElement>) => {
+  e.preventDefault();
+
+  setZoom((prev) => {
+    const zoomSpeed = 0.1;
+    let nextZoom =
+      e.deltaY < 0 ? prev + zoomSpeed : prev - zoomSpeed;
+
+    // Limits
+    nextZoom = Math.min(Math.max(nextZoom, 0.5), 3);
+
+    return nextZoom;
+  });
+};
+
+  const handleDownloadImage =  async(url: string) => {
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Network response was not ok");
+  const response = await fetch(url);
+    const blob = await response.blob();
 
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
 
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      const fileName = url.split("/").pop() || "image.jpg"; 
-      link.download = fileName;
-      link.click();
+    link.href = downloadUrl;
+    link.download = url.split("/").pop() || "image.jpg";
 
-      window.URL.revokeObjectURL(blobUrl);
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Download failed:", error);
       alert("فشل في تنزيل الصورة.");
@@ -650,11 +668,22 @@ export default function AdminCompaniesPage() {
             </button>
 
             {/* الصورة */}
-            <img
-              src={openImage}
-              alt="Preview"
-              className="w-full max-h-[75vh] object-fill rounded"
-            />
+           <div className="overflow-hidden flex justify-center">
+              <img
+                src={openImage}
+                alt="Preview"
+                onWheel={handleWheelZoom}
+                style={{
+                  transform: `scale(${zoom})`,
+                  transition: "transform 0.1s ease-out",
+                  cursor: "zoom-in",
+                }}
+                className="max-h-[75vh] object-contain rounded select-none"
+                draggable={false}
+              />
+            </div>
+
+
 
             {/* زر التحميل */}
             <button
