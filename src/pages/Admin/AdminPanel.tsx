@@ -12,7 +12,7 @@ const AdminBrandsSection = lazy(() => import("./Brands_section"));
 const AdminCategoriesSection = lazy(() => import("./Categories_section"));
 const AdminUsersPage = lazy(() => import("./AdminUsersPage"));
 const AdminCompaniesPage = lazy(() => import("./AdminCompany"));
-const AdminMangeUsersPage = lazy(() => import("./AdminMangeUsersPage"));
+const AdminMangeUsersPage = lazy(() => import("./AdminmangeUsersPage"));
 
 // تعريف tabs حسب role
 const roleTabs: Record<

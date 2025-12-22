@@ -7,7 +7,7 @@ import * as yup from "yup";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
-
+import { resendOTP } from "../../utils/api";
 export const useLoginSchema = () => {
   const { language } = useLanguage();
 
@@ -16,13 +16,13 @@ export const useLoginSchema = () => {
       emailRequired: "Email is required",
       emailInvalid: "Invalid email",
       passwordRequired: "Password is required",
-      passwordMin: "Password must be at least 6 characters",
+      passwordMin: "Password must be at least 8 characters",
     },
     ar: {
       emailRequired: "البريد الإلكتروني مطلوب",
       emailInvalid: "البريد الإلكتروني غير صالح",
       passwordRequired: "كلمة المرور مطلوبة",
-      passwordMin: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+      passwordMin: "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
     },
   };
 
@@ -64,6 +64,7 @@ const Login: React.FC = () => {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
       if (errorMessage.includes("verify your email")) {
+        resendOTP(data.email)
         navigate(`/verify-email?email=${encodeURIComponent(data.email)}`);
       }
     }

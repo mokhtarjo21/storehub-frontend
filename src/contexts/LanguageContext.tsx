@@ -426,7 +426,7 @@ const translations = {
     "auth.register.haveAccount": "Already have an account?",
     companyEmailOnly:
       "Personal emails like Gmail are not allowed. Please use your company email.",
-
+    
     "auth.register.phoneRequired": "Phone number is required",
     "auth.register.phoneInvalid": "Invalid  phone number",
     "auth.register.phone.placeholder": "Enter your phone number",
@@ -853,7 +853,7 @@ const translations = {
     "admin.orders": "الطلبات",
     "admin.analytics": "التحليلات",
     "admin.notifications": "الإشعارات",
-
+    "delete_confirmation":"هل تريد تاكيد حذف المستخدم",
     // Auth
     "auth.login.title": "تسجيل الدخول",
     "auth.login.subtitle": "مرحباً بعودتك إلى ستور هاب",
