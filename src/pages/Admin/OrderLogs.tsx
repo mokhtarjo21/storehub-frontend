@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getLogs, addLogs, deleteLogs } from "../../utils/axiosInstance"; // المسار حسب مشروعك
-import usericon from "../../assets/user.png"
+import usericon from "../../assets/user.png";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 export default function OrderLogs({ orderId }) {
@@ -8,7 +8,7 @@ export default function OrderLogs({ orderId }) {
   const [newLog, setNewLog] = useState("");
   const [loading, setLoading] = useState(false);
   const { t, language } = useLanguage();
-  const{user}=useAuth();
+  const { user } = useAuth();
   // Fetch logs
   const fetchLogs = async () => {
     try {
@@ -52,13 +52,17 @@ export default function OrderLogs({ orderId }) {
 
   return (
     <div className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
-      <h2 className="text-xl font-bold ">{language=='ar'?"Order Logs":"سجل الطلب"}</h2>
+      <h2 className="text-xl font-bold pb-2">
+        {language == "ar" ? "سجلات الطلب" : "Order Logs"}
+      </h2>
 
       {/* Add new log */}
       <form onSubmit={handleAddLog} className="mb-4 gap-4 flex">
         <input
           type="text"
-          placeholder={language=='ar'?"Add log.":"اضف سجل"}
+          placeholder={
+            language == "ar" ? "اكتب سجل جديد..." : "Write a new log..."
+          }
           className="w-full pl-12 pr-4 py-3.5 border border-gray-300 dark:border-gray-600 rounded-xl 
                      bg-white dark:bg-gray-700/60 text-gray-900 dark:text-white 
                      placeholder-gray-500 dark:placeholder-gray-400 
@@ -73,17 +77,27 @@ export default function OrderLogs({ orderId }) {
           className=" px-3 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           disabled={loading}
         >
-          {loading ? language=='ar'?"Posting....":"جاري الاضافة" : language=='ar'?"Post":"اضافة"}
+          {loading
+            ? language == "ar"
+              ? "جاري الاضافة"
+              : "Posting..."
+            : language == "ar"
+            ? "اضافة"
+            : "Add"}
         </button>
       </form>
 
       {/* Logs list */}
       <div className="space-y-4">
-        {logs.length === 0 && <p className="text-gray-500">{language=='ar'?"No logs yet.":"لا توجد سجلات "}</p>}
+        {logs.length === 0 && (
+          <p className="text-gray-500">
+            {language == "ar" ? "لا يوجد سجلات" : "No logs yet"}
+          </p>
+        )}
         {logs.map((log) => (
           <div key={log.id} className="flex space-x-3">
             <img
-              src={log.user.avatar ||usericon}
+              src={log.user.avatar || usericon}
               alt={log.user.full_name}
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -94,13 +108,14 @@ export default function OrderLogs({ orderId }) {
                 {new Date(log.created_at).toLocaleString()}
               </p>
             </div>
-            {user.id ==log.user.id&&(
-            <button
-              onClick={() => handleDeleteLog(log.id)}
-              className="text-red-500 hover:text-red-700 text-sm"
-            >
-              Delete
-            </button>)}
+            {user.id == log.user.id && (
+              <button
+                onClick={() => handleDeleteLog(log.id)}
+                className="text-red-500 hover:text-red-700 text-sm"
+              >
+                {language == "ar" ? "حذف" : "Delete"}
+              </button>
+            )}
           </div>
         ))}
       </div>

@@ -1306,7 +1306,7 @@ export default function AdminOrdersPage() {
                         onClick={() => setActiveTab("Logs")}
                         className="flex-1 sm:flex-none text-center"
                       >
-                        {t("orderLogs")}
+                        {language === "ar" ? "سجلات الطلب" : "Order Logs"}
                       </TabButton>
                     </nav>
                   </div>
