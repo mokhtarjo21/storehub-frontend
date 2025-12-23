@@ -26,12 +26,12 @@ const Products: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | number>("");
   const [selectedBrand, setSelectedBrand] = useState<string | number>("");
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { trackProductClick, trackAddToCart, trackSearch } =
     useActivityTracker();
   const [formProduct, setFormProduct] = useState<any | null>(null);
-  const [pageSize, setPageSize] = useState(24);
+  const [pageSize] = useState(24);
   const [totalPages, setTotalPages] = useState(1);
   // Fetch products
   const getProducts = async () => {
@@ -43,7 +43,7 @@ const Products: React.FC = () => {
       if (selectedCategory) params.category = selectedCategory;
       if (selectedBrand) params.brand = selectedBrand;
 
-      const productsData = await fetchProducts(params);
+      const productsData: any = await fetchProducts(params);
 
       trackSearch(searchTerm, productsData.count);
 
@@ -71,11 +71,13 @@ const Products: React.FC = () => {
         fetchbrands(),
       ]);
       if (cRes.status === "fulfilled") {
-        const cdata = (cRes.value.results ?? cRes.value.data) as Category[];
+        const cVal: any = cRes.value;
+        const cdata = (cVal.results ?? cVal.data) as Category[];
         if (Array.isArray(cdata)) setCategories(cdata);
       }
       if (bRes.status === "fulfilled") {
-        const bdata = (bRes.value.results ?? bRes.value.data) as Brand[];
+        const bVal: any = bRes.value;
+        const bdata = (bVal.results ?? bVal.data) as Brand[];
         if (Array.isArray(bdata)) setBrands(bdata);
       }
     } catch (err) {
@@ -93,7 +95,10 @@ const Products: React.FC = () => {
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, selectedBrand, currentPage]);
 
-  const sendOrderWithRetry = async (data: any, retries = 3) => {
+  const sendOrderWithRetry = async (
+    data: any,
+    retries = 3
+  ): Promise<boolean> => {
     try {
       await apiRequest("/orders/", {
         method: "post",
@@ -105,10 +110,7 @@ const Products: React.FC = () => {
           product_role: formProduct?.product_role,
         }),
       });
-      toast.success(
-        language === "ar" ? "تم إرسال الطلب بنجاح" : "Order sent successfully"
-      );
-      setFormProduct(null);
+      return true;
     } catch (err: any) {
       if (err.message.includes("throttled") && retries > 0) {
         const waitTime = parseInt(err.message.match(/\d+/)?.[0] ?? "1");
@@ -124,7 +126,24 @@ const Products: React.FC = () => {
         toast.error(
           language === "ar" ? "فشل في إرسال الطلب" : "Failed to send order"
         );
+        return false;
       }
+    }
+  };
+
+  const handleFormSubmit = async (data: { phone: string; details: string }) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const ok = await sendOrderWithRetry(data);
+      if (ok) {
+        setFormProduct(null);
+        toast.success(
+          language === "ar" ? "تم إرسال الطلب بنجاح" : "Order sent successfully"
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -145,8 +164,7 @@ const Products: React.FC = () => {
         );
         return;
       }
-      
-      
+
       const quantityToAdd = Math.min(quantity, maxQuantity);
       const cartProduct = {
         id: product.id.toString(),
@@ -294,7 +312,7 @@ const Products: React.FC = () => {
                           : "bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white px-4 py-2"
                         : "bg-[#44B3E1]/80 hover:bg-[#44B3E1]/90 text-white text-sm px-2 py-2"
                     }`}
-                              >
+              >
                 <ShoppingCartIcon className="w-5 h-5" />
                 {product.product_role === "tocart"
                   ? product.stock > 0
@@ -468,14 +486,17 @@ const Products: React.FC = () => {
       {formProduct && (
         <CustomerFormModal
           open={!!formProduct}
-          onClose={() => setFormProduct(null)}
+          onClose={() => {
+            if (!isSubmitting) setFormProduct(null);
+          }}
           itemName={
             language === "ar"
               ? formProduct?.name_ar || formProduct?.name
               : formProduct?.name
           }
           itemType={formProduct?.product_type}
-          onSubmit={sendOrderWithRetry}
+          onSubmit={handleFormSubmit}
+          submitting={isSubmitting}
         />
       )}
     </div>

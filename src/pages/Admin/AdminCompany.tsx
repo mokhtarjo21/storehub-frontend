@@ -668,7 +668,7 @@ export default function AdminCompaniesPage() {
             </button>
 
             {/* الصورة */}
-           <div className="overflow-hidden flex justify-center">
+            <div className="overflow-hidden flex justify-center">
               <img
                 src={openImage}
                 alt="Preview"
@@ -683,7 +683,27 @@ export default function AdminCompaniesPage() {
               />
             </div>
 
-
+            {/* أزرار الزوم للموبايل */}
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <button
+                onClick={() => setZoom((z) => Math.max(z - 0.2, 0.5))}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                -
+              </button>
+              <button
+                onClick={() => setZoom(1)}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                {language === "ar" ? "إعادة" : "Reset"}
+              </button>
+              <button
+                onClick={() => setZoom((z) => Math.min(z + 0.2, 3))}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                +
+              </button>
+            </div>
 
             {/* زر التحميل */}
             <button

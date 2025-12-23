@@ -8,8 +8,9 @@ type CustomerFormModalProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: { phone: string; details: string }) => void;
-  itemName: string; 
-  itemType: "product" | "service"; 
+  itemName: string;
+  itemType: "product" | "service";
+  submitting?: boolean;
 };
 
 const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
@@ -18,6 +19,7 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
   onSubmit,
   itemName,
   itemType,
+  submitting = false,
 }) => {
   const { user } = useAuth();
   const { language } = useLanguage();
@@ -25,6 +27,7 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
   const [details, setDetails] = useState("");
 
   const handleSubmit = () => {
+    if (submitting) return;
     if (!phone || !details) {
       toast.error(
         language === "ar" ? "يرجى ملء جميع الحقول" : "Please fill all fields"
@@ -33,12 +36,6 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
     }
 
     onSubmit({ phone, details });
-
-    toast.success(
-      language === "ar"
-        ? "سوف يتم التواصل معك من أحد ممثلي خدمة العملاء"
-        : "A customer service agent will contact you shortly"
-    );
 
     setPhone("");
     setDetails("");
@@ -51,7 +48,10 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          disabled={submitting}
+          className={`absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white ${
+            submitting ? "opacity-60 cursor-not-allowed" : ""
+          }`}
         >
           <XMarkIcon className="w-6 h-6" />
         </button>
@@ -93,8 +93,14 @@ const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
 
           <button
             onClick={handleSubmit}
-            className="w-full py-3 bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white font-semibold rounded-xl transition-all"
+            disabled={submitting}
+            className={`w-full py-3 bg-[#155F82]/80 hover:bg-[#155F82]/90 text-white font-semibold rounded-xl transition-all inline-flex items-center justify-center gap-2 ${
+              submitting ? "opacity-60 cursor-not-allowed" : ""
+            }`}
           >
+            {submitting && (
+              <span className="h-4 w-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin" />
+            )}
             {language === "ar" ? "إرسال" : "Submit"}
           </button>
         </div>

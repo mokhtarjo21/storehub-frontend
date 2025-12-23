@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { useLanguage } from "../../contexts/LanguageContext";
 import {
@@ -37,10 +37,11 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(24);
+  const [pageSize] = useState(24);
   const [loading, setLoading] = useState(false);
-  const perPage = 10;
   const [totalPages, setTotalPages] = useState(1);
+  const [openImage, setOpenImage] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
   const nanvigate = useNavigate();
   useEffect(() => {
     fetchUsers();
@@ -104,6 +105,49 @@ export default function AdminUsersPage() {
 
     return roleMap[role]?.[language === "ar" ? "ar" : "en"] || role;
   };
+
+  const handleOpenImage = (url: string) => {
+    setOpenImage(url);
+  };
+
+  const handleCloseImage = () => {
+    setOpenImage(null);
+    setZoom(1);
+  };
+
+  const handleWheelZoom = (e: React.WheelEvent<HTMLImageElement>) => {
+    e.preventDefault();
+    setZoom((prev) => {
+      const zoomSpeed = 0.1;
+      let nextZoom = e.deltaY < 0 ? prev + zoomSpeed : prev - zoomSpeed;
+      nextZoom = Math.min(Math.max(nextZoom, 0.5), 3);
+      return nextZoom;
+    });
+  };
+
+  const handleZoomIn = () => setZoom((z) => Math.min(z + 0.2, 3));
+  const handleZoomOut = () => setZoom((z) => Math.max(z - 0.2, 0.5));
+  const handleZoomReset = () => setZoom(1);
+
+  const handleDownloadImage = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = url.split("/").pop() || "image.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert(language === "ar" ? "فشل في تنزيل الصورة." : "Download failed.");
+    }
+  };
+
+  const company = selectedUser?.company;
 
   return (
     <div className="min-h-screen p-4 sm:p-6 bg-gray-50 dark:bg-gray-900">
@@ -777,7 +821,7 @@ export default function AdminUsersPage() {
               )}
 
               {/* Company Details */}
-              {selectedUser.company && (
+              {company && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <h3
                     className={`text-lg font-semibold text-gray-900 dark:text-white mb-4 ${
@@ -794,7 +838,7 @@ export default function AdminUsersPage() {
                         {language === "ar" ? "اسم الشركة" : "Company Name"}
                       </label>
                       <p className="text-gray-900 dark:text-white">
-                        {selectedUser.company.name}
+                        {company.name}
                       </p>
                     </div>
                     <div
@@ -804,7 +848,7 @@ export default function AdminUsersPage() {
                         {language === "ar" ? "البريد الإلكتروني" : "Email"}
                       </label>
                       <p className="text-gray-900 dark:text-white">
-                        {selectedUser.company.email}
+                        {company.email}
                       </p>
                     </div>
                     <div
@@ -817,15 +861,14 @@ export default function AdminUsersPage() {
                       </label>
                       <span
                         className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full capitalize ${
-                          selectedUser.company.approval_status === "approved"
+                          company.approval_status === "approved"
                             ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                            : selectedUser.company.approval_status ===
-                              "rejected"
+                            : company.approval_status === "rejected"
                             ? "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
                             : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
                         }`}
                       >
-                        {selectedUser.company.approval_status}
+                        {company.approval_status}
                       </span>
                     </div>
                     <div
@@ -835,7 +878,7 @@ export default function AdminUsersPage() {
                         {language === "ar" ? "الهاتف" : "Phone"}
                       </label>
                       <p className="text-gray-900 dark:text-white">
-                        {selectedUser.company.phone}
+                        {company.phone}
                       </p>
                     </div>
                   </div>
@@ -854,16 +897,19 @@ export default function AdminUsersPage() {
                         language === "ar" ? "flex-row-reverse" : "flex-row"
                       }`}
                     >
-                      {selectedUser.company.tax_card_image && (
+                      {company.tax_card_image && (
                         <div className="text-center">
                           <img
-                            src={selectedUser.company.tax_card_image}
+                            src={company.tax_card_image}
                             alt={
                               language === "ar"
                                 ? "البطاقة الضريبية"
                                 : "Tax Card"
                             }
-                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
+                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer"
+                            onClick={() =>
+                              handleOpenImage(company.tax_card_image!)
+                            }
                           />
                           <p className="text-xs text-gray-600 dark:text-gray-400">
                             {language === "ar"
@@ -872,18 +918,21 @@ export default function AdminUsersPage() {
                           </p>
                         </div>
                       )}
-                      {selectedUser.company.commercial_registration_image && (
+                      {company.commercial_registration_image && (
                         <div className="text-center">
                           <img
-                            src={
-                              selectedUser.company.commercial_registration_image
-                            }
+                            src={company.commercial_registration_image}
                             alt={
                               language === "ar"
                                 ? "السجل التجاري"
                                 : "Commercial Registration"
                             }
-                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2"
+                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer"
+                            onClick={() =>
+                              handleOpenImage(
+                                company.commercial_registration_image!
+                              )
+                            }
                           />
                           <p className="text-xs text-gray-600 dark:text-gray-400">
                             {language === "ar"
@@ -911,6 +960,58 @@ export default function AdminUsersPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {openImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="relative bg-white dark:bg-gray-900 rounded-lg p-4 max-w-xl w-full">
+            <button
+              onClick={handleCloseImage}
+              className="absolute top-2 right-2 text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+            >
+              ✕
+            </button>
+            <div className="overflow-hidden flex justify-center">
+              <img
+                src={openImage}
+                alt="Preview"
+                onWheel={handleWheelZoom}
+                style={{
+                  transform: `scale(${zoom})`,
+                  transition: "transform 0.1s ease-out",
+                  cursor: "zoom-in",
+                }}
+                className="max-h-[75vh] object-contain rounded select-none"
+                draggable={false}
+              />
+            </div>
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <button
+                onClick={handleZoomOut}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                -
+              </button>
+              <button
+                onClick={handleZoomReset}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                {language === "ar" ? "إعادة" : "Reset"}
+              </button>
+              <button
+                onClick={handleZoomIn}
+                className="px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
+              >
+                +
+              </button>
+            </div>
+            <button
+              onClick={() => handleDownloadImage(openImage)}
+              className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              {language === "ar" ? "تنزيل الصورة" : "Download Image"}
+            </button>
           </div>
         </div>
       )}
