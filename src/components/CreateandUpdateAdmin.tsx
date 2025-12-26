@@ -153,7 +153,6 @@ ${isRTL ? "pr-10 pl-3" : "pl-10 pr-3"}
               value={form.role_admin}
               onChange={(e) => setForm({ ...form, role_admin: e.target.value })}
             >
-              <option value="super">{t("super")}</option>
               <option value="admin">{t("admin")}</option>
               <option value="moderator">{t("moderator")}</option>
             </select>
