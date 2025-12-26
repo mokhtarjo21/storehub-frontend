@@ -49,7 +49,7 @@ function App() {
                     element={<AccountUnderReview />}
                   />
                   <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} />
+                    <Route index element={<Products />} />
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
                     <Route path="/terms" element={<Terms />} />

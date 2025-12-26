@@ -9,7 +9,7 @@ import {
   MoonIcon,
   ShoppingCartIcon,
   GlobeAltIcon,
-  HomeIcon,
+  // HomeIcon,
   CubeIcon,
   ShieldCheckIcon,
   BuildingStorefrontIcon,
@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const { trackPageView } = useActivityTracker();
   const navigation = [
-    { name: t("nav.home"), href: "/", icon: HomeIcon },
+    // { name: t("nav.home"), href: "/", icon: HomeIcon },
     { name: t("nav.products"), href: "/products", icon: CubeIcon },
   ];
 

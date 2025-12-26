@@ -24,7 +24,7 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { changePassword } from "../utils/api";
 import MyInfo from "../components/Profile/MyInfo";
-import MyOrders from "../components/Profile/MyOrders";
+// import MyOrders from "../components/Profile/MyOrders";
 import MyNotifications from "../components/Profile/MyNotifications";
 
 const passwordSchema = yup.object({
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
   const getTabName = (id: string) => {
     const tabNames: { [key: string]: { en: string; ar: string } } = {
       info: { en: "My Info", ar: "معلوماتي" },
-      orders: { en: "My Orders", ar: "طلباتي" },
+      // orders: { en: "My Orders", ar: "طلباتي" },
       notifications: { en: "Notifications", ar: "الإشعارات" },
       activity: { en: "My Activity", ar: "نشاطي" },
       security: { en: "Security", ar: "الأمان" },
@@ -96,7 +96,7 @@ const Profile: React.FC = () => {
 
   const baseTabs = [
     { id: "info", icon: UserIcon },
-    { id: "orders", icon: ShoppingBagIcon },
+    // { id: "orders", icon: ShoppingBagIcon },
     { id: "notifications", icon: BellIcon },
 
     { id: "security", icon: KeyIcon },
@@ -279,7 +279,7 @@ const Profile: React.FC = () => {
               {activeTab === "info" && <MyInfo />}
 
               {/* My Orders Tab */}
-              {activeTab === "orders" && (
+              {/* {activeTab === "orders" && (
                 <div className="p-4 lg:p-6">
                   <h2
                     className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 `}
@@ -288,7 +288,7 @@ const Profile: React.FC = () => {
                   </h2>
                   <MyOrders />
                 </div>
-              )}
+              )} */}
 
               {/* Notifications Tab */}
               {activeTab === "notifications" && (
@@ -392,7 +392,7 @@ const Profile: React.FC = () => {
               )}
 
               {/* Company Panel Tab */}
-              {activeTab === "company" && user?.role === "company_admin" && (
+              {/* {activeTab === "company" && user?.role === "company_admin" && (
                 <div className="p-4 lg:p-6">
                   <h2
                     className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 ${
@@ -418,7 +418,7 @@ const Profile: React.FC = () => {
                     </Link>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Affiliate Panel Tab */}
               {activeTab === "affiliate" && user?.role === "affiliate" && (
