@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {  AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
+import { refreshToken } from '../utils/api';
+
 const ApiStatus: React.FC = () => {
   const [status, setStatus] = useState<'checking' | 'connected' | 'disconnected'>('checking');
- 
-  const { refreshToken } = useAuth();
+
   useEffect(() => {
     checkConnection();
     const interval = setInterval(checkConnection, 30000); // Check every 30 seconds

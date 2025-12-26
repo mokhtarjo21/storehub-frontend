@@ -459,7 +459,7 @@ function ProductForm({
   );
   const [brandId, setBrandId] = useState<number | "">(initial?.brand?.id ?? "");
   const [productType, setProductType] = useState(
-    initial?.product_type ?? "network-device"
+    initial?.product_type ?? "product"
   );
   const [currency, setCurrency] = useState(initial?.currency ?? "EGP");
   const [isActive, setIsActive] = useState<boolean>(initial?.is_active ?? true);

@@ -12,7 +12,7 @@ import { useCart } from "./CartContext";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  refreshToken: () => Promise<void>;
+  
   logout: () => void;
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
@@ -27,7 +27,7 @@ interface AuthContextType {
   updateorders: (order_number: any, updates: any) => Promise<any[]>;
   // Add product endpoints
   cancelorders: (order_number: any, notes: any) => Promise<any[]>;
-  checkApiConnection: () => Promise<boolean>;
+  
   getNotifications: (num: number) => Promise<any[]>;
   myorders: (page: any) => Promise<any>;
   fetchRelatedProducts: (productSlug: string) => Promise<any[]>;
@@ -183,41 +183,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsInitializing(false);
   }, []);
 
-  const checkApiConnection = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) throw new Error("No access token available");
-      const response = await fetch(`${API_BASE}/auth/me/`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-
-      // Even if we get 401 (unauthorized), it means the API is running
-      if (response.ok) {
-        const data = await handleApiResponse(response);
-        const userData = data;
-        setUser({
-          id: userData.id.toString(),
-          name: userData.full_name,
-          email: userData.email,
-          phone: userData.phone,
-          avatar: userData.avatar,
-          address: userData.address,
-          role_admin: userData.role_admin,
-          role: userData.role,
-          points: userData.points || 0,
-          companyName: userData.company_name,
-          affiliateCode: userData.affiliate_code,
-          createdAt: userData.date_joined,
-        });
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      return false;
-    }
-  }, []);
 
   const login = useCallback(
     async (email: string, password: string): Promise<void> => {
@@ -274,16 +239,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     []
   );
 
-  const refreshToken = useCallback(async (): Promise<void> => {
-    try {
-      const refreshToken = localStorage.getItem("refresh_token");
-      if (!refreshToken) throw new Error("No refresh token available");
 
-      await checkApiConnection();
-    } catch (error) {
-      console.error("Token refresh error:", error);
-    }
-  }, [checkApiConnection]);
 
   const logout = useCallback(async () => {
     try {
@@ -786,7 +742,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const contextValue = useMemo(
     () => ({
       user,
-      refreshToken,
+     
       login,
       logout,
       register,
@@ -806,13 +762,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       getNotifications,
       deleteProduct,
       cancelorders,
-      checkApiConnection,
+     
     }),
     [
       user,
       isLoading,
       isInitializing,
-      refreshToken,
+     
       login,
       logout,
       register,
@@ -830,7 +786,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       getNotifications,
       deleteProduct,
       cancelorders,
-      checkApiConnection,
+     
     ]
   );
 

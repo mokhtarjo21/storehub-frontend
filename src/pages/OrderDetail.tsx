@@ -111,7 +111,7 @@ const OrderDetail: React.FC = () => {
       </div>
     );
   }
-  console.log(order);
+  
   
 
   const getStatusColor = (status: string) => {

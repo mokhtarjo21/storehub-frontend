@@ -41,7 +41,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   const currentImage = carouselImages[selectedImage]?.image;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col full">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

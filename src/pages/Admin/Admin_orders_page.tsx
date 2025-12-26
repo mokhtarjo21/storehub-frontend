@@ -950,6 +950,13 @@ export default function AdminOrdersPage() {
                       language === "ar" ? "text-right" : "text-left"
                     }`}
                   >
+                    { (language === "ar" ? "الحالة الدفع" : "Payment Status")}
+                  </th>
+                  <th
+                    className={`px-3 py-3 text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
                     {t("createdAt") ||
                       (language === "ar" ? "تاريخ الإنشاء" : "Created At")}
                   </th>
@@ -1000,6 +1007,7 @@ export default function AdminOrdersPage() {
                   filteredOrders.map((order, index) => {
                     const statusBadge = getStatusBadge(order.order_status);
                     const StatusIcon = statusBadge.icon;
+                    
                     return (
                       <motion.tr
                         key={order.order_number}
@@ -1089,6 +1097,31 @@ export default function AdminOrdersPage() {
                           >
                             <StatusIcon className="w-3.5 h-3.5" />
                             <span>{t(`${order.order_status}`)}</span>
+                          </button>
+                        </td>
+                         <td
+                          className={`px-3 py-4 whitespace-nowrap ${
+                            language === "ar" ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <button
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              statusBadge.bg
+                            } ${
+                              statusBadge.text
+                            } hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap ${
+                              language === "ar"
+                                ? "flex-row-reverse"
+                                : "flex-row"
+                            }`}
+                            title={
+                              language === "ar"
+                                ? "انقر لتغيير الحالة"
+                                : "Click to change status"
+                            }
+                          >
+                            <StatusIcon className="w-3.5 h-3.5" />
+                            <span>{t(`${order.payment_status}`)}</span>
                           </button>
                         </td>
                         <td
