@@ -534,6 +534,7 @@ export default function AdminOrdersPage() {
   const statsCards = [
     {
       name: language === "ar" ? "إجمالي الطلبات" : "Total Orders",
+      named:"",
       value: stats.total,
       icon: ShoppingBagIcon,
       color: "blue",
@@ -542,6 +543,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "قيد الانتظار" : "Pending",
+      named:"pending",
       value: stats.pending,
       icon: ClockIcon,
       color: "yellow",
@@ -550,6 +552,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "تم التاكيد" : "Confirmed",
+      named:"confirmed",
       value: stats.confirmed,
       icon: CheckCircleIcon,
       color: "green",
@@ -558,6 +561,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "قيد التجهيز" : "Processing",
+      named:"processing",
       value: stats.processing,
       icon: CheckCircleIcon,
       color: "green",
@@ -566,6 +570,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "تم التجهيز" : "shipped",
+      named:"shipped",
       value: stats.shipped,
       icon: CheckCircleIcon,
       color: "green",
@@ -574,6 +579,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "تم التسليم" : "Delivered",
+      named:"delivered",
       value: stats.delivered,
       icon: CheckCircleIcon,
       color: "green",
@@ -582,6 +588,7 @@ export default function AdminOrdersPage() {
     },
     {
       name: language === "ar" ? "تم الغاء" : "Cancelled",
+      named:"cancelled",
       value: stats.cancelled,
       icon: CheckCircleIcon,
       color: "red",
@@ -628,6 +635,7 @@ export default function AdminOrdersPage() {
       >
         {statsCards.map((stat, index) => (
           <motion.div
+          onClick={()=>{setStatus(stat.named)}}
             key={stat.name}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
