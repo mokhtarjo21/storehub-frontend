@@ -26,7 +26,7 @@ const AdminSidebar: React.FC<Props> = ({
   const { language } = useLanguage();
   const { user } = useAuth();
   let navItems = [];
-  if (!user) {
+  if (!user?.role_admin) {
     return null;
   }
 

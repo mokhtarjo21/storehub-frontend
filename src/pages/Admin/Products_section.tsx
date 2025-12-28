@@ -6,11 +6,14 @@ import {
   TrashIcon,
   PhotoIcon,
   XMarkIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
+
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-
+import {bulkAddProducts,downloadtempfile,bulkEditProducts, downloadProductsCSV} from "../../utils/axiosInstance"
+import BulkProductUpload from "../../components/BulkUpload";
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
 
@@ -115,7 +118,16 @@ export default function AdminProductsSection() {
       setLoading(false);
     }
   };
+const downloaddata =async ()=>{
+  const res = await downloadProductsCSV();
+const url = window.URL.createObjectURL(new Blob([res.data]));
+const link = document.createElement("a");
+link.href = url;
+link.setAttribute("download", "products.csv");
+document.body.appendChild(link);
+link.click();
 
+}
   const fetchCategoriesAndBrands = async () => {
     try {
       const [cRes, bRes] = await Promise.allSettled([
@@ -240,7 +252,24 @@ export default function AdminProductsSection() {
             <PlusCircleIcon className="w-5 h-5" />
             <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
           </button>
+          <button
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
+          onClick={()=>{downloaddata()}}
+          >
+            <ArrowDownTrayIcon className="w-5 h-5"/>
+            <span>{language === "ar" ? "استخراج المنتجات" : "Export products"}</span>
+          </button>
+          
         </div>
+        <BulkProductUpload
+        title="Bulk Add Products"
+        onUpload={bulkAddProducts}
+        onDownloadTemplate={downloadtempfile}
+      /><BulkProductUpload
+        title="Bulk Edit Products"
+        onUpload={bulkEditProducts}
+        onDownloadTemplate={downloadtempfile}
+      />
       </div>
 
       <div
@@ -444,6 +473,8 @@ function ProductForm({
   const [descriptionAr, setDescriptionAr] = useState(
     initial?.description_ar ?? ""
   );
+  const [sku,setSku]= useState(initial?.sku ?? "");
+
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [comparePrice, setComparePrice] = useState<number | "">(
     initial?.compare_price ?? 0
@@ -580,6 +611,7 @@ function ProductForm({
           setDescriptionAr(data.description_ar ?? "");
           setPrice(data.price ?? 0);
           setComparePrice(data.compare_price ?? "");
+          setSku(data.sku ?? "");
           setCostPrice(data.cost_price ?? "");
           setStock(data.stock ?? 0);
           setLowStockThreshold(data.low_stock_threshold ?? 10);
@@ -652,6 +684,7 @@ function ProductForm({
       }
       fd.append("specifications", JSON.stringify(specifications));
       fd.append("name", name);
+      fd.append("sku",sku)
       if (nameAr) fd.append("name_ar", nameAr);
       if (description) fd.append("description", description);
       if (descriptionAr) fd.append("description_ar", descriptionAr);
@@ -820,8 +853,27 @@ function ProductForm({
                 dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
-          </div>
 
+          </div>
+                <div className={language === "ar" ? "text-right" : "text-left"}>
+              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                {language === "ar" ? "الاسم التعريفي" : "SKU"}
+              </label>
+              <input
+              required
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  language === "ar" ? "text-right" : "text-left"
+                }`}
+                placeholder={
+                  language === "ar"
+                    ? "أدخل SKU المنتج "
+                    : "Enter product SKU "
+                }
+                dir={language === "ar" ? "rtl" : "ltr"}
+              />
+            </div>
           {/* Description Fields */}
           <div className="grid grid-cols-1 gap-4">
             <div className={language === "ar" ? "text-right" : "text-left"}>

@@ -36,31 +36,41 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   mainImage,
 }) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const carouselImages =
-    images.length > 0 ? images : [{ id: 0, image: mainImage || "" }];
+
+  // نضيف mainImage في الأول لو مش موجودة بالفعل
+  const carouselImages = React.useMemo(() => {
+    const imgs = images.length > 0 ? [...images] : [];
+    if (mainImage && !imgs.some(img => img.image === mainImage)) {
+      imgs.unshift({ id: -1, image: mainImage }); // id=-1 عشان mainImage
+    }
+    return imgs.length > 0 ? imgs : [{ id: 0, image: mainImage || "" }];
+  }, [images, mainImage]);
+
   const currentImage = carouselImages[selectedImage]?.image;
 
   return (
-    <div className="flex flex-col full">
+    <div className="flex flex-col w-full">
+      {/* الصورة الكبيرة */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden"
+        className="w-full flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mb-2"
       >
         <img
           src={currentImage}
           alt={`Product ${selectedImage + 1}`}
-          className="w-full h-full object-fill"
+          className="w-full h-full object-contain"
         />
       </motion.div>
 
+      {/* الصور الصغيرة */}
       {carouselImages.length > 1 && (
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 overflow-x-auto pb-2">
           {carouselImages.map((img, idx) => (
             <button
               key={img.id}
               onClick={() => setSelectedImage(idx)}
-              className={`flex-shrink-0 w-16 h-16 rounded-lg border-2 overflow-hidden ${
+              className={`flex-shrink-0 w-20 h-20 rounded-lg border-2 overflow-hidden transition-transform duration-200 ${
                 selectedImage === idx
                   ? "border-blue-600 scale-105"
                   : "border-gray-300 dark:border-gray-700 hover:border-gray-400"
@@ -69,7 +79,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
               <img
                 src={img.image}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-fill"
+                className="w-full h-full object-cover"
               />
             </button>
           ))}
@@ -78,6 +88,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
     </div>
   );
 };
+
 
 // ---------- Main ProductDetail Component ----------
 const ProductDetail: React.FC = () => {
@@ -90,6 +101,20 @@ const ProductDetail: React.FC = () => {
   const { data: product, loading, error } = useApi(`/products/${slug}/`);
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleDownload = async () => {
+  const response = await fetch(product.datasheet);
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = product.datasheet.split("/").pop(); // اسم الملف
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -115,6 +140,7 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
+console.log(product);
 
   const existingItem = items.find(
     (i: any) => i.product.id.toString() === product.id.toString()
@@ -470,6 +496,7 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Datasheet Section */}
+            {product?.datasheet &&(
             <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mt-4 ${
               !product.datasheet ? "opacity-60" : ""
             }`}>
@@ -503,15 +530,14 @@ const ProductDetail: React.FC = () => {
                         {product.datasheet.split("/").pop()}
                       </p>
                     </div>
-                    <a
-                      href={product.datasheet}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
-                    >
-                      <ArrowDownTrayIcon className="w-5 h-5" />
-                      {language === "ar" ? "تحميل" : "Download"}
-                    </a>
+                    <button
+  onClick={handleDownload}
+  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+>
+  <ArrowDownTrayIcon className="w-5 h-5" />
+  {language === "ar" ? "تحميل" : "Download"}
+</button>
+
                   </div>
                 ) : (
                   <div className={`text-center py-4 ${
@@ -523,7 +549,7 @@ const ProductDetail: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div>)}
           </motion.div>
         </div>
 
