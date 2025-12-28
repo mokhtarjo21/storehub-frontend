@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { ShoppingCartIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useCart } from "../contexts/CartContext";
 import { useApi } from "../hooks/useApi";
@@ -467,6 +467,62 @@ const ProductDetail: React.FC = () => {
                     ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Datasheet Section */}
+            <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mt-4 ${
+              !product.datasheet ? "opacity-60" : ""
+            }`}>
+              <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className={`text-lg font-semibold text-center ${
+                  product.datasheet 
+                    ? "text-gray-900 dark:text-white" 
+                    : "text-gray-400 dark:text-gray-500"
+                }`}>
+                  {language === "ar" ? "Datasheet" : "Datasheet"}
+                </h2>
+              </div>
+              <div className="p-5">
+                {product.datasheet ? (
+                  <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm mb-1 ${
+                        product.datasheet 
+                          ? "text-gray-600 dark:text-gray-400" 
+                          : "text-gray-400 dark:text-gray-500"
+                      }`}>
+                        {language === "ar" ? "اسم الملف:" : "File name:"}
+                      </p>
+                      <p className={`font-medium break-all ${
+                        product.datasheet 
+                          ? "text-gray-900 dark:text-white" 
+                          : "text-gray-400 dark:text-gray-500"
+                      }`}>
+                        {product.datasheet.split("/").pop()}
+                      </p>
+                    </div>
+                    <a
+                      href={product.datasheet}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5" />
+                      {language === "ar" ? "تحميل" : "Download"}
+                    </a>
+                  </div>
+                ) : (
+                  <div className={`text-center py-4 ${
+                    language === "ar" ? "text-right" : "text-left"
+                  }`}>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm opacity-60">
+                      {language === "ar" ? "Datasheet" : "Datasheet"}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>

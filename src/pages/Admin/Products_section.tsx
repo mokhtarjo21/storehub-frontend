@@ -36,6 +36,7 @@ type ProductListItem = {
   product_type: string;
   product_role: string;
   image: string | null;
+  datasheet: string | null;
   meta_title: string | null;
   meta_description: string | null;
   is_active: boolean;
@@ -62,6 +63,9 @@ type ProductListItem = {
   is_low_stock: boolean;
   created_at: string;
   updated_at: string;
+  category_name?: string;
+  brand_name?: string;
+  primary_image?: string | null;
 };
 
 export default function AdminProductsSection() {
@@ -484,6 +488,10 @@ function ProductForm({
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [datasheetFile, setDatasheetFile] = useState<File | null>(null);
+  const [datasheetUrl, setDatasheetUrl] = useState<string | null>(
+    initial?.datasheet ?? null
+  );
 
   // إضافة صف جديد
   const addSpec = () =>
@@ -521,6 +529,25 @@ function ProductForm({
     setImageFile(file);
   };
 
+  const handleDatasheetFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf") {
+      toast.error(
+        language === "ar"
+          ? "يجب أن يكون الملف من نوع PDF"
+          : "File must be a PDF"
+      );
+      setDatasheetFile(null);
+      return;
+    }
+
+    setDatasheetFile(file);
+    setDatasheetUrl(null); // Clear old URL when new file is selected
+  };
+
   // تحديث صف
   const updateSpec = (
     index: number,
@@ -540,6 +567,9 @@ function ProductForm({
   };
 
   useEffect(() => {
+    // إعادة تعيين حالة الملف عند فتح النموذج
+    setDatasheetFile(null);
+
     if (initial && initial.id) {
       (async () => {
         try {
@@ -567,10 +597,19 @@ function ProductForm({
           setSpecifications(data.specifications);
           if (data.category?.id) setCategoryId(data.category.id);
           if (data.brand?.id) setBrandId(data.brand.id);
+          if (data.datasheet) {
+            setDatasheetUrl(data.datasheet);
+            
+          } else {
+            setDatasheetUrl(null);
+          }
         } catch (e) {
           console.warn("fetch product detail failed", e);
         }
       })();
+    } else {
+      // إعادة تعيين عند إنشاء منتج جديد
+      setDatasheetUrl(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
@@ -636,11 +675,20 @@ function ProductForm({
       if (metaDescription) fd.append("meta_description", metaDescription);
       if (imageFile) fd.append("image", imageFile);
       if (currency) fd.append("currency", currency);
+
+      // إضافة ملف Datasheet إذا كان موجوداً
+      if (datasheetFile) {
+        fd.append("datasheet", datasheetFile);
+       
+      } 
+      console.log(fd);
+      
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
         : await createProduct(fd);
 
       const saved = res;
+
       const normalized: ProductListItem = {
         id: saved.id,
         name: saved.name,
@@ -654,7 +702,10 @@ function ProductForm({
         is_active: saved.is_active ?? true,
         is_featured: saved.is_featured ?? false,
         slug: saved.slug,
+        datasheet: saved.datasheet ?? null,
       };
+
+    
 
       onSaved(normalized);
     } catch (err: any) {
@@ -1133,6 +1184,48 @@ function ProductForm({
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Datasheet PDF */}
+          <div className={language === "ar" ? "text-right" : "text-left"}>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "Datasheet (PDF)" : "Datasheet (PDF)"}
+            </label>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleDatasheetFile}
+              className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
+                language === "ar"
+                  ? "file:ml-4 file:mr-0 text-right"
+                  : "file:mr-4 text-left"
+              }`}
+              dir={language === "ar" ? "rtl" : "ltr"}
+            />
+            {datasheetUrl && !datasheetFile && (
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {language === "ar" ? "الملف الحالي: " : "Current file: "}
+                <a
+                  href={datasheetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {datasheetUrl.split("/").pop()}
+                </a>
+              </p>
+            )}
+            {datasheetFile && (
+              <p className="mt-2 text-sm text-green-600 dark:text-green-400">
+                {language === "ar" ? "ملف جديد: " : "New file: "}
+                {datasheetFile.name}
+              </p>
+            )}
+            <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
+              {language === "ar"
+                ? "مسموح بالملفات: PDF. لا يوجد حد أقصى للحجم"
+                : "Allowed types: PDF. No size limit"}
+            </p>
           </div>
 
           {productRole == "tocart" && (
