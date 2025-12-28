@@ -12,7 +12,12 @@ import toast from "react-hot-toast";
 
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
-import {bulkAddProducts,downloadtempfile,bulkEditProducts, downloadProductsCSV} from "../../utils/axiosInstance"
+import {
+  bulkAddProducts,
+  downloadtempfile,
+  bulkEditProducts,
+  downloadProductsCSV,
+} from "../../utils/axiosInstance";
 import BulkProductUpload from "../../components/BulkUpload";
 type Category = { id: number; name: string };
 type Brand = { id: number; name: string };
@@ -118,16 +123,15 @@ export default function AdminProductsSection() {
       setLoading(false);
     }
   };
-const downloaddata =async ()=>{
-  const res = await downloadProductsCSV();
-const url = window.URL.createObjectURL(new Blob([res.data]));
-const link = document.createElement("a");
-link.href = url;
-link.setAttribute("download", "products.csv");
-document.body.appendChild(link);
-link.click();
-
-}
+  const downloaddata = async () => {
+    const res = await downloadProductsCSV();
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "products.csv");
+    document.body.appendChild(link);
+    link.click();
+  };
   const fetchCategoriesAndBrands = async () => {
     try {
       const [cRes, bRes] = await Promise.allSettled([
@@ -195,8 +199,9 @@ link.click();
 
   return (
     <div className="min-h-screen p-6 bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-1/2">
+      <div className="mb-4 space-y-4">
+        {/* Search & Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <input
             value={query}
             onChange={(e) => {
@@ -206,15 +211,16 @@ link.click();
             placeholder={
               language === "ar" ? "ابحث عن منتج..." : "Search products..."
             }
-            className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
           />
+
           <select
             value={categoryFilter}
             onChange={(e) => {
               setCategoryFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
             <option value="">
               {language === "ar" ? "كل الفئات" : "All categories"}
@@ -225,13 +231,14 @@ link.click();
               </option>
             ))}
           </select>
+
           <select
             value={brandFilter}
             onChange={(e) => {
               setBrandFilter(e.target.value);
               setCurrentPage(1);
             }}
-            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
             <option value="">
               {language === "ar" ? "كل العلامات" : "All brands"}
@@ -244,32 +251,44 @@ link.click();
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div
+          className={`grid sm:grid-cols-2 lg:grid-cols-4 gap-2 ${
+            language === "ar" ? "lg:justify-start" : "lg:justify-end"
+          }`}
+        >
           <button
             onClick={openCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
+            className={`flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium ${
+              language === "ar" ? "flex-row-reverse" : ""
+            }`}
           >
             <PlusCircleIcon className="w-5 h-5" />
-            <span>{language === "ar" ? "إضافة منتج" : "Add product"}</span>
+            {language === "ar" ? "إضافة منتج" : "Add product"}
           </button>
+
           <button
-          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 shadow-sm"
-          onClick={()=>{downloaddata()}}
+            onClick={downloaddata}
+            className={`flex items-center justify-center gap-2 px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium ${
+              language === "ar" ? "flex-row-reverse" : ""
+            }`}
           >
-            <ArrowDownTrayIcon className="w-5 h-5"/>
-            <span>{language === "ar" ? "استخراج المنتجات" : "Export products"}</span>
+            <ArrowDownTrayIcon className="w-5 h-5" />
+            {language === "ar" ? "استخراج المنتجات" : "Export products"}
           </button>
-          
+
+          <BulkProductUpload
+            title={language === "ar" ? "إضافة جماعية" : "Bulk Add"}
+            onUpload={bulkAddProducts}
+            onDownloadTemplate={downloadtempfile}
+          />
+
+          <BulkProductUpload
+            title={language === "ar" ? "تعديل جماعي" : "Bulk Edit"}
+            onUpload={bulkEditProducts}
+            onDownloadTemplate={downloadtempfile}
+          />
         </div>
-        <BulkProductUpload
-        title="Bulk Add Products"
-        onUpload={bulkAddProducts}
-        onDownloadTemplate={downloadtempfile}
-      /><BulkProductUpload
-        title="Bulk Edit Products"
-        onUpload={bulkEditProducts}
-        onDownloadTemplate={downloadtempfile}
-      />
       </div>
 
       <div
@@ -377,21 +396,27 @@ link.click();
                     </td>
 
                     {/* Actions */}
-                    <td className="px-4 py-3 whitespace-nowrap text-start text-sm">
-                      <div className="flex gap-2 rtl:gap-2">
+                    <td className="px-2 sm:px-4 py-3 whitespace-nowrap text-start text-sm">
+                      <div
+                        className={`flex gap-1.5 sm:gap-2 ${
+                          language === "ar" ? "flex-row-reverse" : "flex-row"
+                        }`}
+                      >
                         <button
                           onClick={() => openEdit(p)}
-                          className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-colors duration-200"
+                          className="p-1.5 sm:p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow"
                           title={language === "ar" ? "تعديل" : "Edit"}
+                          aria-label={language === "ar" ? "تعديل" : "Edit"}
                         >
-                          <PencilSquareIcon className="w-5 h-5 text-yellow-700 dark:text-yellow-400" />
+                          <PencilSquareIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-700 dark:text-yellow-400" />
                         </button>
                         <button
                           onClick={() => handleDelete(p.id)}
-                          className="p-2 bg-red-100 dark:bg-red-900/30 rounded hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
+                          className="p-1.5 sm:p-2 bg-red-100 dark:bg-red-900/30 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hover:shadow"
                           title={language === "ar" ? "حذف" : "Delete"}
+                          aria-label={language === "ar" ? "حذف" : "Delete"}
                         >
-                          <TrashIcon className="w-5 h-5 text-red-700 dark:text-red-400" />
+                          <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-700 dark:text-red-400" />
                         </button>
                       </div>
                     </td>
@@ -417,26 +442,30 @@ link.click();
       )}
       {/* Pagination */}
       <div
-        className={`flex items-center gap-6 justify-center mt-4 ${
+        className={`flex items-center gap-3 sm:gap-6 justify-center mt-4 ${
           language === "ar" ? "text-right" : "text-left"
         }`}
       >
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-xs sm:text-sm font-medium hover:shadow-sm active:scale-95 ${
+              language === "ar" ? "flex-row-reverse" : "flex-row"
+            }`}
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((p) => p - 1)}
           >
             {language === "ar" ? "السابق" : "Previous"}
           </button>
           {/* Page Info */}
-          <span className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300">
+          <span className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
             {language === "ar"
               ? `الصفحة ${currentPage} من ${totalPages}`
               : `Page ${currentPage} of ${totalPages}`}
           </span>
           <button
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+            className={`px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-xs sm:text-sm font-medium hover:shadow-sm active:scale-95 ${
+              language === "ar" ? "flex-row-reverse" : "flex-row"
+            }`}
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage((p) => p + 1)}
           >
@@ -473,7 +502,7 @@ function ProductForm({
   const [descriptionAr, setDescriptionAr] = useState(
     initial?.description_ar ?? ""
   );
-  const [sku,setSku]= useState(initial?.sku ?? "");
+  const [sku, setSku] = useState(initial?.sku ?? "");
 
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [comparePrice, setComparePrice] = useState<number | "">(
@@ -631,7 +660,6 @@ function ProductForm({
           if (data.brand?.id) setBrandId(data.brand.id);
           if (data.datasheet) {
             setDatasheetUrl(data.datasheet);
-            
           } else {
             setDatasheetUrl(null);
           }
@@ -684,7 +712,7 @@ function ProductForm({
       }
       fd.append("specifications", JSON.stringify(specifications));
       fd.append("name", name);
-      fd.append("sku",sku)
+      fd.append("sku", sku);
       if (nameAr) fd.append("name_ar", nameAr);
       if (description) fd.append("description", description);
       if (descriptionAr) fd.append("description_ar", descriptionAr);
@@ -712,10 +740,9 @@ function ProductForm({
       // إضافة ملف Datasheet إذا كان موجوداً
       if (datasheetFile) {
         fd.append("datasheet", datasheetFile);
-       
-      } 
+      }
       console.log(fd);
-      
+
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
         : await createProduct(fd);
@@ -737,8 +764,6 @@ function ProductForm({
         slug: saved.slug,
         datasheet: saved.datasheet ?? null,
       };
-
-    
 
       onSaved(normalized);
     } catch (err: any) {
@@ -853,27 +878,24 @@ function ProductForm({
                 dir={language === "ar" ? "rtl" : "ltr"}
               />
             </div>
-
           </div>
-                <div className={language === "ar" ? "text-right" : "text-left"}>
-              <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "الاسم التعريفي" : "SKU"}
-              </label>
-              <input
+          <div className={language === "ar" ? "text-right" : "text-left"}>
+            <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+              {language === "ar" ? "الاسم التعريفي" : "SKU"}
+            </label>
+            <input
               required
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  language === "ar" ? "text-right" : "text-left"
-                }`}
-                placeholder={
-                  language === "ar"
-                    ? "أدخل SKU المنتج "
-                    : "Enter product SKU "
-                }
-                dir={language === "ar" ? "rtl" : "ltr"}
-              />
-            </div>
+              value={sku}
+              onChange={(e) => setSku(e.target.value)}
+              className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                language === "ar" ? "text-right" : "text-left"
+              }`}
+              placeholder={
+                language === "ar" ? "أدخل SKU المنتج " : "Enter product SKU "
+              }
+              dir={language === "ar" ? "rtl" : "ltr"}
+            />
+          </div>
           {/* Description Fields */}
           <div className="grid grid-cols-1 gap-4">
             <div className={language === "ar" ? "text-right" : "text-left"}>

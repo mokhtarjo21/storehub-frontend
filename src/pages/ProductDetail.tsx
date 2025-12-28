@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCartIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import {
+  ShoppingCartIcon,
+  ArrowDownTrayIcon,
+} from "@heroicons/react/24/outline";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useCart } from "../contexts/CartContext";
 import { useApi } from "../hooks/useApi";
@@ -40,7 +43,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   // نضيف mainImage في الأول لو مش موجودة بالفعل
   const carouselImages = React.useMemo(() => {
     const imgs = images.length > 0 ? [...images] : [];
-    if (mainImage && !imgs.some(img => img.image === mainImage)) {
+    if (mainImage && !imgs.some((img) => img.image === mainImage)) {
       imgs.unshift({ id: -1, image: mainImage }); // id=-1 عشان mainImage
     }
     return imgs.length > 0 ? imgs : [{ id: 0, image: mainImage || "" }];
@@ -89,7 +92,6 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
   );
 };
 
-
 // ---------- Main ProductDetail Component ----------
 const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -103,17 +105,17 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
 
   const handleDownload = async () => {
-  const response = await fetch(product.datasheet);
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = product.datasheet.split("/").pop(); // اسم الملف
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-};
+    const response = await fetch(product.datasheet);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = product.datasheet.split("/").pop(); // اسم الملف
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
 
   if (loading) {
     return (
@@ -140,7 +142,7 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
-console.log(product);
+  console.log(product);
 
   const existingItem = items.find(
     (i: any) => i.product.id.toString() === product.id.toString()
@@ -401,7 +403,7 @@ console.log(product);
                   : language === "ar"
                   ? "طلب خدمة"
                   : "Request Service"}
-               </button>
+              </button>
             </div>
 
             {/* ---------- Professional Specs Card ---------- */}
@@ -496,60 +498,85 @@ console.log(product);
             </div>
 
             {/* Datasheet Section */}
-            {product?.datasheet &&(
-            <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mt-4 ${
-              !product.datasheet ? "opacity-60" : ""
-            }`}>
-              <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className={`text-lg font-semibold text-center ${
-                  product.datasheet 
-                    ? "text-gray-900 dark:text-white" 
-                    : "text-gray-400 dark:text-gray-500"
-                }`}>
-                  {language === "ar" ? "Datasheet" : "Datasheet"}
-                </h2>
-              </div>
-              <div className="p-5">
-                {product.datasheet ? (
-                  <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                    language === "ar" ? "text-right" : "text-left"
-                  }`}>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm mb-1 ${
-                        product.datasheet 
-                          ? "text-gray-600 dark:text-gray-400" 
-                          : "text-gray-400 dark:text-gray-500"
-                      }`}>
-                        {language === "ar" ? "اسم الملف:" : "File name:"}
-                      </p>
-                      <p className={`font-medium break-all ${
-                        product.datasheet 
-                          ? "text-gray-900 dark:text-white" 
-                          : "text-gray-400 dark:text-gray-500"
-                      }`}>
-                        {product.datasheet.split("/").pop()}
-                      </p>
+            {product?.datasheet && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden mt-6"
+              >
+                <div className="px-4 sm:px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+                  <h2
+                    className={`text-lg sm:text-xl font-bold ${
+                      language === "ar" ? "text-right" : "text-left"
+                    } text-gray-900 dark:text-white flex items-center gap-2`}
+                  >
+                    <svg
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    {language === "ar"
+                      ? "الكتالوج / البيانات الفنية"
+                      : "Datasheet / Technical Data"}
+                  </h2>
+                </div>
+                <div className="p-4 sm:p-6">
+                  <div
+                    className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                      language === "ar" ? "text-right" : "text-left"
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="flex-shrink-0 w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                          <svg
+                            className="w-6 h-6 text-red-600 dark:text-red-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            {language === "ar" ? "اسم الملف:" : "File name:"}
+                          </p>
+                          <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white break-words truncate">
+                            {product.datasheet.split("/").pop()}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                     <button
-  onClick={handleDownload}
-  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
->
-  <ArrowDownTrayIcon className="w-5 h-5" />
-  {language === "ar" ? "تحميل" : "Download"}
-</button>
-
+                      onClick={handleDownload}
+                      className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white rounded-lg transition-all duration-200 text-sm sm:text-base font-medium whitespace-nowrap shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto ${
+                        language === "ar" ? "flex-row-reverse" : "flex-row"
+                      }`}
+                    >
+                      <ArrowDownTrayIcon className="w-5 h-5 flex-shrink-0" />
+                      <span>
+                        {language === "ar" ? "تحميل الملف" : "Download File"}
+                      </span>
+                    </button>
                   </div>
-                ) : (
-                  <div className={`text-center py-4 ${
-                    language === "ar" ? "text-right" : "text-left"
-                  }`}>
-                    <p className="text-gray-400 dark:text-gray-500 text-sm opacity-60">
-                      {language === "ar" ? "Datasheet" : "Datasheet"}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>)}
+                </div>
+              </motion.div>
+            )}
           </motion.div>
         </div>
 
