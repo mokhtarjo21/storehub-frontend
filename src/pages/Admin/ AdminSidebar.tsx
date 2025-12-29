@@ -58,17 +58,17 @@ const AdminSidebar: React.FC<Props> = ({
         tab: "order",
       },
       {
-        label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
+        label: language === "ar" ? " المستخدمين" : "Users",
         icon: <FaUsers />,
         tab: "user management",
       },
       {
-        label: language === "ar" ? "إدارة الشركات" : "Companies manage",
+        label: language === "ar" ? " الشركات" : "Companies",
         icon: <FaBuilding />,
         tab: "Companies management",
       },
       {
-        label: language === "ar" ? "المسؤولين" : "Admin Users",
+        label: language === "ar" ? "المسؤولين" : "Admins",
         icon: <FaUsers />,
         tab: "admin users",
       },
@@ -101,7 +101,7 @@ const AdminSidebar: React.FC<Props> = ({
         tab: "order",
       },
       {
-        label: language === "ar" ? "إدارة المستخدمين" : "Users Manage",
+        label: language === "ar" ? " المستخدمين" : "Users",
         icon: <FaUsers />,
         tab: "user management",
       },

@@ -148,7 +148,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ className = '', autoFocus = false
                     <img
                       src={suggestion.image}
                       alt={suggestion.name}
-                      className="w-12 h-12 object-cover rounded"
+                      className="w-12 h-12 rounded"
                     />
                   ) : (
                     <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded flex items-center justify-center">

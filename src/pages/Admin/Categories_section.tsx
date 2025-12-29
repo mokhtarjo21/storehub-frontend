@@ -248,7 +248,7 @@ export default function AdminCategoriesSection() {
                         <img
                           src={category.image}
                           alt={category.name}
-                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-fill border border-gray-200 dark:border-gray-600 flex-shrink-0"
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg border border-gray-200 dark:border-gray-600 flex-shrink-0 object-contain"
                         />
                       ) : (
                         <PhotoIcon className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 dark:text-gray-500 flex-shrink-0" />

@@ -67,7 +67,7 @@ const RelatedServices: React.FC<RelatedServicesProps> = ({ slug }) => {
                     s.image.startsWith("http") ? s.image : `${s.image}`
                   }
                   alt={language === "ar" ? s.title_ar || s.title : s.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
 

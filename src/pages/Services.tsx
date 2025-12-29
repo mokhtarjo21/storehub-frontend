@@ -165,7 +165,7 @@ const Services: React.FC = () => {
                 ? service.title_ar || service.title
                 : service.title
             }
-            className="w-full h-64 object-fill"
+            className="w-full h-64 "
           />
         </div>
       )}

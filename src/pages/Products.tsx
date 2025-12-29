@@ -215,7 +215,7 @@ const Products: React.FC = () => {
                   ? product.name_ar || product.name
                   : product.name
               }
-              className="h-full w-full object-fill"
+              className="max-h-full max-w-full object-contain"
             />
           </div>
         </Link>

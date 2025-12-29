@@ -21,10 +21,10 @@ import toast from "react-hot-toast";
 const OrderDetail: React.FC = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const { t, language } = useLanguage();
-  const { cancelorders} = useAuth();
+  const { cancelorders } = useAuth();
   const [cancelling, setCancelling] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-    const [rejectReason, setRejectReason] = useState("");
+  const [rejectReason, setRejectReason] = useState("");
   const locale = useMemo(
     () => (language === "ar" ? "ar-EG" : "en-GB"),
     [language]
@@ -37,23 +37,18 @@ const OrderDetail: React.FC = () => {
     execute: refetchOrder,
   } = useApi(`/orders/${orderNumber}/`);
 
-  const handleCancelOrder = async (notes:any) => {
+  const handleCancelOrder = async (notes: any) => {
     if (!order) return;
 
-    
     setCancelling(true);
     try {
-      
       const [cancelResult] = await Promise.allSettled([
-        cancelorders(order.order_number,rejectReason),
+        cancelorders(order.order_number, rejectReason),
       ]);
 
-    
       let cancelSuccess = false;
       try {
         refetchOrder();
-
-        
       } catch (refreshError) {
         console.error("Error refreshing order data:", refreshError);
       }
@@ -111,8 +106,6 @@ const OrderDetail: React.FC = () => {
       </div>
     );
   }
-  
-  
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -168,7 +161,7 @@ const OrderDetail: React.FC = () => {
 
               {order.can_be_cancelled && (
                 <button
-                  onClick={()=>setIsRejectModalOpen(true)}
+                  onClick={() => setIsRejectModalOpen(true)}
                   disabled={cancelling}
                   className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 disabled:bg-red-400 dark:disabled:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -295,7 +288,8 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "المجموع الفرعي:" : "Subtotal:")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-medium">
-                    {parseFloat(order.subtotal || 0).toFixed(2)} {order.currency}
+                    {parseFloat(order.subtotal || 0).toFixed(2)}{" "}
+                    {order.currency}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
@@ -304,7 +298,8 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "الضريبة:" : "Tax:")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-medium">
-                    {parseFloat(order.tax_amount || 0).toFixed(2)} {order.currency}
+                    {parseFloat(order.tax_amount || 0).toFixed(2)}{" "}
+                    {order.currency}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
@@ -316,7 +311,10 @@ const OrderDetail: React.FC = () => {
                     {parseFloat(order.shipping_amount || 0) === 0
                       ? t("orders.free") ||
                         (language === "ar" ? "مجاني" : "Free")
-                      : `${parseFloat(order.shipping_amount || 0).toFixed(2)}`} {order.currency}
+                      : `${parseFloat(order.shipping_amount || 0).toFixed(
+                          2
+                        )}`}{" "}
+                    {order.currency}
                   </span>
                 </div>
                 {parseFloat(order.discount_amount || 0) > 0 && (
@@ -336,7 +334,8 @@ const OrderDetail: React.FC = () => {
                       (language === "ar" ? "المجموع:" : "Total:")}
                   </span>
                   <span className="text-gray-900 dark:text-white">
-                    {parseFloat(order.total_price || 0).toFixed(2)} {order.currency}
+                    {parseFloat(order.total_price || 0).toFixed(2)}{" "}
+                    {order.currency}
                   </span>
                 </div>
               </div>
@@ -432,7 +431,6 @@ const OrderDetail: React.FC = () => {
 
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
             {order.items?.map((item: any) => (
-                          
               <div
                 key={item.id}
                 className="px-4 sm:px-6 py-3 sm:py-4 flex items-start sm:items-center gap-3 sm:gap-4"
@@ -441,7 +439,7 @@ const OrderDetail: React.FC = () => {
                   <img
                     src={item.item_image}
                     alt={item.item_name}
-                    className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex-shrink-0 object-contain bg-gray-100 dark:bg-gray-700 p-1"
                   />
                 )}
                 <div className="flex-1 min-w-0">
@@ -463,20 +461,25 @@ const OrderDetail: React.FC = () => {
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="font-medium text-xs sm:text-sm text-gray-900 dark:text-white mb-1">
-                    {item.item_role=='toform' && item.unit_price == 0? t('pricing'): parseFloat(item.unit_price || 0).toFixed(2) } {order.currency}
+                    {item.item_role == "toform" && item.unit_price == 0
+                      ? t("pricing")
+                      : parseFloat(item.unit_price || 0).toFixed(2)}{" "}
+                    {order.currency}
                   </p>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {t("orders.totalItem") ||
                       (language === "ar" ? "الإجمالي:" : "Total:")}{" "}
-                   
-                    {item.item_role=='toform' && item.total_price == 0? t('pricing'): parseFloat(item.total_price || 0).toFixed(2) } {order.currency}
+                    {item.item_role == "toform" && item.total_price == 0
+                      ? t("pricing")
+                      : parseFloat(item.total_price || 0).toFixed(2)}{" "}
+                    {order.currency}
                   </p>
                 </div>
               </div>
             ))}
           </div>
         </motion.div>
-             {order.hint_note && (
+        {order.hint_note && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -484,8 +487,7 @@ const OrderDetail: React.FC = () => {
             className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6"
           >
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
-              {
-                (language === "ar" ? "ملاحظات الدفع" : "Payment Notes")}
+              {language === "ar" ? "ملاحظات الدفع" : "Payment Notes"}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 break-words">
               {order.hint_note}
@@ -510,83 +512,82 @@ const OrderDetail: React.FC = () => {
           </motion.div>
         )}
       </div>
-       {isRejectModalOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-xl shadow-xl p-4 sm:p-6">
-                  <h2
-                    className={`text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white ${
-                      language === "ar" ? "text-right" : "text-left"
-                    }`}
-                  >
-                    {language === "ar" ? "رفض الطلب" : "cancel Order"}
-                  </h2>
-                  <label
-                    className={`block text-gray-600 dark:text-gray-300 mb-2 ${
-                      language === "ar" ? "text-right" : "text-left"
-                    }`}
-                  >
-                    {language === "ar" ? "سبب الغاء:" : "Reason for Cancel:"}
-                  </label>
-                  <textarea
-                    className={`w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 min-h-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
-                      language === "ar" ? "text-right" : "text-left"
-                    }`}
-                    value={rejectReason}
-                    onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder={
+      {isRejectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-xl shadow-xl p-4 sm:p-6">
+            <h2
+              className={`text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white ${
+                language === "ar" ? "text-right" : "text-left"
+              }`}
+            >
+              {language === "ar" ? "رفض الطلب" : "cancel Order"}
+            </h2>
+            <label
+              className={`block text-gray-600 dark:text-gray-300 mb-2 ${
+                language === "ar" ? "text-right" : "text-left"
+              }`}
+            >
+              {language === "ar" ? "سبب الغاء:" : "Reason for Cancel:"}
+            </label>
+            <textarea
+              className={`w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 min-h-[120px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                language === "ar" ? "text-right" : "text-left"
+              }`}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder={
+                language === "ar"
+                  ? "اكتب سبب الالغاء..."
+                  : "Write the cancel reason..."
+              }
+              dir={language === "ar" ? "rtl" : "ltr"}
+            />
+            <div
+              className={`flex justify-end gap-3 mt-4 ${
+                language === "ar" ? "flex-row-reverse" : "flex-row"
+              }`}
+            >
+              <button
+                className="px-4 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors text-sm"
+                onClick={() => {
+                  setIsRejectModalOpen(false);
+                  setRejectReason("");
+                }}
+              >
+                {language === "ar" ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors text-sm"
+                onClick={async () => {
+                  if (!rejectReason.trim()) {
+                    alert(
                       language === "ar"
-                        ? "اكتب سبب الالغاء..."
-                        : "Write the cancel reason..."
-                    }
-                    dir={language === "ar" ? "rtl" : "ltr"}
-                  />
-                  <div
-                    className={`flex justify-end gap-3 mt-4 ${
-                      language === "ar" ? "flex-row-reverse" : "flex-row"
-                    }`}
-                  >
-                    <button
-                      className="px-4 py-2 bg-gray-400 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors text-sm"
-                      onClick={() => {
-                        setIsRejectModalOpen(false);
-                        setRejectReason("");
-                      }}
-                    >
-                      {language === "ar" ? "إلغاء" : "Cancel"}
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors text-sm"
-                      onClick={async () => {
-                        if (!rejectReason.trim()) {
-                          alert(
-                            language === "ar"
-                              ? "الرجاء إدخال سبب الغاء"
-                              : "Please enter a cancel reason"
-                          );
-                          return;
-                        }
-                        try {
-                          await handleCancelOrder(rejectReason)
-                          
-                          setIsRejectModalOpen(false);
-                          setRejectReason("");
-                          
-                        } catch (error) {
-                          console.error(error);
-                          alert(
-                            language === "ar"
-                              ? "فشل في الغاء الطلب"
-                              : "Failed to cancel order"
-                          );
-                        }
-                      }}
-                    >
-                      {language === "ar" ? "تأكيد الغاء" : "Confirm Cancel"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+                        ? "الرجاء إدخال سبب الغاء"
+                        : "Please enter a cancel reason"
+                    );
+                    return;
+                  }
+                  try {
+                    await handleCancelOrder(rejectReason);
+
+                    setIsRejectModalOpen(false);
+                    setRejectReason("");
+                  } catch (error) {
+                    console.error(error);
+                    alert(
+                      language === "ar"
+                        ? "فشل في الغاء الطلب"
+                        : "Failed to cancel order"
+                    );
+                  }
+                }}
+              >
+                {language === "ar" ? "تأكيد الغاء" : "Confirm Cancel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

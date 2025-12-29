@@ -187,7 +187,7 @@ const Profile: React.FC = () => {
                           imagePreview || user?.avatar || "/default-avatar.png"
                         }
                         alt="Profile"
-                        className="w-full h-full rounded-full object-fill"
+                        className="w-full h-full rounded-full"
                       />
                     </div>
                   ) : (

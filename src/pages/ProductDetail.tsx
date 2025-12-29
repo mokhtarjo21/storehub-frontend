@@ -57,12 +57,15 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="w-full flex-1 bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden mb-2"
+        className="w-full aspect-[4/3] flex items-center justify-center
+             bg-white dark:bg-gray-800 rounded-2xl shadow-md
+             border border-gray-200 dark:border-gray-700
+             overflow-hidden mb-2"
       >
         <img
           src={currentImage}
           alt={`Product ${selectedImage + 1}`}
-          className="w-full h-full object-contain"
+          className="max-h-full max-w-full object-contain"
         />
       </motion.div>
 
@@ -82,7 +85,7 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({
               <img
                 src={img.image}
                 alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="max-h-full max-w-full object-contain"
               />
             </button>
           ))}

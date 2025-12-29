@@ -166,36 +166,35 @@ export default function AdminCompaniesPage() {
     setZoom(1);
   };
   const handleWheelZoom = (e: React.WheelEvent<HTMLImageElement>) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setZoom((prev) => {
-    const zoomSpeed = 0.1;
-    let nextZoom =
-      e.deltaY < 0 ? prev + zoomSpeed : prev - zoomSpeed;
+    setZoom((prev) => {
+      const zoomSpeed = 0.1;
+      let nextZoom = e.deltaY < 0 ? prev + zoomSpeed : prev - zoomSpeed;
 
-    // Limits
-    nextZoom = Math.min(Math.max(nextZoom, 0.5), 3);
+      // Limits
+      nextZoom = Math.min(Math.max(nextZoom, 0.5), 3);
 
-    return nextZoom;
-  });
-};
+      return nextZoom;
+    });
+  };
 
-  const handleDownloadImage =  async(url: string) => {
+  const handleDownloadImage = async (url: string) => {
     try {
-  const response = await fetch(url);
-    const blob = await response.blob();
+      const response = await fetch(url);
+      const blob = await response.blob();
 
-    const downloadUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-    link.href = downloadUrl;
-    link.download = url.split("/").pop() || "image.jpg";
+      link.href = downloadUrl;
+      link.download = url.split("/").pop() || "image.jpg";
 
-    document.body.appendChild(link);
-    link.click();
+      document.body.appendChild(link);
+      link.click();
 
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Download failed:", error);
       alert("فشل في تنزيل الصورة.");
@@ -606,7 +605,7 @@ export default function AdminCompaniesPage() {
                           alt={
                             language === "ar" ? "البطاقة الضريبية" : "Tax Card"
                           }
-                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
+                          className="w-full h-48 object-contain border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
                           onClick={() =>
                             handleOpenImage(selectedCompany.tax_card_image)
                           }
@@ -627,7 +626,7 @@ export default function AdminCompaniesPage() {
                               ? "السجل التجاري"
                               : "Commercial Registration"
                           }
-                          className="w-full h-48 object-fill border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
+                          className="w-full h-48 object-contain border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 cursor-pointer"
                           onClick={() =>
                             handleOpenImage(
                               selectedCompany.commercial_registration_image
@@ -678,7 +677,7 @@ export default function AdminCompaniesPage() {
                   transition: "transform 0.1s ease-out",
                   cursor: "zoom-in",
                 }}
-                className="max-h-[75vh] object-contain rounded select-none"
+                className="max-h-[75vh] rounded select-none"
                 draggable={false}
               />
             </div>

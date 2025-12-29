@@ -146,7 +146,7 @@ const Cart: React.FC = () => {
                           "https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg"
                         }
                         alt={item.product?.name || "Item Image"}
-                        className="w-24 h-24 object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
+                        className="w-24 h-24 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
                       />
                     </div>
                     <div className="flex-1 min-w-0">

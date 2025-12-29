@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
                             <img
                               src={user.avatar}
                               alt="Profile"
-                              className="h-8 w-8 rounded-full object-fill"
+                              className="h-8 w-8 rounded-full"
                             />
                           ) : (
                             <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center">
@@ -393,7 +393,7 @@ const Navbar: React.FC = () => {
                       <img
                         src={user.avatar}
                         alt="Profile"
-                        className="h-8 w-8 rounded-full object-fill mr-2"
+                        className="h-8 w-8 rounded-full mr-2"
                       />
                     ) : (
                       <UserIcon className="h-5 w-5 mr-2" />

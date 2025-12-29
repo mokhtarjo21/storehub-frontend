@@ -99,7 +99,7 @@ export default function OrderLogs({ orderId }) {
             <img
               src={log.user.avatar || usericon}
               alt={log.user.full_name}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-10 h-10 rounded-full"
             />
             <div className="flex-1">
               <p className="font-semibold">{log.user.full_name}</p>

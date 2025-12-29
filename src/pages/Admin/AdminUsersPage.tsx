@@ -906,7 +906,7 @@ export default function AdminUsersPage() {
                                 ? "البطاقة الضريبية"
                                 : "Tax Card"
                             }
-                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer"
+                            className="w-24 h-24 object-contain border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer hover:shadow-md transition-shadow"
                             onClick={() =>
                               handleOpenImage(company.tax_card_image!)
                             }
@@ -927,7 +927,7 @@ export default function AdminUsersPage() {
                                 ? "السجل التجاري"
                                 : "Commercial Registration"
                             }
-                            className="w-24 h-24 object-fill border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer"
+                            className="w-24 h-24 object-contain border border-gray-300 dark:border-gray-600 rounded-lg mb-2 cursor-pointer hover:shadow-md transition-shadow"
                             onClick={() =>
                               handleOpenImage(
                                 company.commercial_registration_image!
@@ -982,7 +982,7 @@ export default function AdminUsersPage() {
                   transition: "transform 0.1s ease-out",
                   cursor: "zoom-in",
                 }}
-                className="max-h-[75vh] object-contain rounded select-none"
+                className="max-h-[75vh] rounded select-none"
                 draggable={false}
               />
             </div>

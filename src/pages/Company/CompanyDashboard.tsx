@@ -818,7 +818,7 @@ const CompanyCard: React.FC<{
             <img
               src={taxCard}
               alt="Tax Card"
-              className="w-full h-96 object-fill rounded-lg border border-gray-300 dark:border-gray-700"
+              className="w-full h-96 rounded-lg border border-gray-300 dark:border-gray-700"
             />
           </div>
 
@@ -827,7 +827,7 @@ const CompanyCard: React.FC<{
             <img
               src={crCard}
               alt="CR Certificate"
-              className="w-full h-96 object-fill rounded-lg border border-gray-300 dark:border-gray-700"
+              className="w-full h-96 rounded-lg border border-gray-300 dark:border-gray-700"
             />
           </div>
         </div>

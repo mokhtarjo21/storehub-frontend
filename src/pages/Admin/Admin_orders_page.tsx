@@ -1489,7 +1489,7 @@ export default function AdminOrdersPage() {
                                   "/placeholder.png"
                                 }
                                 alt={it.item_name}
-                                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md object-fil flex-shrink-0 border border-gray-200 dark:border-gray-700 mx-auto sm:mx-0"
+                                className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-md flex-shrink-0 border border-gray-200 dark:border-gray-700 mx-auto sm:mx-0"
                               />
                               <div className="flex-1 min-w-0 w-full sm:w-auto">
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 sm:gap-4">

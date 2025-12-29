@@ -13,7 +13,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
   const { data: products, loading } = useApi(
     `/products/${productSlug}/related/`
   );
- 
+
   if (loading) {
     return (
       <div className="py-12">
@@ -48,7 +48,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
               className="group flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700 overflow-hidden w-full h-full transform hover:-translate-y-1 duration-300"
             >
               {/* صورة المنتج */}
-              <div className="aspect-square bg-gray-100 dark:bg-gray-700 overflow-hidden relative">
+              <div className="aspect-[4/3] bg-gray-100 dark:bg-gray-700 overflow-hidden relative flex items-center justify-center">
                 <img
                   src={
                     product.primary_image ||
@@ -60,7 +60,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                       ? product.name_ar || product.name
                       : product.name
                   }
-                  className="w-full h-full object-fill group-hover:scale-105 transition-transform duration-500"
+                  className="max-h-full max-w-full object-contain"
                 />
               </div>
 
@@ -127,7 +127,6 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                           {language === "ar"
                             ? "الكمية المتوفرة"
                             : "In Stock"}{" "}
-                        
                         </span>
                       </>
                     ) : (
@@ -143,7 +142,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ productSlug }) => {
                   ) : (
                     // ------- SERVICE: Show Availability -------
                     <>
-                      {product.product_role==="toform" ? (
+                      {product.product_role === "toform" ? (
                         <>
                           <div className="w-2 h-2 rounded-full bg-green-500"></div>
                           <span className="text-green-600 dark:text-green-400 font-medium">

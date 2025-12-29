@@ -142,7 +142,7 @@ const ServiceDetails: React.FC = () => {
               <img
                 src={service.image}
                 alt={title}
-                className="w-full h-full object-fill"
+                className="w-full h-full"
               />
             </div>
           </motion.div>
