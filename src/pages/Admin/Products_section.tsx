@@ -741,7 +741,7 @@ function ProductForm({
       if (datasheetFile) {
         fd.append("datasheet", datasheetFile);
       }
-      console.log(fd);
+      
 
       const res = initial?.id
         ? await updateProduct(initial.id, fd)

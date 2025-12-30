@@ -70,12 +70,14 @@ export const downloadtempfile = () =>
     responseType: "blob",
   });
 // Google Login
-export const loginWithGoogle = (googleToken: string) =>
-  instance.post("/api/auth/social/login/google/", {
-    
-    id_token: googleToken,
-    
+export const loginWithGoogle = (googleToken: any) =>
+  instance.post(
+    "/api/auth/login/google/",
+    { token: googleToken },
+    {
       headers: {
         "Content-Type": "application/json",
       },
-  });
+    }
+  );
+

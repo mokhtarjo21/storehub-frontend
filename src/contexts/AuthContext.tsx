@@ -12,7 +12,7 @@ import { useCart } from "./CartContext";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  
+  loginGoole:(token:any)=>Promise<void>;
   logout: () => void;
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
@@ -184,6 +184,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsInitializing(false);
   }, []);
 
+ 
+  const loginGoole = useCallback(
+    async (token:any): Promise<void> => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/login/google/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        });
+
+        const data = await handleApiResponse(response);
+
+        // Store tokens
+        localStorage.setItem("access_token", data.tokens.access);
+        localStorage.setItem("refresh_token", data.tokens.refresh);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        await fetchCart();
+        // Set user state
+        const userData = data.user;
+        setUser({
+          id: userData.id.toString(),
+          name: userData.full_name,
+          email: userData.email,
+          phone: userData.phone,
+          avatar: userData.avatar,
+          role_admin: userData.role_admin,
+          address: userData.address,
+          role: userData.role,
+          points: userData.points || 0,
+          companyName: userData.company_name,
+          affiliateCode: userData.affiliate_code,
+          createdAt: userData.date_joined,
+        });
+
+        toast.success("Login successful!");
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Login failed";
+        setUser(null);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+
+        toast.error(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
 
   const login = useCallback(
     async (email: string, password: string): Promise<void> => {
@@ -748,6 +803,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       logout,
       register,
       isLoading,
+      loginGoole,
       isInitializing,
       fetchProducts,
       fetchRelatedProducts,
@@ -769,7 +825,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       user,
       isLoading,
       isInitializing,
-     
+      loginGoole,
       login,
       logout,
       register,
