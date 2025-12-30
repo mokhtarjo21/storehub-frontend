@@ -8,6 +8,8 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { resendOTP } from "../../utils/api";
+import {loginWithGoogle} from "../../utils/axiosInstance"
+import { GoogleLogin } from "@react-oauth/google";
 export const useLoginSchema = () => {
   const { language } = useLanguage();
 
@@ -41,6 +43,7 @@ export const useLoginSchema = () => {
 const Login: React.FC = () => {
   const { login, isLoading } = useAuth();
   const { t } = useLanguage();
+   
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -48,6 +51,20 @@ const Login: React.FC = () => {
 
   type LoginFormData = yup.InferType<typeof schema>;
 
+const handleGoogleLogin = async (credentialResponse: any) => {
+    try {
+      const response = await loginWithGoogle(credentialResponse.credential);
+      console.log(response);
+      
+      localStorage.setItem("access_token", response.data.access_token);
+      localStorage.setItem("refresh_token", response.data.refresh_token);
+
+      navigate("/"); // redirect بعد الدخول
+    } catch (error) {
+      console.error("Google login failed:", error);
+      alert("Login failed");
+    }
+  };
   const {
     register,
     handleSubmit,
@@ -178,6 +195,31 @@ const Login: React.FC = () => {
                 {t("auth.login.forgotPassword")}
               </Link>
             </div>
+            <GoogleLogin
+        onSuccess={handleGoogleLogin}
+        onError={() => console.log("Google Login Failed")}
+      />
+{/* <GoogleLogin
+  onSuccess={async (credentialResponse) => {
+    try {
+      const googleAccessToken = credentialResponse.credential;
+
+      const response = await loginWithGoogle(googleAccessToken);
+
+      console.log("JWT from backend:", response.data);
+      localStorage.setItem("access_token", response.data.access_token);
+      localStorage.setItem("refresh_token", response.data.refresh_token);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Google login failed", error);
+      alert("Login failed");
+    }
+  }}
+  onError={() => {
+    console.log("Google Login Failed");
+  }}
+/> */}
           </div>
         </motion.form>
       </motion.div>

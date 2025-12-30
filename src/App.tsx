@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { CartProvider } from "./contexts/CartContext";
@@ -32,7 +33,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import Checkout from "./pages/checkout";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
-
+const goole_id =import.meta.env.VITE_CLIENT_ID
 function App() {
   return (
     <LanguageProvider>
@@ -55,7 +56,11 @@ function App() {
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="cart" element={<Cart />} />
-                    <Route path="login" element={<Login />} />
+                    <Route path="login" element={
+                      <GoogleOAuthProvider clientId={goole_id}>
+                      <Login />
+                      </GoogleOAuthProvider>
+                      } />
                     <Route path="register" element={<Register />} />
                     <Route path="smart-register" element={<SmartRegister />} />
                     <Route

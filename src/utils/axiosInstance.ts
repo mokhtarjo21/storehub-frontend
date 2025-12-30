@@ -69,3 +69,9 @@ export const downloadtempfile = () =>
   instance.get("/api/products/temp-csv/", {
     responseType: "blob",
   });
+// Google Login
+export const loginWithGoogle = (googleToken: string) =>
+  instance.post("/api/auth/social/login/google/", {
+    provider: "google",
+    access_token: googleToken,
+  });
