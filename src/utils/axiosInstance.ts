@@ -72,6 +72,10 @@ export const downloadtempfile = () =>
 // Google Login
 export const loginWithGoogle = (googleToken: string) =>
   instance.post("/api/auth/social/login/google/", {
-    provider: "google",
-    access_token: googleToken,
+    
+    id_token: googleToken,
+    
+      headers: {
+        "Content-Type": "application/json",
+      },
   });
