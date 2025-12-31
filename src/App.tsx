@@ -7,7 +7,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { UserConfigProvider } from "./contexts/UserConfigContext";
 import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home";
+// import Home from "./pages/Home";
 import MyActivity from "./components/Profile/MyActivity";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import Products from "./pages/Products";
