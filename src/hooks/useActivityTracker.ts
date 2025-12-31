@@ -69,9 +69,16 @@ export const useActivityTracker = () => {
   const { user } = useAuth();
   const hasLoggedPageView = useRef(false);
 
-  const trackActivity = useCallback(async (data: ActivityData) => {
+const trackActivity = useCallback(
+  async (data: ActivityData) => {
+    
+    if (!user) return;
+
     await logActivity(data);
-  }, []);
+  },
+  [user]
+);
+
 
   const trackPageView = useCallback(
     async (pagePath: string) => {

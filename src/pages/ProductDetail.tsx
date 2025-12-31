@@ -145,7 +145,7 @@ const ProductDetail: React.FC = () => {
       </div>
     );
   }
-  console.log(product);
+ 
 
   const existingItem = items.find(
     (i: any) => i.product.id.toString() === product.id.toString()

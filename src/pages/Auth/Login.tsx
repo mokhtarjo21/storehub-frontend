@@ -8,6 +8,8 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { resendOTP } from "../../utils/api";
+import { GoogleLogin } from "@react-oauth/google";
+
 export const useLoginSchema = () => {
   const { language } = useLanguage();
 
@@ -39,14 +41,16 @@ export const useLoginSchema = () => {
 };
 
 const Login: React.FC = () => {
-  const { login, isLoading } = useAuth();
-  const { t } = useLanguage();
+  const { login, isLoading ,loginGoole} = useAuth();
+  const { t , language} = useLanguage();
+   
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
   const schema = useLoginSchema();
 
   type LoginFormData = yup.InferType<typeof schema>;
+
 
   const {
     register,
@@ -158,6 +162,32 @@ const Login: React.FC = () => {
             >
               {isLoading ? t("common.loading") : t("auth.login.title")}
             </button>
+            <div className="flex items-center my-6" dir={language === "ar" ? "rtl" : "ltr"}>
+              <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+
+              <span className="mx-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                {language === "ar" ? "أو الاستمرار بـ" : "or continue with"}
+              </span>
+
+              <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+            </div>
+
+            <div className="flex justify-center mt-4 mb-2">
+                <div className="w-full flex justify-center">
+                <GoogleLogin
+                  width="320"
+                  theme="outline"
+                  size="large"
+                  shape="rectangular"
+                  onSuccess={async (credentialResponse) => {
+                    await loginGoole(credentialResponse.credential);
+                    navigate("/");
+                  }}
+                  onError={() => console.log("Login Failed")}
+                />
+              </div>
+            </div>
+
 
             {/* LINKS */}
             <div className="text-center mt-6 space-y-3">
