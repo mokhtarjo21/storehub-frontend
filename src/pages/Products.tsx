@@ -219,7 +219,6 @@ const Products: React.FC = () => {
             />
           </div>
         </Link>
-
         <div className="p-4 flex flex-col flex-1">
           {/* Title */}
           <Link to={`/products/${product.slug}`}>
