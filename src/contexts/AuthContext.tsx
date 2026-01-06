@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { User } from "../types";
 import toast from "react-hot-toast";
-import { useCart } from "./CartContext";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -150,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
-  const { fetchCart } = useCart();
+  
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -204,7 +203,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
         localStorage.setItem("user", JSON.stringify(data.user));
-        await fetchCart();
+        
         // Set user state
         const userData = data.user;
         setUser({
@@ -259,7 +258,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.setItem("access_token", data.tokens.access);
         localStorage.setItem("refresh_token", data.tokens.refresh);
         localStorage.setItem("user", JSON.stringify(data.user));
-        await fetchCart();
+        
+        
         // Set user state
         const userData = data.user;
         setUser({

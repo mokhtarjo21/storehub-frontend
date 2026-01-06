@@ -29,7 +29,7 @@ const API_BASE = apiBase + "/api/products/cart";
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  
+  const { logout } = useAuth();
   const { language } = useLanguage();
   const [items, setItems] = useState<CartItem[]>([]);
   const token = localStorage.getItem("access_token");
@@ -54,7 +54,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addItem = async (product: Product, quantity = 1) => {
-    const { logout } = useAuth();
+    
     try {
       const res = await fetch(`${API_BASE}/add/`, {
         method: "POST",
@@ -68,15 +68,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           item_type: "product",
         }),
       });
-      if(res.status > 400) {
-        toast.error(language === "ar" ? "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى." : "Session expired. Please log in again.");
-      logout();
-      }
-      if (!res.ok) {
-        const errData = await res.json();
+      if (res.status === 401 || res.status === 403) {
+  toast.error(
+    language === "ar"
+      ? "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى."
+      : "Session expired. Please log in again."
+  );
+  logout();
+  return;
+}
 
-        throw new Error(errData.message || "Failed to add item");
-      }
+      if (!res.ok) {
+  const errData = await res.json();
+  toast.error(errData.message || "Failed to add item");
+  return;
+}
+
 
       await fetchCart();
       toast.success("Product added to cart");

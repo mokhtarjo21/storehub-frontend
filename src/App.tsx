@@ -36,10 +36,10 @@ import Privacy from "./pages/Privacy";
 const goole_id =import.meta.env.VITE_CLIENT_ID
 function App() {
   return (
+          <AuthProvider>
     <LanguageProvider>
       <ThemeProvider>
         <CartProvider>
-          <AuthProvider>
             <UserConfigProvider>
               <Router>
                 <ScrollToTop />
@@ -173,10 +173,10 @@ function App() {
                 </Routes>
               </Router>
             </UserConfigProvider>
-          </AuthProvider>
         </CartProvider>
       </ThemeProvider>
     </LanguageProvider>
+          </AuthProvider>
   );
 }
 
