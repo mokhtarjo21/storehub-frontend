@@ -1340,7 +1340,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                       <img
                         src={img.image}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
+                        className="full h-24 object-cover rounded-lg"
                       />
                       <button
                         type="button"
@@ -1360,7 +1360,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                       <img
                         src={img}
                         alt={`Preview ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
+                        className="full h-24 object-cover rounded-lg"
                       />
                       <button
                         type="button"
