@@ -387,6 +387,7 @@ const translations = {
     "admin.notifications": "Notifications",
 
     // Auth
+    "auth.login.googleError": "Failed to login with Google",
     "auth.login.title": "Sign In",
     "auth.login.subtitle": "Welcome back to StoreHub",
     "auth.register.title": "Create Account",
@@ -855,6 +856,7 @@ const translations = {
     "admin.notifications": "الإشعارات",
     "delete_confirmation":"هل تريد تاكيد حذف المستخدم",
     // Auth
+    "auth.login.googleError": "فشل تسجيل الدخول عبر جوجل",
     "auth.login.title": "تسجيل الدخول",
     "auth.login.subtitle": "مرحباً بعودتك إلى ستور هاب",
     "auth.register.title": "إنشاء حساب",

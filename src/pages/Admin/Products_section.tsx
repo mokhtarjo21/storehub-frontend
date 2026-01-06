@@ -184,7 +184,7 @@ export default function AdminProductsSection() {
   };
 
   const openEdit = (p: ProductListItem) => {
-    console.log(p);
+    
   
 
     setEditing(p);
@@ -761,7 +761,7 @@ const submit = async (e?: React.FormEvent) => {
         fd.append("datasheet", datasheetFile);
       }
       
-      console.log(fd);
+      
       
       const res = initial?.id
         ? await updateProduct(initial.id, fd)

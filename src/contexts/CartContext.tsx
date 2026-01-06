@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product } from "../types";
 import toast from "react-hot-toast";
+import { useLanguage } from "./LanguageContext";
+import { useAuth } from "./AuthContext";
 const apiBase = import.meta.env.VITE_API_BASE;
 interface CartItem {
   id: string;
@@ -27,6 +29,8 @@ const API_BASE = apiBase + "/api/products/cart";
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  
+  const { language } = useLanguage();
   const [items, setItems] = useState<CartItem[]>([]);
   const token = localStorage.getItem("access_token");
   const [loading, setLoading] = useState(true);
@@ -50,6 +54,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const addItem = async (product: Product, quantity = 1) => {
+    const { logout } = useAuth();
     try {
       const res = await fetch(`${API_BASE}/add/`, {
         method: "POST",
@@ -63,7 +68,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           item_type: "product",
         }),
       });
-
+      if(res.status > 400) {
+        toast.error(language === "ar" ? "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى." : "Session expired. Please log in again.");
+      logout();
+      }
       if (!res.ok) {
         const errData = await res.json();
 

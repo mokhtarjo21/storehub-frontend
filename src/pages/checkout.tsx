@@ -8,8 +8,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useActivityTracker } from "../hooks/useActivityTracker";
 import { apiRequest, handleApiResponse, getAuthHeaders } from "../utils/api";
-const apiBase = import.meta.env.VITE_API_BASE;
-const API_BASE_URL = apiBase + "/api";
+
 
 // Checkout page: converts current user's cart into an order by calling
 // POST /api/orders/ (adjust endpoint if your backend differs)
@@ -136,86 +135,7 @@ export default function Checkout(): JSX.Element {
       trackCheckout(finalTotal, items.length);
       // Update stock for products after successful order creation
       // Note: This should ideally be handled by the backend, but we do it here as a fallback
-      try {
-        const stockUpdatePromises = items.map(async (item: any) => {
-          const actualItemId =
-            item.item_id ||
-            item.product_id ||
-            item.service_id ||
-            item.product?.id ||
-            item.service?.id;
-
-          if (!actualItemId) return;
-
-          const itemType =
-            item.item_type ||
-            (item.product ? "product" : item.service ? "service" : "product");
-
-          // Only update stock for products (services typically don't have stock)
-          if (itemType === "product" && item.product) {
-            const quantity = item.quantity || 1;
-            const currentStock = item.product?.stock || 0;
-            const newStock = Math.max(0, currentStock - quantity);
-
-            try {
-              // Fetch current product data
-              const productResponse = await fetch(
-                `${API_BASE_URL}/products/${item.slug}/`,
-                {
-                  method: "GET",
-                  headers: getAuthHeaders(),
-                }
-              );
-
-              if (productResponse.ok) {
-                const productData = await productResponse.json();
-                const formData = new FormData();
-
-                // Preserve all existing product data and update stock
-                Object.keys(productData).forEach((key) => {
-                  if (
-                    key !== "id" &&
-                    key !== "image" &&
-                    key !== "images" &&
-                    key !== "primary_image"
-                  ) {
-                    if (key === "stock") {
-                      formData.append(key, String(newStock));
-                    } else if (
-                      productData[key] !== null &&
-                      productData[key] !== undefined
-                    ) {
-                      formData.append(key, String(productData[key]));
-                    }
-                  }
-                });
-
-                // Update product stock
-                const updateResponse = await fetch(
-                  `${API_BASE_URL}/products/admin/products/${actualItemId}/update/`,
-                  {
-                    method: "PUT",
-                    headers: getAuthHeaders(true),
-                    body: formData,
-                  }
-                );
-              }
-            } catch (stockError) {
-              console.error(
-                `Failed to update stock for product ${actualItemId}:`,
-                stockError
-              );
-              // Don't fail the order if stock update fails
-            }
-          }
-        });
-
-        // Wait for all stock updates to complete (but don't fail if any fail)
-        await Promise.allSettled(stockUpdatePromises);
-      } catch (stockUpdateError) {
-        console.error("Error updating stock:", stockUpdateError);
-        // Don't fail the order if stock update fails - backend should handle it
-      }
+     
 
       toast.success(
         t("checkout.success") ||

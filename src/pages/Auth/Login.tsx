@@ -9,6 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { resendOTP } from "../../utils/api";
 import { GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
 
 export const useLoginSchema = () => {
   const { language } = useLanguage();
@@ -183,7 +184,7 @@ const Login: React.FC = () => {
                     await loginGoole(credentialResponse.credential);
                     navigate("/");
                   }}
-                  onError={() => console.log("Login Failed")}
+                  onError={() =>toast.error(t("auth.login.googleError"))}
                 />
               </div>
             </div>
