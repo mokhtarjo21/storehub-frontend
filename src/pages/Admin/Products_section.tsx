@@ -497,7 +497,7 @@ function ProductForm({
   const { language } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
-  const MAX_FILE_SIZE_MB = 2;
+  const MAX_FILE_SIZE_MB = 5;
   const MAX_IMAGES = 5; 
   // form state
   const [name, setName] = useState(initial?.name ?? "");
