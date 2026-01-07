@@ -1263,26 +1263,45 @@ function ProductForm({
               <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
                 {language === "ar" ? "الصورة الرئيسية" : "Primary Image"}
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFile}
-                className={`cursor-pointer w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
-                  language === "ar"
-                    ? "file:ml-4 file:mr-0 text-right"
-                    : "file:mr-4 text-left"
-                }`}
-                dir={language === "ar" ? "rtl" : "ltr"}
-              />
-              {primaryPreview && (
-                <div className="mt-3">
-                  <img
-                    src={primaryPreview}
-                    alt="Primary Preview"
-                    className="w-24 h-24 object-cover rounded-lg border"
-                  />
-                </div>
-              )}
+              <div className="relative w-24 h-24">
+  <label
+    className={`group w-full h-full flex items-center justify-center cursor-pointer
+      border-2 border-dashed rounded-lg overflow-hidden
+      ${
+        primaryPreview
+          ? "border-gray-300"
+          : "border-gray-400 hover:border-blue-500"
+      }
+      bg-gray-50 dark:bg-gray-800`}
+  >
+    {primaryPreview ? (
+      <>
+        {/* الصورة */}
+        <img
+          src={primaryPreview}
+          alt="Primary Preview"
+          className="w-full h-full object-cover"
+        />
+
+        {/* طبقة hover */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+          <span className="text-white text-xl">✏️</span>
+        </div>
+      </>
+    ) : (
+      <span className="text-3xl text-gray-400 dark:text-gray-500">+</span>
+    )}
+
+    {/* input مخفي */}
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleFile}
+      className="hidden"
+    />
+  </label>
+</div>
+
               <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
                 {language === "ar"
                   ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
