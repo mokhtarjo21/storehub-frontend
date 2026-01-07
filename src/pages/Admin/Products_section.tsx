@@ -585,9 +585,6 @@ function ProductForm({
     const file = input.files?.[0] ?? null;
     if (!file) return;
 
-    // 🔁 مهم: يسمح بإعادة اختيار نفس الصورة
-    
-
     // 🧾 تحقق من الامتداد
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
@@ -616,16 +613,17 @@ function ProductForm({
       toast.error(
         language === "ar"
           ? `حجم الصورة أكبر من ${MAX_FILE_SIZE_MB}MB`
-          : `Image size exceeds ${MAX_FILE_SIZE_MB}MB`
+          : `The image size is larger than ${MAX_FILE_SIZE_MB}MB`
       );
       input.value = "";
       return;
     }
 
-    // ✅ كل شيء تمام
     setImageError(null);
     setImageFile(file);
-    
+    const previewUrl = URL.createObjectURL(file);
+    setPrimaryPreview(previewUrl);
+
   };
 
   const handleDatasheetFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -699,6 +697,9 @@ function ProductForm({
           setSpecifications(data.specifications);
           if (data.category?.id) setCategoryId(data.category.id);
           if (data.brand?.id) setBrandId(data.brand.id);
+          if (data.image) {
+            setPrimaryPreview(data.image);
+          }
           if (data.datasheet) {
             setDatasheetUrl(data.datasheet);
           } else {
@@ -844,7 +845,7 @@ function ProductForm({
         toast.error(
           language === "ar"
             ? `حجم الصورة كبير جدًا (${file.name})`
-            : `Image too large: ${file.name}`
+            : `Image is too large: ${file.name}`
         );
         continue;
       }
@@ -1273,6 +1274,15 @@ function ProductForm({
                 }`}
                 dir={language === "ar" ? "rtl" : "ltr"}
               />
+              {primaryPreview && (
+                <div className="mt-3">
+                  <img
+                    src={primaryPreview}
+                    alt="Primary Preview"
+                    className="w-24 h-24 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
               <p className="mt-1 text-sm text-[#E97132] dark:text-[#E97132]">
                 {language === "ar"
                   ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
