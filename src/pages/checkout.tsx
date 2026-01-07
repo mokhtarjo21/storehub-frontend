@@ -35,6 +35,20 @@ export default function Checkout(): JSX.Element {
   const [shippingPostalCode, setShippingPostalCode] = useState("");
   const [shippingCountry, setShippingCountry] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const inputClass = (value: string, required = false,col=false) =>
+  `
+  ${col ?"sm:col-span-2":""} px-3 py-2 rounded-md bg-white dark:bg-gray-700
+  text-gray-900 dark:text-white
+  placeholder-gray-500 dark:placeholder-gray-400
+  focus:ring-2 focus:ring-blue-500 focus:border-transparent
+  transition-colors
+  ${
+    submitted && required && !value
+      ? "border border-red-500 focus:ring-red-500"
+      : "border border-gray-300 dark:border-gray-600"
+  }
+`;
 
   useEffect(() => {
     // If the user has a default shipping address in profile, you can populate here.
@@ -76,7 +90,7 @@ export default function Checkout(): JSX.Element {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-
+    setSubmitted(true);
     if (!validate()) return;
 
     setLoading(true);
@@ -203,7 +217,7 @@ export default function Checkout(): JSX.Element {
                 value={shippingName}
                 onChange={(e) => setShippingName(e.target.value)}
                 placeholder={t("checkout.name") || "Full name"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingName, true)}
               />
               <input
               required
@@ -211,7 +225,7 @@ export default function Checkout(): JSX.Element {
                 onChange={(e) => setShippingEmail(e.target.value)}
                 type="email"
                 placeholder={t("checkout.email") || "Email"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingEmail, true)}
               />
 
               <input
@@ -220,7 +234,7 @@ export default function Checkout(): JSX.Element {
                 onChange={(e) => setShippingPhone(e.target.value)}
                 type="tel"
                 placeholder={t("checkout.phone") || "Phone"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingPhone, true)}
               />
 
               <input
@@ -228,7 +242,7 @@ export default function Checkout(): JSX.Element {
                 value={shippingAddress1}
                 onChange={(e) => setShippingAddress1(e.target.value)}
                 placeholder={t("checkout.address1") || "Address line 1"}
-                className="sm:col-span-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingAddress1, true,true)}
               />
 
               <input
@@ -237,7 +251,7 @@ export default function Checkout(): JSX.Element {
                 placeholder={
                   t("checkout.address2") || "Address line 2 (optional)"
                 }
-                className="sm:col-span-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingAddress2,false,true)}
               />
 
               <input
@@ -245,7 +259,7 @@ export default function Checkout(): JSX.Element {
                 value={shippingCity}
                 onChange={(e) => setShippingCity(e.target.value)}
                 placeholder={t("checkout.city") || "City"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingCity, true)}
               />
 
               <input
@@ -253,7 +267,7 @@ export default function Checkout(): JSX.Element {
                 value={shippingState}
                 onChange={(e) => setShippingState(e.target.value)}
                 placeholder={t("checkout.state") || "State"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingState, true)}
               />
 
               <input
@@ -261,7 +275,7 @@ export default function Checkout(): JSX.Element {
                 value={shippingCountry}
                 onChange={(e) => setShippingCountry(e.target.value)}
                 placeholder={t("checkout.country") || "Country"}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className={inputClass(shippingCountry, true)}
               />
 
               <input
@@ -352,7 +366,7 @@ export default function Checkout(): JSX.Element {
             </div>
 
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={loading}
               className="w-full inline-flex items-center justify-center space-x-2 rtl:space-x-reverse bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
@@ -377,3 +391,4 @@ export default function Checkout(): JSX.Element {
     </div>
   );
 }
+

@@ -87,6 +87,7 @@ export const apiRequest = async (
         localStorage.removeItem("user");
         window.location.href = "/login";
         throw new Error("Session expired");
+        
       }
     }
 

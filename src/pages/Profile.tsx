@@ -42,7 +42,7 @@ const passwordSchema = yup.object({
 type PasswordFormData = yup.InferType<typeof passwordSchema>;
 
 const Profile: React.FC = () => {
-  const { user, checkApiConnection } = useAuth();
+  const { user,fetchUserInfo } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("info");
@@ -70,6 +70,7 @@ const Profile: React.FC = () => {
       });
       toast.success(t("profile.passwordChanged"));
       passwordForm.reset();
+      fetchUserInfo();
     } catch (error) {
       const errorMessage =
         error instanceof Error
@@ -128,7 +129,6 @@ const Profile: React.FC = () => {
 
         // Pass the formData directly to the updateAvatar function
         await updateAvatar(formData);
-        await checkApiConnection();
         toast.success("Profile updated successfully!");
       } catch (error) {
         toast.error(t("profile.imageUpdateFailed"));
@@ -278,18 +278,6 @@ const Profile: React.FC = () => {
               {/* My Info Tab */}
               {activeTab === "info" && <MyInfo />}
 
-              {/* My Orders Tab */}
-              {/* {activeTab === "orders" && (
-                <div className="p-4 lg:p-6">
-                  <h2
-                    className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 `}
-                  >
-                    {getTabName("orders")}
-                  </h2>
-                  <MyOrders />
-                </div>
-              )} */}
-
               {/* Notifications Tab */}
               {activeTab === "notifications" && (
                 <div className="p-4 lg:p-6">
@@ -391,35 +379,7 @@ const Profile: React.FC = () => {
                 </div>
               )}
 
-              {/* Company Panel Tab */}
-              {/* {activeTab === "company" && user?.role === "company_admin" && (
-                <div className="p-4 lg:p-6">
-                  <h2
-                    className={`text-lg font-semibold text-gray-900 dark:text-white mb-6 ${
-                      isRTL ? "text-right" : "text-left"
-                    }`}
-                  >
-                    {getTabName("company")}
-                  </h2>
-                  <div className="text-center py-8 lg:py-12">
-                    <BuildingOfficeIcon className="w-12 h-12 lg:w-16 lg:h-16 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm lg:text-base">
-                      {language === "ar"
-                        ? "إدارة إعدادات الشركة والموظفين"
-                        : "Manage your company settings and employees"}
-                    </p>
-                    <Link
-                      to="/company"
-                      className="inline-block px-4 lg:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors text-sm lg:text-base"
-                    >
-                      {language === "ar"
-                        ? "الذهاب إلى لوحة الشركة"
-                        : "Go to Company Dashboard"}
-                    </Link>
-                  </div>
-                </div>
-              )} */}
-
+             
               {/* Affiliate Panel Tab */}
               {activeTab === "affiliate" && user?.role === "affiliate" && (
                 <div className="p-4 lg:p-6">

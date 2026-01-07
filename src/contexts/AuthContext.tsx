@@ -13,6 +13,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   loginGoole:(token:any)=>Promise<void>;
   logout: () => void;
+  fetchUserInfo: () => Promise<void>;
   register: (userData: Partial<User>, password: string) => Promise<void>;
   isLoading: boolean;
   isInitializing: boolean;
@@ -373,6 +374,58 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     []
   );
+    // 2. جلب منتج واحد
+  
+  const fetchUserInfo = useCallback(
+    async (): Promise<void> => {
+      setIsLoading(true);
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/me/`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+        });
+
+        const data = await handleApiResponse(response);
+        
+        
+        // Store tokens
+        
+        localStorage.setItem("user", JSON.stringify(data));
+        
+        // Set user state
+        const userData = data;
+        setUser({
+          id: userData.id.toString(),
+          name: userData.full_name,
+          email: userData.email,
+          phone: userData.phone,
+          avatar: userData.avatar,
+          role_admin: userData.role_admin,
+          address: userData.address,
+          role: userData.role,
+          points: userData.points || 0,
+          companyName: userData.company_name,
+          affiliateCode: userData.affiliate_code,
+          createdAt: userData.date_joined,
+        });
+
+        
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Login failed";
+        
+        toast.error(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+
 
   const getNotifications = useCallback(async (num: number): Promise<any[]> => {
     setIsLoading(true);
@@ -801,6 +854,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
      
       login,
       logout,
+      fetchUserInfo,
       register,
       isLoading,
       loginGoole,
@@ -827,6 +881,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       isInitializing,
       loginGoole,
       login,
+      fetchUserInfo,
       logout,
       register,
       fetchProducts,
