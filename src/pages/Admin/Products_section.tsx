@@ -8,9 +8,9 @@ import {
   XMarkIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import { Upload, X} from 'lucide-react';
+import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { Card } from '../../components/Card';
+import { Card } from "../../components/Card";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { useAuth } from "../../contexts/AuthContext";
 import {
@@ -184,9 +184,6 @@ export default function AdminProductsSection() {
   };
 
   const openEdit = (p: ProductListItem) => {
-    
-  
-
     setEditing(p);
     setShowForm(true);
   };
@@ -498,7 +495,7 @@ function ProductForm({
   const [submitting, setSubmitting] = useState(false);
   const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"];
   const MAX_FILE_SIZE_MB = 5;
-  const MAX_IMAGES = 5; 
+  const MAX_IMAGES = 5;
   // form state
   const [name, setName] = useState(initial?.name ?? "");
   const [nameAr, setNameAr] = useState(initial?.name_ar ?? "");
@@ -508,15 +505,16 @@ function ProductForm({
   );
   const [deletedImageIds, setDeletedImageIds] = useState<string[]>([]);
   const [sku, setSku] = useState(initial?.sku ?? "");
-  
-  type ExistingImage = {
-  id: number;
-  image: string;
-};
+  const [primaryPreview, setPrimaryPreview] = useState<string | null>(null);
 
-const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
-const [newImages, setNewImages] = useState<File[]>([]);
-const [newPreviews, setNewPreviews] = useState<string[]>([]);
+  type ExistingImage = {
+    id: number;
+    image: string;
+  };
+
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [newPreviews, setNewPreviews] = useState<string[]>([]);
 
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [comparePrice, setComparePrice] = useState<number | "">(
@@ -552,7 +550,7 @@ const [newPreviews, setNewPreviews] = useState<string[]>([]);
   const [metaDescription, setMetaDescription] = useState(
     initial?.meta_description ?? ""
   );
-  
+
   const [productRole, setProductRole] = useState(
     initial?.product_role ?? "tocart"
   );
@@ -566,15 +564,15 @@ const [newPreviews, setNewPreviews] = useState<string[]>([]);
   const [datasheetUrl, setDatasheetUrl] = useState<string | null>(
     initial?.datasheet ?? null
   );
-const removeExistingImage = (imageUrl: string) => {
-  setDeletedImageIds(prev => [...prev, imageUrl]);
-  setExistingImages(prev => prev.filter(img => img.image !== imageUrl));
-};
+  const removeExistingImage = (imageUrl: string) => {
+    setDeletedImageIds((prev) => [...prev, imageUrl]);
+    setExistingImages((prev) => prev.filter((img) => img.image !== imageUrl));
+  };
 
-const removeNewImage = (index: number) => {
-  setNewImages(prev => prev.filter((_, i) => i !== index));
-  setNewPreviews(prev => prev.filter((_, i) => i !== index));
-};
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+    setNewPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // إضافة صف جديد
   const addSpec = () =>
@@ -582,51 +580,53 @@ const removeNewImage = (index: number) => {
       ...specifications,
       { name: "", value: "", id: 0, name_ar: "", value_ar: "", sort_order: 0 },
     ]);
-const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const input = e.target;
-  const file = input.files?.[0] ?? null;
-  if (!file) return;
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const file = input.files?.[0] ?? null;
+    if (!file) return;
 
-  // 🔁 مهم: يسمح بإعادة اختيار نفس الصورة
-  input.value = "";
-
-  // 🧾 تحقق من الامتداد
-  const ext = file.name.split(".").pop()?.toLowerCase();
-  if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
-    setImageError(
-      language === "ar"
-        ? `نوع الملف غير مسموح (${ALLOWED_EXTENSIONS.join(", ")})`
-        : `Invalid file type (${ALLOWED_EXTENSIONS.join(", ")})`
-    );
-    setImageFile(null);
-    return;
-  }
-
-  // 🧪 تحقق من نوع MIME (أمان إضافي)
-  if (!file.type.startsWith("image/")) {
-    setImageError(
-      language === "ar"
-        ? "الملف ليس صورة صالحة"
-        : "Selected file is not a valid image"
-    );
-    setImageFile(null);
-    return;
-  }
-
-  // 📦 تحقق من الحجم
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-    toast.error( language === "ar"
-        ? `حجم الصورة أكبر من ${MAX_FILE_SIZE_MB}MB`
-        : `Image size exceeds ${MAX_FILE_SIZE_MB}MB`
-    )
+    // 🔁 مهم: يسمح بإعادة اختيار نفس الصورة
     
-    return;
-  }
 
-  // ✅ كل شيء تمام
-  setImageError(null);
-  setImageFile(file);
-};
+    // 🧾 تحقق من الامتداد
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+      setImageError(
+        language === "ar"
+          ? `نوع الملف غير مسموح (${ALLOWED_EXTENSIONS.join(", ")})`
+          : `Invalid file type (${ALLOWED_EXTENSIONS.join(", ")})`
+      );
+      setImageFile(null);
+      return;
+    }
+
+    // 🧪 تحقق من نوع MIME (أمان إضافي)
+    if (!file.type.startsWith("image/")) {
+      setImageError(
+        language === "ar"
+          ? "الملف ليس صورة صالحة"
+          : "Selected file is not a valid image"
+      );
+      setImageFile(null);
+      return;
+    }
+
+    // 📦 تحقق من الحجم
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      toast.error(
+        language === "ar"
+          ? `حجم الصورة أكبر من ${MAX_FILE_SIZE_MB}MB`
+          : `Image size exceeds ${MAX_FILE_SIZE_MB}MB`
+      );
+      input.value = "";
+      return;
+    }
+
+    // ✅ كل شيء تمام
+    setImageError(null);
+    setImageFile(file);
+    
+  };
 
   const handleDatasheetFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -675,7 +675,7 @@ const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
           const data = await fetchProduct(initial.slug || String(initial.id));
           setName(data.name ?? "");
           setNameAr(data.name_ar ?? "");
-          
+
           setExistingImages(data.images);
           setDescription(data.description ?? "");
           setDescriptionAr(data.description_ar ?? "");
@@ -714,21 +714,18 @@ const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
-    
 
-
-
-const submit = async (e?: React.FormEvent) => {
+  const submit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setSubmitting(true);
     try {
       const fd = new FormData();
-      newImages.forEach(file => {
-          fd.append("images", file);
-        });
-     if (deletedImageIds.length > 0) {
-  fd.append("deleted_images", JSON.stringify(deletedImageIds));
-}
+      newImages.forEach((file) => {
+        fd.append("images", file);
+      });
+      if (deletedImageIds.length > 0) {
+        fd.append("deleted_images", JSON.stringify(deletedImageIds));
+      }
       fd.append("specifications", JSON.stringify(specifications));
       fd.append("name", name);
       fd.append("sku", sku);
@@ -760,9 +757,7 @@ const submit = async (e?: React.FormEvent) => {
       if (datasheetFile) {
         fd.append("datasheet", datasheetFile);
       }
-      
-      
-      
+
       const res = initial?.id
         ? await updateProduct(initial.id, fd)
         : await createProduct(fd);
@@ -800,7 +795,7 @@ const submit = async (e?: React.FormEvent) => {
     }
   };
   const modalRef = useRef(null);
-  
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
@@ -815,68 +810,67 @@ const submit = async (e?: React.FormEvent) => {
       onClose();
     }
   };
-const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const files = Array.from(e.target.files || []);
-  if (files.length === 0) return;
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-  // 🔢 تحقق من العدد الإجمالي
-  if (existingImages.length + newImages.length + files.length > MAX_IMAGES) {
-    toast.error(
-      language === "ar"
-        ? `الحد الأقصى للصور هو ${MAX_IMAGES}`
-        : `Maximum ${MAX_IMAGES} images allowed`
-    );
-    return;
-  }
-
-  const validFiles: File[] = [];
-  const validPreviews: string[] = [];
-
-  for (const file of files) {
-    // 🧾 تحقق من الامتداد
-    const ext = file.name.split(".").pop()?.toLowerCase();
-    if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+    // 🔢 تحقق من العدد الإجمالي
+    if (existingImages.length + newImages.length + files.length > MAX_IMAGES) {
       toast.error(
         language === "ar"
-          ? `نوع الملف غير مسموح: ${file.name}`
-          : `Invalid file type: ${file.name}`
+          ? `الحد الأقصى للصور هو ${MAX_IMAGES}`
+          : `Maximum ${MAX_IMAGES} images allowed`
       );
-      continue;
+      return;
     }
 
-    // 📦 تحقق من الحجم
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      toast.error(
-        language === "ar"
-          ? `حجم الصورة كبير جدًا (${file.name})`
-          : `Image too large: ${file.name}`
-      );
-      continue;
-    }
+    const validFiles: File[] = [];
+    const validPreviews: string[] = [];
 
-    validFiles.push(file);
-  }
-
-  if (validFiles.length === 0) return;
-
-  // ➕ إضافة الصور الصالحة
-  setNewImages(prev => [...prev, ...validFiles]);
-
-  // 🖼️ إنشاء previews
-  validFiles.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      if (e.target?.result) {
-        setNewPreviews(prev => [...prev, e.target!.result as string]);
+    for (const file of files) {
+      // 🧾 تحقق من الامتداد
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+        toast.error(
+          language === "ar"
+            ? `نوع الملف غير مسموح: ${file.name}`
+            : `Invalid file type: ${file.name}`
+        );
+        continue;
       }
-    };
-    reader.readAsDataURL(file);
-  });
 
-  // 🔄 إعادة تعيين input (مهم)
-  e.target.value = "";
-};
+      // 📦 تحقق من الحجم
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(
+          language === "ar"
+            ? `حجم الصورة كبير جدًا (${file.name})`
+            : `Image too large: ${file.name}`
+        );
+        continue;
+      }
 
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    // ➕ إضافة الصور الصالحة
+    setNewImages((prev) => [...prev, ...validFiles]);
+
+    // 🖼️ إنشاء previews
+    validFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setNewPreviews((prev) => [...prev, e.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // 🔄 إعادة تعيين input (مهم)
+    e.target.value = "";
+  };
 
   return (
     <div
@@ -948,10 +942,12 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
             <div className={language === "ar" ? "text-right" : "text-left"}>
               <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                {language === "ar" ? "اسم المنتج (عربي)" : "Product Name (AR)"}
+                {language === "ar"
+                  ? "اسم المنتج (عربي) * "
+                  : "Product Name (AR) *"}
               </label>
               <input
-              required
+                required
                 value={nameAr}
                 onChange={(e) => setNameAr(e.target.value)}
                 className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
@@ -968,7 +964,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
           </div>
           <div className={language === "ar" ? "text-right" : "text-left"}>
             <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-              {language === "ar" ? "الاسم التعريفي" : "SKU"}
+              {language === "ar" ? "الاسم التعريفي *" : "SKU *"}
             </label>
             <input
               required
@@ -1270,7 +1266,7 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
                 type="file"
                 accept="image/*"
                 onChange={handleFile}
-                className={`w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
+                className={`cursor-pointer w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 ${
                   language === "ar"
                     ? "file:ml-4 file:mr-0 text-right"
                     : "file:mr-4 text-left"
@@ -1297,87 +1293,85 @@ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
               )}
             </div>
             {/* Additional Images */}
-      <Card>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              {language === "ar" ? "الصور الإضافية" : "Additional Images"}
-            </h2>
-            
-            <div className="space-y-4">
-              {/* Upload Area */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="service-images"
-                />
-                <label
-                  htmlFor="service-images"
-                  className="cursor-pointer text-primary-600 hover:text-primary-500 font-medium"
-                >
-                   {language === "ar" ? " اختر الصور أو اسحبها هنا" : "Select Images or Drop hire"}
-                 
-                </label>
-                <p className="text-sm text-gray-500 mt-2">
-                   {language === "ar"
-                  ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
-                      ", "
-                    )}. الحد الأقصى: ${MAX_FILE_SIZE_MB}MB`
-                  : `Allowed types: ${ALLOWED_EXTENSIONS.join(
-                      ", "
-                    )}. Max size: ${MAX_FILE_SIZE_MB}MB`}
-                </p>
+            <Card>
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                {language === "ar" ? "الصور الإضافية" : "Additional Images"}
+              </h2>
+
+              <div className="space-y-4">
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="service-images"
+                  />
+                  <label
+                    htmlFor="service-images"
+                    className="cursor-pointer text-primary-600 hover:text-primary-500 font-medium"
+                  >
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    {language === "ar"
+                      ? " اختر الصور أو اسحبها هنا"
+                      : "Select Images or Drop hire"}
+                  </label>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {language === "ar"
+                      ? `مسموح بالملفات: ${ALLOWED_EXTENSIONS.join(
+                          ", "
+                        )}. الحد الأقصى: ${MAX_FILE_SIZE_MB}MB`
+                      : `Allowed types: ${ALLOWED_EXTENSIONS.join(
+                          ", "
+                        )}. Max size: ${MAX_FILE_SIZE_MB}MB`}
+                  </p>
+                </div>
+
+                {/* Image Previews */}
+                {existingImages.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {existingImages.map((img, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={img.image}
+                          alt={`Preview ${index + 1}`}
+                          className="full h-24 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(img.image)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {newPreviews.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {newPreviews.map((img, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={img}
+                          alt={`Preview ${index + 1}`}
+                          className="full h-24 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeNewImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-
-              {/* Image Previews */}
-              {existingImages.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {existingImages.map((img, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={img.image}
-                        alt={`Preview ${index + 1}`}
-                        className="full h-24 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeExistingImage(img.image)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {newPreviews.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {newPreviews.map((img, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={img}
-                        alt={`Preview ${index + 1}`}
-                        className="full h-24 object-cover rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeNewImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Card>
-
-            
-           
+            </Card>
           </div>
 
           {/* Datasheet PDF */}
